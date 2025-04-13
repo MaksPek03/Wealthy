@@ -1,0 +1,17 @@
+{% block content %}
+  <p>actual prices</p>
+  {% if prices %}
+    <ul>
+        {% for price in prices %}
+            <li>name: {{ price.name }}</li>
+            <p>symbol: {{price.symbol}}</p>
+            <p>current price: {{price.current_price}}</p>
+            <p> </p>
+            {% endfor %}
+
+    </ul>
+    {% else %}
+        <p>no prices</p>
+        {% endif %}
+    <p><a href = "{% url 'profile' %}">come back</a> </p>
+{% endblock %}
