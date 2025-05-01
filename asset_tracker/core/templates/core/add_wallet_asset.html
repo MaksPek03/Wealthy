@@ -1,0 +1,11 @@
+{% block content %}
+    <h2>add asset to wallet</h2>
+    {% if assets %}
+        {% for asset in assets %}
+            <p><a href = "{% url 'add_wallet_asset_details' wallet_id asset.id %}"> {{asset.name }}</a></p>
+        {% endfor %}
+    {% else %}
+        <p> no assets</p>
+    {% endif %}
+    <a href = "{% url 'wallet_detail' wallet_id %}"> come back</a>
+{% endblock %}

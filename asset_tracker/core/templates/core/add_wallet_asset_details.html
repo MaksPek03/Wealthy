@@ -1,0 +1,13 @@
+{% block content %}
+    <h2>Add asset to wallet</h2>
+
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add</button>
+    </form>
+
+    <br>
+    <a href="{% url 'add_wallet_asset' wallet_id %}">Come back</a>
+{% endblock %}
