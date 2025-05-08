@@ -3,7 +3,7 @@ import { useRouter} from 'expo-router';
 import {useTheme} from "@/app/context/ThemeContext";
 import {useState} from "react";
 
-export default function Register() {
+export default function Login() {
     const { isDark, toggleTheme } = useTheme();
     const router = useRouter();
     const [email, setEmail] = useState('');
