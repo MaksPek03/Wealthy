@@ -3,7 +3,7 @@ import { useRouter} from 'expo-router';
 import {useTheme} from "@/app/context/ThemeContext";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function Register() {
+export default function MainMenu() {
     const { isDark, toggleTheme } = useTheme();
     const router = useRouter();
 
