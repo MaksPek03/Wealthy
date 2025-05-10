@@ -1,5 +1,6 @@
 {% block content %}
-    <h2>wallet details</h2>
+    <h2>wallet {{wallet.name}} details</h2>
+    <a href="{% url 'add_wallet_asset' wallet.id %}">Add Asset</a>
     {% if wallet_assets %}
         <ul>
             {% for asset in wallet_assets %}

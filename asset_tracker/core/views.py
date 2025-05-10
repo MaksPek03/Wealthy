@@ -1,9 +1,9 @@
 from django.shortcuts import render,  redirect,  get_object_or_404
-from .models import Wallet, CurrentAsset, WalletAsset
+from .models import Wallet, CurrentAsset, WalletAsset, Asset
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import WalletForm
+from .forms import WalletForm, WalletAssetForm
 
 def home(request):
     return render(request, 'core/home.html')
@@ -59,6 +59,34 @@ def wallet_detail(request, wallet_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     wallet_assets = WalletAsset.objects.filter(wallet=wallet).select_related('asset')
     return render(request, 'core/wallet_detail.html', {'wallet': wallet, 'wallet_assets': wallet_assets})
+
+@login_required 
+def add_wallet_asset(request, wallet_id):
+    assets = Asset.objects.all()
+    return render(request, 'core/add_wallet_asset.html', {'wallet_id': wallet_id, 'assets': assets})
+
+@login_required
+def add_wallet_asset_details(request, wallet_id, asset_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id)
+    asset = get_object_or_404(Asset, id=asset_id)
+
+    if request.method == 'POST':
+        form = WalletAssetForm(request.POST)
+        if form.is_valid():
+            wallet_asset = form.save(commit=False)
+            wallet_asset.wallet = wallet
+            wallet_asset.asset = asset
+            wallet_asset.save()
+            return redirect('wallet_details', wallet_id=wallet.id)
+    else:
+        form = WalletAssetForm()
+
+    return render(request, 'core/add_wallet_asset_details.html', {
+        'form': form,
+        'wallet_id': wallet_id,
+        'asset_id': asset_id,
+        
+    })
 
 @login_required
 def remove_wallet(request, wallet_id):
