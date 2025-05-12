@@ -7,8 +7,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'insecure-dev-key')
 
-#DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-DEBUG = False
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+#DEBUG = False
 
 ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1', 'wealthy-0mga.onrender.com']
 
@@ -53,9 +53,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'asset_tracker.wsgi.application'
 
-DATABASES = {
-    'default': dj_database_url.config(default='postgres://maks:vSnkauIlrp3FTMmGmqCtgSspv3fB3ecR@dpg-d09kcjmuk2gs73dhn6ig-a.oregon-postgres.render.com:5432/wealthy_database')
+if not DEBUG:
+    DATABASES = {
+        "default": dj_database_url.parse(os.environ.get("DATABASE_URL"))
 }
+else:
+    DATABASES = {
+        'default': dj_database_url.config(default='postgres://maks:vSnkauIlrp3FTMmGmqCtgSspv3fB3ecR@dpg-d09kcjmuk2gs73dhn6ig-a.oregon-postgres.render.com:5432/wealthy_database')
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
