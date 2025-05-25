@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import WalletForm, WalletAssetForm
 import json
 import traceback
+from django.contrib.auth import authenticate, login
 
 def home(request):
     return render(request, 'core/home.html')
