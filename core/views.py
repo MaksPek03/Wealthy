@@ -32,7 +32,6 @@ def api_login(request):
     else:
         return JsonResponse({"message": "Method not allowed"}, status=405)
 
-
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
