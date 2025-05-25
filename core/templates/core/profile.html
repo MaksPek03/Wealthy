@@ -1,0 +1,11 @@
+{% block content %}
+  <h2></h2>
+  <p>hey, {{ user.username }}!</p>
+
+  <ul>
+    <li><a href = "{% url 'wallet_list' %}">check your wallets</a></li>
+    <li><a href = "{% url 'price' %}">check prices</a></li>
+    <li><a href = "{% url 'trends' %}">check actual trends</a></li>
+  </ul>
+  <a href = "{% url 'home' %}">log out</a>
+{% endblock %}
