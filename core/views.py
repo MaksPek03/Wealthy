@@ -32,6 +32,28 @@ def api_login(request):
     else:
         return JsonResponse({"message": "Method not allowed"}, status=405)
 
+@csrf_exempt
+def api_register(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            username = data.get("username")
+            password = data.get("password")
+
+            if not username or not password:
+                return JsonResponse({"message": "Username and password required"}, status=400)
+
+            if User.objects.filter(username=username).exists():
+                return JsonResponse({"message": "Username already taken"}, status=400)
+
+            user = User.objects.create_user(username=username, password=password)
+            user.save()
+
+            return JsonResponse({"message": "User registered successfully"})
+        except Exception as e:
+            return JsonResponse({"message": "Server error"}, status=500)
+    else:
+        return JsonResponse({"message": "Method not allowed"}, status=405)
 
 def register(request):
     form = UserCreationForm(request.POST or None)
