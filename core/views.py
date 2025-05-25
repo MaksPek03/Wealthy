@@ -15,18 +15,19 @@ def api_login(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            print(">>> Received data:", data)
             username = data.get("username")
             password = data.get("password")
-        except json.JSONDecodeError:
-            return JsonResponse({"message": "Invalid JSON"}, status=400)
 
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return JsonResponse({"message": "Logged in successfully"})
-        else:
-            return JsonResponse({"message": "Invalid credentials"}, status=401)
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return JsonResponse({"message": "Logged in successfully"})
+            else:
+                return JsonResponse({"message": "Invalid credentials"}, status=401)
+        except Exception as e:
+            print("ERROR in api_login:", e)
+            print(traceback.format_exc())
+            return JsonResponse({"message": "Server error"}, status=500)
     else:
         return JsonResponse({"message": "Method not allowed"}, status=405)
 
