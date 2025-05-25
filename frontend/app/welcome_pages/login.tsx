@@ -1,13 +1,47 @@
-import {View, Text, TouchableOpacity, TextInput } from 'react-native';
+import {View, Text, TouchableOpacity, TextInput, Alert} from 'react-native';
 import { useRouter} from 'expo-router';
 import {useTheme} from "@/app/context/ThemeContext";
 import {useState} from "react";
+import React from 'react';
 
 export default function Login() {
     const { isDark, toggleTheme } = useTheme();
     const router = useRouter();
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleLogin = async () => {
+        if (!username || !password) {
+            Alert.alert("Missing data", "Please enter both username and password.");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const response = await fetch('https://wealthy-0mga.onrender.com/api/login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                Alert.alert("Login failed", data.message || "An error occurred.");
+                return;
+            }
+
+            router.replace('/menu/mainmenu');
+        } catch (error) {
+            Alert.alert("Error", "Could not connect to the server.");
+            console.error("Login error:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <View className={`flex-1 justify-between items-center ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
@@ -18,10 +52,10 @@ export default function Login() {
                 <TextInput
                     className={`px-8 py-4 min-h-14 min-w-60 mt-12 text-center text-lg font-bold ${isDark ?
                         "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
-                    placeholder={"email:"}
+                    placeholder={"username:"}
                     placeholderTextColor={"#000000"}
-                    value={email}
-                    onChangeText={setEmail}
+                    value={username}
+                    onChangeText={setUsername}
                     autoCapitalize="none"
                 />
 
@@ -36,10 +70,13 @@ export default function Login() {
                 />
 
                 <TouchableOpacity
-                    onPress={() => router.push('/menu/mainmenu')}
+                    onPress={handleLogin}
+                    disabled={loading}
                     className={`px-8 py-4 rounded-3xl min-h-10 min-w-32 mt-14 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
                 >
-                    <Text className={`text-1xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>CONFIRM</Text>
+                    <Text className={`text-1xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
+                        {loading ? "Logging in..." : "CONFIRM"}
+                    </Text>
                 </TouchableOpacity>
             </View>
 
