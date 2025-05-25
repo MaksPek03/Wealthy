@@ -1,4 +1,5 @@
 from django.shortcuts import render,  redirect,  get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 from .models import Wallet, CurrentAsset, WalletAsset, Asset
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
