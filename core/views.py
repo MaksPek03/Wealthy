@@ -8,6 +8,7 @@ from .forms import WalletForm, WalletAssetForm
 import json
 import traceback
 from django.contrib.auth import authenticate, login
+from django.http import JsonResponse
 
 def home(request):
     return render(request, 'core/home.html')
