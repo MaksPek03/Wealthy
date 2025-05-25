@@ -11,9 +11,11 @@ def home(request):
 
 @csrf_exempt
 def api_login(request):
+    print(">>> LOGIN ENDPOINT CALLED")
     if request.method == "POST":
         try:
             data = json.loads(request.body)
+            print(">>> Received data:", data)
             username = data.get("username")
             password = data.get("password")
         except json.JSONDecodeError:
