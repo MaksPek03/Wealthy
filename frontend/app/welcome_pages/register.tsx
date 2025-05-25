@@ -91,7 +91,7 @@ export default function Register() {
                     className={`px-8 py-4 rounded-3xl min-h-10 min-w-32 mt-14 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
                 >
                     <Text className={`text-1xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
-                        {loading ? "Logging in..." : "CONFIRM"}
+                        {loading ? "Registering..." : "CONFIRM"}
                     </Text>
                 </TouchableOpacity>
             </View>
