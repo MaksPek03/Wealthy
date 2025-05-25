@@ -5,6 +5,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import WalletForm, WalletAssetForm
+import json
+import traceback
 
 def home(request):
     return render(request, 'core/home.html')
