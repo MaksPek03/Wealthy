@@ -51,6 +51,8 @@ def api_register(request):
 
             return JsonResponse({"message": "User registered successfully"})
         except Exception as e:
+            print("ERROR in api_register:", e)
+            print(traceback.format_exc())
             return JsonResponse({"message": "Server error"}, status=500)
     else:
         return JsonResponse({"message": "Method not allowed"}, status=405)
