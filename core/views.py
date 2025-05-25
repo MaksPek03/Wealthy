@@ -8,6 +8,25 @@ from .forms import WalletForm, WalletAssetForm
 def home(request):
     return render(request, 'core/home.html')
 
+@csrf_exempt
+def api_login(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            username = data.get("username")
+            password = data.get("password")
+        except json.JSONDecodeError:
+            return JsonResponse({"message": "Invalid JSON"}, status=400)
+
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return JsonResponse({"message": "Logged in successfully"})
+        else:
+            return JsonResponse({"message": "Invalid credentials"}, status=401)
+    else:
+        return JsonResponse({"message": "Method not allowed"}, status=405)
+
 def api_login(request):
     if request.method == "POST":
         try:
@@ -79,7 +98,7 @@ def wallet_detail(request, wallet_id):
     wallet_assets = WalletAsset.objects.filter(wallet=wallet).select_related('asset')
     return render(request, 'core/wallet_detail.html', {'wallet': wallet, 'wallet_assets': wallet_assets})
 
-@login_required 
+@login_required
 def add_wallet_asset(request, wallet_id):
     assets = Asset.objects.all()
     return render(request, 'core/add_wallet_asset.html', {'wallet_id': wallet_id, 'assets': assets})
@@ -104,7 +123,7 @@ def add_wallet_asset_details(request, wallet_id, asset_id):
         'form': form,
         'wallet_id': wallet_id,
         'asset_id': asset_id,
-        
+
     })
 
 @login_required
