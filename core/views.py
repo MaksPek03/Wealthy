@@ -27,25 +27,6 @@ def api_login(request):
     else:
         return JsonResponse({"message": "Method not allowed"}, status=405)
 
-def api_login(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            username = data.get("username")
-            password = data.get("password")
-        except json.JSONDecodeError:
-            return JsonResponse({"message": "Invalid JSON"}, status=400)
-
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return JsonResponse({"message": "Logged in successfully"})
-        else:
-            return JsonResponse({"message": "Invalid credentials"}, status=401)
-    else:
-        return JsonResponse({"message": "Method not allowed"}, status=405)
-
-
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
