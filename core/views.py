@@ -9,6 +9,7 @@ import json
 import traceback
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
+from django.contrib.auth.models import User
 
 def home(request):
     return render(request, 'core/home.html')
