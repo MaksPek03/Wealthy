@@ -1,0 +1,17 @@
+{% block content %}
+  <h2>Historical Prices for {{ asset.name }} ({{ asset.symbol }})</h2>
+
+  {% if history %}
+    <ul>
+      {% for record in history %}
+        <li>
+          {{ record.date_recorded|date:"Y-m-d H:i:s" }} — ${{ record.price }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No historical data available for this asset.</p>
+  {% endif %}
+
+  <p><a href="{% url 'profile' %}">← Back to Profile</a></p>
+{% endblock %}

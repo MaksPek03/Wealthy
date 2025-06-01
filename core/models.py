@@ -8,11 +8,11 @@ class Asset(models.Model):
     price = models.DecimalField(max_digits = 10, decimal_places = 2)
 
 class HistoricAsset(models.Model):
-    name = models.CharField(max_length = 50)
-    type = models.CharField(max_length = 50)
-    symbol = models.CharField(max_length = 10)
-    price = models.DecimalField(max_digits = 10, decimal_places = 2)
-    date_recorded = models.DateField()
+    name = models.CharField(max_length=50)
+    type = models.CharField(max_length=50)
+    symbol = models.CharField(max_length=10)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    date_recorded = models.DateTimeField()  
 
 class CurrentAsset(models.Model):
     name = models.CharField(max_length = 50)
