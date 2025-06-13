@@ -59,7 +59,7 @@ if not DEBUG:
 }
 else:
     DATABASES = {
-        'default': dj_database_url.config(default='postgres://maks:vSnkauIlrp3FTMmGmqCtgSspv3fB3ecR@dpg-d09kcjmuk2gs73dhn6ig-a.oregon-postgres.render.com:5432/wealthy_database')
+        'default': dj_database_url.config(default='postgresql://maks:cUNjxyfepTEPl12ItXTSvgEzBLAnN3OA@dpg-d0u0bmm3jp1c73f669r0-a.oregon-postgres.render.com/wealthy_database_m342')
     }
 
 AUTH_PASSWORD_VALIDATORS = [
