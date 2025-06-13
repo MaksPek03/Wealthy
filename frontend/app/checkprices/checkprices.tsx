@@ -1,4 +1,4 @@
-import {View, Text, TouchableOpacity, ActivityIndicator, FlatList} from 'react-native';
+import {View, Text, TouchableOpacity, ActivityIndicator, FlatList, TextInput} from 'react-native';
 import { useRouter} from 'expo-router';
 import {useTheme} from "@/app/context/ThemeContext";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,6 +9,7 @@ export default function MainMenu() {
     const router = useRouter();
     const [prices, setPrices] = useState([]);
     const [filteredPrices, setFilteredPrices] = useState([]);
+    const [search, setSearch] = useState('');
     const [sortKey, setSortKey] = useState('name');
     const [sortAsc, setSortAsc] = useState(true);
     const [loading, setLoading] = useState(false);
@@ -30,12 +31,20 @@ export default function MainMenu() {
         }
     };
 
+    const handleSearch = (text) => {
+        setSearch(text);
+        const filtered = prices.filter(item =>
+            item.name.toLowerCase().includes(text.toLowerCase())
+        );
+        setFilteredPrices(filtered);
+    };
+
     const handleSort = (key) => {
         const asc = key === sortKey ? !sortAsc : true;
         setSortKey(key);
         setSortAsc(asc);
 
-        const source = filteredPrices.length > 0  ? filteredPrices : prices;
+        const source = filteredPrices.length > 0 || search ? filteredPrices : prices;
 
         const sorted = [...source].sort((a, b) => {
             const valA = key === 'current_price' ? Number(a[key]) : a[key];
@@ -77,11 +86,19 @@ export default function MainMenu() {
                 <Text className={`text-6xl ${isDark ? "text-headers-text-dark" : "text-headers-text"}`}>CHECK PRICES</Text>
             </View>
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
+                <TextInput
+                    className=" p-2 mb-2"
+                    placeholder="Search by name..."
+                    value={search}
+                    onChangeText={handleSearch}
+                />
+
+                renderHeader
                 {loading ? (
                     <ActivityIndicator size="large" />
                 ):(
                     <FlatList
-                        data={filteredPrices.length > 0 ? filteredPrices : prices}
+                        data={filteredPrices.length > 0 || search ? filteredPrices : prices}
                         keyExtractor={(item) => item.symbol}
                         ListHeaderComponent={renderHeader}
                         renderItem={({item}) => (
