@@ -4,11 +4,19 @@ import {useTheme} from "@/app/context/ThemeContext";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useEffect, useState} from 'react';
 
+interface Price {
+    name: string;
+    symbol: string;
+    current_price: string;
+}
+
+type PriceKey = keyof Price;
+
 export default function MainMenu() {
     const { isDark, toggleTheme } = useTheme();
     const router = useRouter();
-    const [prices, setPrices] = useState([]);
-    const [filteredPrices, setFilteredPrices] = useState([]);
+    const [prices, setPrices] = useState<Price[]>([]);
+    const [filteredPrices, setFilteredPrices] = useState<Price[]>([]);
     const [search, setSearch] = useState('');
     const [sortKey, setSortKey] = useState('name');
     const [sortAsc, setSortAsc] = useState(true);
@@ -22,7 +30,7 @@ export default function MainMenu() {
         setLoading(true);
         try {
             const response = await fetch('https://wealthy-0mga.onrender.com/api/price/');
-            const data = await response.json();
+            const data: Price[] = await response.json();
             setPrices(data);
         } catch (err) {
             console.error('Error fetching prices:', err);
@@ -31,7 +39,7 @@ export default function MainMenu() {
         }
     };
 
-    const handleSearch = (text) => {
+    const handleSearch = (text: string) => {
         setSearch(text);
         const filtered = prices.filter(item =>
             item.name.toLowerCase().includes(text.toLowerCase())
@@ -39,7 +47,7 @@ export default function MainMenu() {
         setFilteredPrices(filtered);
     };
 
-    const handleSort = (key) => {
+    const handleSort = (key: PriceKey) => {
         const asc = key === sortKey ? !sortAsc : true;
         setSortKey(key);
         setSortAsc(asc);
