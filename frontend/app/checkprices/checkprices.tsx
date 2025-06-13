@@ -70,17 +70,17 @@ export default function MainMenu() {
     const renderHeader = () => (
         <View className={`flex-row ${isDark ? "bg-buttons-dark" : "bg-buttons"} p-2 px-4 border-b border-gray-300`}>
             <TouchableOpacity onPress={() => handleSort('name')} className="flex-1">
-                <Text className={`font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
+                <Text className={`font-bold text-xl ${isDark ? "text-text-dark" : "text-text"}`}>
                     Name {sortKey === 'name' ? (sortAsc ? '↑' : '↓') : ''}
                 </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => handleSort('symbol')} className="flex-1">
-                <Text className={`font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
+                <Text className={`font-bold text-xl ${isDark ? "text-text-dark" : "text-text"}`}>
                     Symbol {sortKey === 'symbol' ? (sortAsc ? '↑' : '↓') : ''}
                 </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => handleSort('current_price')} className="flex-1">
-                <Text className={`font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
+                <Text className={`font-bold text-xl ${isDark ? "text-text-dark" : "text-text"}`}>
                     Current price {sortKey === 'current_price' ? (sortAsc ? '↑' : '↓') : ''}
                 </Text>
             </TouchableOpacity>
@@ -111,9 +111,9 @@ export default function MainMenu() {
                         stickyHeaderIndices={[0]}
                         renderItem={({item}) => (
                             <View className={`flex-row py-2 border-b border-gray-300 px-4`}>
-                                <Text className={`flex-1 ${isDark ? "text-text-dark" : "text-text"}`}>{item.name}</Text>
-                                <Text className={`flex-1 ${isDark ? "text-text-dark" : "text-text"}`}>{item.symbol}</Text>
-                                <Text className={`flex-1 ${isDark ? "text-text-dark" : "text-text"}`}>$ {item.current_price}</Text>
+                                <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>{item.name}</Text>
+                                <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>{item.symbol}</Text>
+                                <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>$ {item.current_price}</Text>
                             </View>
                         )}
                         />
