@@ -62,6 +62,7 @@ def api_price(request):
     prices = CurrentAsset.objects.all().values('name', 'symbol', 'current_price')
     return JsonResponse(list(prices), safe = False)
 
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
