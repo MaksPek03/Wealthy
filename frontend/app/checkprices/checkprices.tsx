@@ -10,6 +10,23 @@ export default function MainMenu() {
     const [prices, setPrices] = useState([]);
     const [loading, setLoading] = useState(false);
 
+    useEffect(() => {
+        fetchPrices();
+    }, []);
+
+    const fetchPrices = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch('https://wealthy-0mga.onrender.com/api/price/');
+            const data = await response.json();
+            setPrices(data);
+        } catch (err) {
+            console.error('Error fetching prices:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
             <View className={`flex-[1] justify-center items-center relative ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
