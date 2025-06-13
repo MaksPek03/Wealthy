@@ -60,19 +60,19 @@ export default function MainMenu() {
 
 
     const renderHeader = () => (
-        <View className="flex-row bg-gray-200 p-2 px-4 border-b border-gray-300">
+        <View className={`flex-row ${isDark ? "bg-buttons-dark" : "bg-buttons"} p-2 px-4 border-b border-gray-300`}>
             <TouchableOpacity onPress={() => handleSort('name')} className="flex-1">
-                <Text className="font-bold">
+                <Text className={`font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
                     Name {sortKey === 'name' ? (sortAsc ? '↑' : '↓') : ''}
                 </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => handleSort('symbol')} className="flex-1">
-                <Text className="font-bold">
+                <Text className={`font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
                     Symbol {sortKey === 'symbol' ? (sortAsc ? '↑' : '↓') : ''}
                 </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => handleSort('current_price')} className="flex-1">
-                <Text className="font-bold">
+                <Text className={`font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
                     Current price {sortKey === 'current_price' ? (sortAsc ? '↑' : '↓') : ''}
                 </Text>
             </TouchableOpacity>
@@ -87,7 +87,7 @@ export default function MainMenu() {
             </View>
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <TextInput
-                    className=" p-2 mb-2"
+                    className={`p-2 mb-2 ${isDark ? "text-text-dark" : "text-text"}`}
                     placeholder="Search by name..."
                     value={search}
                     onChangeText={handleSearch}
@@ -103,9 +103,9 @@ export default function MainMenu() {
                         stickyHeaderIndices={[0]}
                         renderItem={({item}) => (
                             <View className={`flex-row py-2 border-b border-gray-300 px-4`}>
-                                <Text className={`flex-1`}>{item.name}</Text>
-                                <Text className={`flex-1`}>{item.symbol}</Text>
-                                <Text className={`flex-1`}>$ {item.current_price}</Text>
+                                <Text className={`flex-1 ${isDark ? "text-text-dark" : "text-text"}`}>{item.name}</Text>
+                                <Text className={`flex-1 ${isDark ? "text-text-dark" : "text-text"}`}>{item.symbol}</Text>
+                                <Text className={`flex-1 ${isDark ? "text-text-dark" : "text-text"}`}>$ {item.current_price}</Text>
                             </View>
                         )}
                         />
