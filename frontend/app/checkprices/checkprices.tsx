@@ -1,4 +1,4 @@
-import {View, Text, TouchableOpacity} from 'react-native';
+import {View, Text, TouchableOpacity, ActivityIndicator, FlatList} from 'react-native';
 import { useRouter} from 'expo-router';
 import {useTheme} from "@/app/context/ThemeContext";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -34,6 +34,23 @@ export default function MainMenu() {
             </View>
             <View className={`flex-[5] justify-center items-center ${isDark ? "bg-background-dark" : "bg-background"}`}>
 
+            <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
+                {loading ? (
+                    <ActivityIndicator size="large" />
+                ):(
+                    <FlatList
+                        data={prices}
+                        keyExtractor={(item) => item.symbol}
+                        renderItem={({item}) => (
+                            <View className={`flex-row py-2 border-b border-gray-300 px-4`}>
+                                <Text className={`flex-1`}>{item.name}</Text>
+                                <Text className={`flex-1`}>{item.symbol}</Text>
+                                <Text className={`flex-1`}>$ {item.current_price}</Text>
+                            </View>
+                        )}
+                        />
+                )
+                }
             </View>
 
             <View className={`flex-[1] justify-center items-center ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
