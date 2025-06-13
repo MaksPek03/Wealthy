@@ -36,7 +36,7 @@ urlpatterns = [
     path('account/profile/wallets/<int:wallet_id>/add_wallet_asset/<int:asset_id>/', views.add_wallet_asset_details, name='add_wallet_asset_details'),
     path('accounts/profile/wallets/remove_wallet/<int:wallet_id>/', views.remove_wallet, name='remove_wallet'),
     path('price/', views.price, name='price'),
-    path('api/price/', views.api_price, name='api_price')
+    path('api/price/', views.api_price, name='api_price'),
     path('trends/', views.trends, name='trends'),
 
 ]
