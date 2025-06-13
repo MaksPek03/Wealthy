@@ -7,7 +7,7 @@ import React, {useEffect, useState} from 'react';
 interface Price {
     name: string;
     symbol: string;
-    current_price: string;
+    current_price: number;
 }
 
 type PriceKey = keyof Price;
