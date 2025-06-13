@@ -24,9 +24,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('api/login/', views.api_login, name='api_login'),
-    path('api/register/', views.api_register, name='api_register'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('register/', views.register, name='register'),
+    path('api/register/', views.api_register, name='api_register'),
     path('', views.home, name='home'),
     path('accounts/profile/', views.profile, name='profile'),
     path('accounts/profile/wallets/', views.wallets, name='wallet_list'),
@@ -36,6 +36,7 @@ urlpatterns = [
     path('account/profile/wallets/<int:wallet_id>/add_wallet_asset/<int:asset_id>/', views.add_wallet_asset_details, name='add_wallet_asset_details'),
     path('accounts/profile/wallets/remove_wallet/<int:wallet_id>/', views.remove_wallet, name='remove_wallet'),
     path('price/', views.price, name='price'),
+    path('api/price/', views.api_price, name='api_price')
     path('trends/', views.trends, name='trends'),
 
 ]
