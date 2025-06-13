@@ -93,7 +93,6 @@ export default function MainMenu() {
                     onChangeText={handleSearch}
                 />
 
-                renderHeader
                 {loading ? (
                     <ActivityIndicator size="large" />
                 ):(
@@ -101,6 +100,7 @@ export default function MainMenu() {
                         data={filteredPrices.length > 0 || search ? filteredPrices : prices}
                         keyExtractor={(item) => item.symbol}
                         ListHeaderComponent={renderHeader}
+                        stickyHeaderIndices={[0]}
                         renderItem={({item}) => (
                             <View className={`flex-row py-2 border-b border-gray-300 px-4`}>
                                 <Text className={`flex-1`}>{item.name}</Text>
