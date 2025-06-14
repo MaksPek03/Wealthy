@@ -1,10 +1,8 @@
-from datetime import datetime  
+from django.core.management.base import BaseCommand
+from core.models import Asset, CurrentAsset
+from datetime import datetime  # at the top
 import requests
 from datetime import date
-from django.core.management.base import BaseCommand
-from core.models import Asset, CurrentAsset, HistoricAsset
-
-
 
 
 class Command(BaseCommand):
@@ -54,7 +52,6 @@ class Command(BaseCommand):
 
                 if price is not None and price > 0:
                     self.update_asset(asset, price)
-                    self.save_historic_asset(asset, price)
                     self.stdout.write(self.style.SUCCESS(f"Updated {asset.name} ({asset.symbol}): {price}"))
                 else:
                     self.stdout.write(self.style.WARNING(f"No price found for {asset.name} ({asset.symbol})"))
@@ -88,8 +85,11 @@ class Command(BaseCommand):
             return 1.0
 
         try:
-            url = "https://api.frankfurter.app/latest"
-            params = {'from': base, 'to': quote}
+            url = f"https://api.frankfurter.app/latest"
+            params = {
+                'from': base,
+                'to': quote,
+            }
             response = session.get(url, params=params, timeout=5)
             response.raise_for_status()
             data = response.json()
@@ -102,6 +102,8 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"Failed to fetch forex rate {base}/{quote}: {e}"))
             return None
+
+
 
     def get_finnhub_price(self, asset, session):
         try:
@@ -123,14 +125,4 @@ class Command(BaseCommand):
                 'symbol': asset.symbol,
                 'type': asset.type,
                 'current_price': price,
-            }
-        )
-
-    def save_historic_asset(self, asset, price):
-        HistoricAsset.objects.create(
-            name=asset.name,
-            type=asset.type,
-            symbol=asset.symbol,
-            price=price,
-            date_recorded=datetime.now()
-        ) 
+            })

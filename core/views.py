@@ -1,6 +1,6 @@
 from django.shortcuts import render,  redirect,  get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from .models import Wallet, CurrentAsset, WalletAsset, Asset
+from .models import Wallet, CurrentAsset, WalletAsset, Asset, HistoricAsset
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -85,6 +85,19 @@ def price(request):
     prices = CurrentAsset.objects.all()
     return render(request, 'core/price.html', {'prices': prices})
 
+@login_required
+def asset_list(request):
+    assets = Asset.objects.all()
+    return render(request, 'core/asset_list.html', {'assets': assets})
+
+@login_required
+def asset_history(request, symbol):
+    asset = get_object_or_404(Asset, symbol__iexact=symbol)
+    history = HistoricAsset.objects.filter(symbol__iexact=symbol).order_by('-date_recorded')
+    return render(request, 'core/historic_price.html', {
+        'asset': asset,
+        'history': history
+    })
 
 @login_required
 def trends(request):
