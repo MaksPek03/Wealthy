@@ -72,6 +72,7 @@ export default function Register() {
                     placeholderTextColor={"#000000"}
                     value={password}
                     onChangeText={setPassword}
+                    secureTextEntry={true}
                     autoCapitalize="none"
                 />
 
@@ -82,6 +83,7 @@ export default function Register() {
                     placeholderTextColor={"#000000"}
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
+                    secureTextEntry={true}
                     autoCapitalize="none"
                 />
 
