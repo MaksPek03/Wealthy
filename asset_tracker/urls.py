@@ -21,5 +21,7 @@ urlpatterns = [
     path('api/price/', views.api_price, name='api_price'),
     path('assets/', views.asset_list, name='asset_list'),
     path('asset/<str:symbol>/history/', views.asset_history, name='historic_price'),
+    path('api/asset/<str:symbol>/history/', views.api_asset_history, name='api_history_price'),
     path('trends/', views.trends, name='trends'),
+    path('asset/name/' views.api_asset_name, name='asset_name'),
 ]
