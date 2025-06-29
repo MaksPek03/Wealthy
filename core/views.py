@@ -64,11 +64,12 @@ def api_price(request):
 
 def api_asset_history(request, symbol):
     history = HistoricAsset.objects.filter(symbol__iexact=symbol).order_by('-date_recorded')
-    return JsonResponse(list(history), safe = False)
+    data = [model_to_dict(h) for h in history]
+    return JsonResponse(data, safe = False)
 
 def api_asset_name(request, symbol):
-    name = Asset.objects.filter(symbol__iexact=symbol)
-    return JsonResponse(name)
+    asset = Asset.objects.filter(symbol__iexact=symbol).first()
+    return JsonResponse({'name': asset.name})
 
 def register(request):
     form = UserCreationForm(request.POST or None)
