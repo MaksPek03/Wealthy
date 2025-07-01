@@ -66,6 +66,13 @@ def api_price(request):
     prices = CurrentAsset.objects.all().values('name', 'symbol', 'current_price')
     return JsonResponse(list(prices), safe = False)
 
+def api_asset_history(request, symbol):
+    history = HistoricAsset.objects.filter(symbol__iexact=symbol).order_by('-date_recorded').values('price')
+    return JsonResponse(list(history), safe = False)
+
+def api_asset_name(request, symbol):
+    asset = Asset.objects.filter(symbol__iexact=symbol).first()
+    return JsonResponse({'name': asset.name})
 
 def register(request):
     form = UserCreationForm(request.POST or None)
