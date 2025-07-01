@@ -12,7 +12,8 @@ from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
-from .models import FriendRequest, FriendList
+from .models import FriendRequest, FriendList, UserGoal
+from django import forms
 
 
 def home(request):
@@ -220,3 +221,36 @@ def friends_list(request):
         'friend_requests': friend_requests,
         'users': users,
     })
+
+
+class UserGoalForm(forms.ModelForm):
+    class Meta:
+        model = UserGoal
+        fields = ['name', 'description', 'target_amount', 'current_amount', 'deadline']
+
+
+@login_required
+def user_goals(request):
+    goals = UserGoal.objects.filter(user=request.user)
+    return render(request, 'core/user_goals.html', {'goals': goals})
+
+
+@login_required
+def add_user_goal(request):
+    if request.method == 'POST':
+        form = UserGoalForm(request.POST)
+        if form.is_valid():
+            goal = form.save(commit=False)
+            goal.user = request.user
+            goal.save()
+            return redirect('user_goals')
+    else:
+        form = UserGoalForm()
+    return render(request, 'core/add_user_goal.html', {'form': form})
+
+
+@login_required
+def delete_user_goal(request, goal_id):
+    goal = get_object_or_404(UserGoal, id=goal_id, user=request.user)
+    goal.delete()
+    return redirect('user_goals')
