@@ -110,3 +110,14 @@ class UserGoal(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.user.username})"
+    
+class PriceAlert(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
+    target_price = models.DecimalField(max_digits=12, decimal_places=2)
+    above = models.BooleanField(default=True) 
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        direction = "above" if self.above else "below"
+        return f"{self.asset.symbol} {direction} {self.target_price}"
