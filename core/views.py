@@ -14,7 +14,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from .models import FriendRequest, FriendList, UserGoal
 from django import forms
-
+from .forms import PriceAlertForm
+from .models import PriceAlert
 
 def home(request):
     return render(request, 'core/home.html')
@@ -254,3 +255,26 @@ def delete_user_goal(request, goal_id):
     goal = get_object_or_404(UserGoal, id=goal_id, user=request.user)
     goal.delete()
     return redirect('user_goals')
+
+
+
+
+@login_required
+def add_price_alert(request, asset_id):
+    asset = get_object_or_404(Asset, id=asset_id)
+    if request.method == 'POST':
+        form = PriceAlertForm(request.POST)
+        if form.is_valid():
+            alert = form.save(commit=False)
+            alert.asset = asset
+            alert.user = request.user
+            alert.save()
+            messages.success(request, 'Price alert added!')
+            return redirect('asset_list')
+    else:
+        form = PriceAlertForm()
+    return render(request, 'core/add_price_alert.html', {
+        'form': form,
+        'asset': asset
+    })
+
