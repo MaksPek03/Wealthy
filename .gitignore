@@ -3,7 +3,10 @@ venv/
 asset_tracker/__pycache__/settings.cpython-311.pyc
 asset_tracker/__pycache__
 **/__pycache__/
-
+__pycache__/
+*/__pycache__/
+*.pyo
+*.pyd
 *.pyc
 
 

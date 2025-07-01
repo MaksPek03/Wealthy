@@ -10,6 +10,10 @@ import traceback
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 from django.contrib.auth.models import User
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.models import User
+from .models import FriendRequest, FriendList
+
 
 def home(request):
     return render(request, 'core/home.html')
@@ -168,3 +172,51 @@ def remove_wallet(request, wallet_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     wallet.delete()
     return redirect('wallet_list')
+
+@login_required
+def send_friend_request(request, user_id):
+    receiver = get_object_or_404(User, id=user_id)
+    existing_request = FriendRequest.objects.filter(sender=request.user, receiver=receiver, is_active = True)
+    if not existing_request.exists() and request.user != receiver:
+        FriendRequest.objects.create(sender=request.user, receiver=receiver)
+    return redirect('friends_list')
+
+
+
+
+@login_required
+def accept_friend_request(request, request_id):
+    friend_request = get_object_or_404(FriendRequest, id=request_id, receiver = request.user)
+    friend_request.accept()
+    return redirect('friends_list')
+
+@login_required
+def decline_friend_request(request, request_id):
+    friend_request = get_object_or_404(FriendRequest, id=request_id, receiver = request.user)
+    friend_request.decline()
+    return redirect('friends_list')
+
+@login_required
+def remove_friend(request, user_id):
+    user_to_remove = get_object_or_404(User, id=user_id)
+    friend_list = FriendList.objects.get(user=request.user)
+    if friend_list.is_mutual_friend(user_to_remove):
+        friend_list.unfriend(user_to_remove)
+    return redirect('friends_list')
+
+@login_required
+def friends_list(request):
+    friend_list = FriendList.objects.get_or_create(user=request.user)[0]
+    friends = friend_list.friends.all()
+    friend_requests = FriendRequest.objects.filter(receiver=request.user, is_active=True)
+
+    users = None
+    query = request.GET.get('q')
+    if query:
+        users = User.objects.filter(username__icontains=query).exclude(id=request.user.id)
+
+    return render(request, 'core/friends_list.html', {
+        'friends': friends,
+        'friend_requests': friend_requests,
+        'users': users,
+    })
