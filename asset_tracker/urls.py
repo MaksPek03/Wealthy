@@ -28,5 +28,9 @@ urlpatterns = [
     path('friends/accept-request/<int:request_id>/', views.accept_friend_request, name='accept_friend_request'),
     path('friends/decline-request/<int:request_id>/', views.decline_friend_request, name='decline_friend_request'),
     path('friends/remove-friend/<int:user_id>/', views.remove_friend, name='remove_friend'),
-    path('api/asset/name/<str:symbol>/', views.api_asset_name, name='api_asset_name'),
+    path('goals/', views.user_goals, name='user_goals'),
+    path('goals/add/', views.add_user_goal, name='add_user_goal'),
+    path('goals/delete/<int:goal_id>/', views.delete_user_goal, name='delete_user_goal'),
+
+
 ]
