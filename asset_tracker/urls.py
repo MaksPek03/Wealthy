@@ -32,6 +32,7 @@ urlpatterns = [
     path('goals/add/', views.add_user_goal, name='add_user_goal'),
     path('goals/delete/<int:goal_id>/', views.delete_user_goal, name='delete_user_goal'),
     path('assets/<int:asset_id>/add-alert/', views.add_price_alert, name='add_price_alert'),
+    path('api/asset/name/<str:symbol>/', views.api_asset_name, name='api_asset_name'),
 
 
 
