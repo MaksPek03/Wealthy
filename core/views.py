@@ -69,7 +69,7 @@ def api_price(request):
     return JsonResponse(list(prices), safe = False)
 
 def api_asset_history(request, symbol):
-    history = HistoricAsset.objects.filter(symbol__iexact=symbol).order_by('-date_recorded').values('price')
+    history = HistoricAsset.objects.filter(symbol__iexact=symbol).order_by('-date_recorded').values('price', 'date_recorded')
     return JsonResponse(list(history), safe = False)
 
 def api_asset_name(request, symbol):
