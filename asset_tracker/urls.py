@@ -20,6 +20,7 @@ urlpatterns = [
     path('price/', views.price, name='price'),
     path('api/price/', views.api_price, name='api_price'),
     path('assets/', views.asset_list, name='asset_list'),
+    path('api/asset/<str:symbol>/price/', views.api_asset_price, name='api_asset_price'),
     path('asset/<str:symbol>/history/', views.asset_history, name='historic_price'),
     path('api/asset/<str:symbol>/history/', views.api_asset_history, name='api_history_price'),
     path('api/asset/<str:symbol>/history/<str:day>/', views.api_asset_history_filter, name='api_history_price_filter'),
