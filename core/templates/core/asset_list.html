@@ -1,13 +1,8 @@
-{% block content %}
-  <h2>Select an Asset to View Historical Prices</h2>
-  <ul>
-    {% for asset in assets %}
-      <li>
-        <a href="{% url 'historic_price' asset.symbol %}">
-          {{ asset.name }} ({{ asset.symbol }})
-        </a>
-      </li>
-    {% endfor %}
-  </ul>
-  <p><a href="{% url 'profile' %}">← Back to Profile</a></p>
-{% endblock %}
+{% for asset in assets %}
+  <li>
+    <a href="{% url 'historic_price' asset.symbol %}">
+      {{ asset.name }} ({{ asset.symbol }})
+    </a>
+    <a href="{% url 'add_price_alert' asset.id %}">add alert</a>
+  </li>
+{% endfor %}

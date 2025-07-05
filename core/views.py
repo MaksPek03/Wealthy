@@ -12,7 +12,12 @@ from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.utils.timezone import now
 from datetime import timedelta
-
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.models import User
+from .models import FriendRequest, FriendList, UserGoal
+from django import forms
+from .forms import PriceAlertForm
+from .models import PriceAlert
 
 def home(request):
     return render(request, 'core/home.html')
@@ -183,3 +188,107 @@ def remove_wallet(request, wallet_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     wallet.delete()
     return redirect('wallet_list')
+
+@login_required
+def send_friend_request(request, user_id):
+    receiver = get_object_or_404(User, id=user_id)
+    existing_request = FriendRequest.objects.filter(sender=request.user, receiver=receiver, is_active = True)
+    if not existing_request.exists() and request.user != receiver:
+        FriendRequest.objects.create(sender=request.user, receiver=receiver)
+    return redirect('friends_list')
+
+
+
+
+@login_required
+def accept_friend_request(request, request_id):
+    friend_request = get_object_or_404(FriendRequest, id=request_id, receiver = request.user)
+    friend_request.accept()
+    return redirect('friends_list')
+
+@login_required
+def decline_friend_request(request, request_id):
+    friend_request = get_object_or_404(FriendRequest, id=request_id, receiver = request.user)
+    friend_request.decline()
+    return redirect('friends_list')
+
+@login_required
+def remove_friend(request, user_id):
+    user_to_remove = get_object_or_404(User, id=user_id)
+    friend_list = FriendList.objects.get(user=request.user)
+    if friend_list.is_mutual_friend(user_to_remove):
+        friend_list.unfriend(user_to_remove)
+    return redirect('friends_list')
+
+@login_required
+def friends_list(request):
+    friend_list = FriendList.objects.get_or_create(user=request.user)[0]
+    friends = friend_list.friends.all()
+    friend_requests = FriendRequest.objects.filter(receiver=request.user, is_active=True)
+
+    users = None
+    query = request.GET.get('q')
+    if query:
+        users = User.objects.filter(username__icontains=query).exclude(id=request.user.id)
+
+    return render(request, 'core/friends_list.html', {
+        'friends': friends,
+        'friend_requests': friend_requests,
+        'users': users,
+    })
+
+
+class UserGoalForm(forms.ModelForm):
+    class Meta:
+        model = UserGoal
+        fields = ['name', 'description', 'target_amount', 'current_amount', 'deadline']
+
+
+@login_required
+def user_goals(request):
+    goals = UserGoal.objects.filter(user=request.user)
+    return render(request, 'core/user_goals.html', {'goals': goals})
+
+
+@login_required
+def add_user_goal(request):
+    if request.method == 'POST':
+        form = UserGoalForm(request.POST)
+        if form.is_valid():
+            goal = form.save(commit=False)
+            goal.user = request.user
+            goal.save()
+            return redirect('user_goals')
+    else:
+        form = UserGoalForm()
+    return render(request, 'core/add_user_goal.html', {'form': form})
+
+
+@login_required
+def delete_user_goal(request, goal_id):
+    goal = get_object_or_404(UserGoal, id=goal_id, user=request.user)
+    goal.delete()
+    return redirect('user_goals')
+
+
+
+
+@login_required
+def add_price_alert(request, asset_id):
+    asset = get_object_or_404(Asset, id=asset_id)
+    if request.method == 'POST':
+        form = PriceAlertForm(request.POST)
+        if form.is_valid():
+            alert = form.save(commit=False)
+            alert.asset = asset
+            alert.user = request.user
+            alert.save()
+            messages.success(request, 'Price alert added!')
+            return redirect('asset_list')
+    else:
+        form = PriceAlertForm()
+    return render(request, 'core/add_price_alert.html', {
+        'form': form,
+        'asset': asset
+    })
+

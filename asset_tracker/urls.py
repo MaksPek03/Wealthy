@@ -24,5 +24,17 @@ urlpatterns = [
     path('api/asset/<str:symbol>/history/', views.api_asset_history, name='api_history_price'),
     path('api/asset/<str:symbol>/history/<str:day>/', views.api_asset_history_filter, name='api_history_price_filter'),
     path('trends/', views.trends, name='trends'),
+    path('friends/', views.friends_list, name='friends_list'),
+    path('friends/send-request/<int:user_id>/', views.send_friend_request, name='send_friend_request'),
+    path('friends/accept-request/<int:request_id>/', views.accept_friend_request, name='accept_friend_request'),
+    path('friends/decline-request/<int:request_id>/', views.decline_friend_request, name='decline_friend_request'),
+    path('friends/remove-friend/<int:user_id>/', views.remove_friend, name='remove_friend'),
+    path('goals/', views.user_goals, name='user_goals'),
+    path('goals/add/', views.add_user_goal, name='add_user_goal'),
+    path('goals/delete/<int:goal_id>/', views.delete_user_goal, name='delete_user_goal'),
+    path('assets/<int:asset_id>/add-alert/', views.add_price_alert, name='add_price_alert'),
     path('api/asset/name/<str:symbol>/', views.api_asset_name, name='api_asset_name'),
+
+
+
 ]

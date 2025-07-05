@@ -1,0 +1,49 @@
+{% block content %}
+<h2>friends list</h2>
+
+<h3>your friends:</h3>
+<ul>
+  {% for friend in friends %}
+    <li>
+      {{ friend.username }} 
+      <a href="{% url 'remove_friend' friend.id %}">Remove</a>
+    </li>
+  {% empty %}
+    <li>You have no friends</li>
+  {% endfor %}
+</ul>
+
+<h3>friend requests:</h3>
+<ul>
+  {% for request in friend_requests %}
+    <li>
+      {{ request.sender.username }}
+      <a href="{% url 'accept_friend_request' request.id %}">Accept</a>
+      <a href="{% url 'decline_friend_request' request.id %}">Decline</a>
+    </li>
+  {% empty %}
+    <li>No new friend requests</li>
+  {% endfor %}
+</ul>
+
+<h3>send friend request</h3>
+<form method="get" action="">
+  <input type="text" name="q" placeholder="Username...">
+  <input type="submit" value="Search">
+</form>
+
+{% if users %}
+  <ul>
+    {% for u in users %}
+      {% if u != request.user %}
+        <li>
+          {{ u.username }}
+          <a href="{% url 'send_friend_request' u.id %}">Send request</a>
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<a href="{% url 'profile' %}">back to profile</a>
+{% endblock %}

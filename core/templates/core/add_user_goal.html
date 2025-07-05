@@ -1,0 +1,7 @@
+<h1>new goal</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">save</button>
+</form>
+<a href="{% url 'user_goals' %}">come back</a>
