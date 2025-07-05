@@ -71,8 +71,10 @@ def api_price(request):
     return JsonResponse(list(prices), safe = False)
 
 def api_asset_price(request, symbol):
-    prices = CurrentAsset.objects.filter(symbol__iexact=symbol).values('name', 'symbol', 'current_price')
-    return JsonResponse({'name': asset.name, 'symbol': asset.symbol, 'current_price': asset.current_price} safe = False)
+    asset = CurrentAsset.objects.filter(symbol__iexact=symbol).values('name', 'symbol', 'current_price').first()
+    return JsonResponse({'name': asset['name'],
+                                     'symbol': asset['symbol'],
+                                     'current_price': asset['current_price']} safe = False)
 
 def api_asset_history(request, symbol):
     history = HistoricAsset.objects.filter(symbol__iexact=symbol).order_by('-date_recorded').values('price', 'date_recorded')
