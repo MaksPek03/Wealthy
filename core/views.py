@@ -77,7 +77,7 @@ def api_asset_history(request, symbol):
 def api_asset_history_filter(request, symbol, day):
     if day != "max":
         day_int = int(day)
-        time_threshold = now() timedelta(days_int)
+        time_threshold = now() - timedelta(days_int)
         history = HistoricAsset.objects.filter(
                 symbol__iexact=symbol,
                 date_recorded__gte=time_threshold
