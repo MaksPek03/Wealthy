@@ -10,6 +10,8 @@ import traceback
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 from django.contrib.auth.models import User
+from django.utils.timezone import now
+from datetime import timedelta
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from .models import FriendRequest, FriendList, UserGoal
@@ -70,6 +72,18 @@ def api_price(request):
 
 def api_asset_history(request, symbol):
     history = HistoricAsset.objects.filter(symbol__iexact=symbol).order_by('-date_recorded').values('price', 'date_recorded')
+    return JsonResponse(list(history), safe = False)
+
+def api_asset_history_filter(request, symbol, day):
+    if day != "max":
+        day_int = int(day)
+        time_threshold = now() timedelta(days_int)
+        history = HistoricAsset.objects.filter(
+                symbol__iexact=symbol,
+                date_recorded__gte=time_threshold
+            ).order_by('-date_recorded').values('price', 'date_recorded')
+    else:
+        history = HistoricAsset.objects.filter(symbol__iexact=symbol).order_by('-date_recorded').values('price', 'date_recorded')
     return JsonResponse(list(history), safe = False)
 
 def api_asset_name(request, symbol):
