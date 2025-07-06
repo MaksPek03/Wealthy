@@ -16,6 +16,8 @@ module.exports = {
         "text-dark": "#ffffff",
         "headers-text": "#ffffff",
         "headers-text-dark": "#9f9f9f",
+        "selected": "#272727",
+        "no-selected": "#707070",
       }
     },
   },
