@@ -2,6 +2,9 @@ import {View, Text, TouchableOpacity} from 'react-native';
 import { useRouter} from 'expo-router';
 import {useTheme} from "@/app/context/ThemeContext";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import React from 'react';
+import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
 
 export default function MainMenu() {
     const { isDark, toggleTheme } = useTheme();
@@ -9,16 +12,9 @@ export default function MainMenu() {
 
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
-            <View className={`flex-[1] justify-center items-center relative ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
-                <TouchableOpacity
-                    onPress={() => router.push('/menu/settings')}
-                    className={`absolute top-10 left-5 ${isDark ? "text-headers-text-dark" : "text-headers-text"}`}
-                >
-                    <Text className={`text-lg font-bold ${isDark ? "text-headers-text-dark" : "text-headers-text"}`}>SET</Text>
-                </TouchableOpacity>
 
-                <Text className={`text-6xl ${isDark ? "text-headers-text-dark" : "text-headers-text"}`}>MAIN PAGE</Text>
-            </View>
+            <Header title={"MAIN PAGE"} settings={true}/>
+
             <View className={`flex-[5] justify-center items-center ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <TouchableOpacity
                     onPress={() => router.push('/wallets/wallets')}
@@ -42,8 +38,8 @@ export default function MainMenu() {
                 </TouchableOpacity>
             </View>
 
-            <View className={`flex-[1] justify-center items-center ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
-            </View>
+            <Footer backButton={false}/>
+
         </SafeAreaView>
     );
 }
