@@ -4,7 +4,9 @@ import {useTheme} from "@/app/context/ThemeContext";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useEffect, useState} from 'react';
 import Graph from "@/app/components/Graph";
-import FilterHistory from "@/app/components/filterHistory";
+import FilterHistory from "@/app/components/FilterHistory";
+import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
 
 
 interface Price {
@@ -12,7 +14,7 @@ interface Price {
     date_recorded: Date;
 }
 
-export default function AssetScreen() {
+const AssetScreen = () => {
     const { symbol } = useLocalSearchParams();
     const { isDark, toggleTheme } = useTheme();
     const router = useRouter();
@@ -29,7 +31,7 @@ export default function AssetScreen() {
 
     useEffect(() => {
         fetchHistory();
-    }, [selectedFilter, symbol]);
+    }, [selectedFilter]);
 
     const fetchHistory = async () => {
         setLoading(true);
@@ -77,9 +79,9 @@ export default function AssetScreen() {
 
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
-            <View className={`flex-[1] justify-center items-center relative ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
-                <Text className={`text-6xl ${isDark ? "text-headers-text-dark" : "text-headers-text"}`}>{name} TRENDS</Text>
-            </View>
+
+            <Header title={`${name} TRENDS`} />
+
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
 
                 <View className={`flex-row justify-around py-5 bg-no-selected`}>
@@ -98,14 +100,10 @@ export default function AssetScreen() {
                 )}
             </View>
 
-            <View className={`flex-[1] justify-center items-center ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
-                <TouchableOpacity
-                    onPress={() => router.back()}
-                    className={`px-8 py-4 rounded-3xl min-h-10 min-w-40 mb-8 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
-                >
-                    <Text className={`text-1xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>GO BACK</Text>
-                </TouchableOpacity>
-            </View>
+            <Footer />
+
         </SafeAreaView>
     );
 }
+
+export default AssetScreen;
