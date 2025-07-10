@@ -1,8 +1,9 @@
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTheme } from "@/app/context/ThemeContext";
+import React from 'react';
 
-export default function Welcome() {
+const Welcome = () => {
     const { isDark, toggleTheme } = useTheme();
     const router = useRouter();
 
@@ -25,3 +26,5 @@ export default function Welcome() {
         </View>
     );
 }
+
+export default Welcome;

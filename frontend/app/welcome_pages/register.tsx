@@ -4,7 +4,7 @@ import {useTheme} from "@/app/context/ThemeContext";
 import {useState} from "react";
 import React from 'react';
 
-export default function Register() {
+const Register = () => {
     const { isDark, toggleTheme } = useTheme();
     const router = useRouter();
     const [username, setUsername] = useState('');
@@ -108,3 +108,5 @@ export default function Register() {
         </View>
     );
 }
+
+export default Register;
