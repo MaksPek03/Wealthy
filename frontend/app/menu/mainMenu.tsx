@@ -6,7 +6,7 @@ import React from 'react';
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 
-export default function MainMenu() {
+const MainMenu = () => {
     const { isDark, toggleTheme } = useTheme();
     const router = useRouter();
 
@@ -43,3 +43,5 @@ export default function MainMenu() {
         </SafeAreaView>
     );
 }
+
+export default MainMenu;
