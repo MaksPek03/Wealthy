@@ -4,7 +4,7 @@ import {useTheme} from "@/app/context/ThemeContext";
 import {useState} from "react";
 import React from 'react';
 
-export default function Login() {
+const Login = () => {
     const { isDark, toggleTheme } = useTheme();
     const router = useRouter();
     const [username, setUsername] = useState('');
@@ -91,3 +91,5 @@ export default function Login() {
         </View>
     );
 }
+
+export default Login;
