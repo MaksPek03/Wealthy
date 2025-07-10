@@ -3,14 +3,17 @@ import { View, Text } from 'react-native';
 import { LineChart } from 'react-native-wagmi-charts'
 import { useTheme } from "@/app/context/ThemeContext";
 
-
 interface Point {
     timestamp: number;
     value: number;
 }
 
-const Graph = (props: { points: Point[] ; currentPrice: string}) => {
-    const { points, currentPrice } = props;
+interface Props {
+    points?: Point[];
+    currentPrice: string;
+}
+
+const Graph = ({ points = [], currentPrice }: Props) => {
     const { isDark, toggleTheme } = useTheme();
 
     return (
