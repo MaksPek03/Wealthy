@@ -25,14 +25,20 @@ const Graph = ({ points = [], currentPrice }: Props) => {
 
             </View>
             <View>
-                <LineChart.Provider data={points}>
-                    <LineChart>
-                        <LineChart.Path />
-                        <LineChart.CursorCrosshair/>
-                    </LineChart>
-                    <LineChart.PriceText style={{textAlign:"center"}}/>
-                    <LineChart.DatetimeText style={{textAlign:"center"}}/>
-                </LineChart.Provider>
+                {points?.length ? (
+                    <LineChart.Provider data={points}>
+                        <LineChart>
+                            <LineChart.Path />
+                            <LineChart.CursorCrosshair/>
+                        </LineChart>
+                        <LineChart.PriceText style={{textAlign:"center"}}/>
+                        <LineChart.DatetimeText style={{textAlign:"center"}}/>
+                    </LineChart.Provider>
+                    ) : (
+                        <Text className={` text-center `}>
+                            We don't have any historic prices to show
+                        </Text>
+                    )}
             </View>
         </View>
 
