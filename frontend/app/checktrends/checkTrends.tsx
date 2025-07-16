@@ -1,8 +1,10 @@
-import {View, Text, TouchableOpacity, ActivityIndicator, FlatList, TextInput} from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, FlatList, TextInput } from 'react-native';
 import { useRouter} from 'expo-router';
 import { useTheme } from "@/app/context/ThemeContext";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useEffect, useState} from 'react';
+import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
 
 interface Price {
     name: string;
@@ -10,7 +12,7 @@ interface Price {
     current_price: number;
 }
 
-export default function MainMenu() {
+const checkTrends = () => {
     const { isDark, toggleTheme } = useTheme();
     const router = useRouter();
     const [prices, setPrices] = useState<Price[]>([]);
@@ -60,9 +62,9 @@ export default function MainMenu() {
 
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
-            <View className={`flex-[1] justify-center items-center relative ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
-                <Text className={`text-6xl ${isDark ? "text-headers-text-dark" : "text-headers-text"}`}>CHECK TRENDS</Text>
-            </View>
+
+            <Header title={"CHECK TRENDS"}/>
+
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <TextInput
                     className={`p-2 mb-2 ${isDark ? "text-text-dark" : "text-text"}`}
@@ -94,14 +96,10 @@ export default function MainMenu() {
                 }
             </View>
 
-            <View className={`flex-[1] justify-center items-center ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
-                <TouchableOpacity
-                    onPress={() => router.back()}
-                    className={`px-8 py-4 rounded-3xl min-h-10 min-w-40 mb-8 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
-                >
-                    <Text className={`text-1xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>GO BACK</Text>
-                </TouchableOpacity>
-            </View>
+            <Footer />
+
         </SafeAreaView>
     );
 }
+
+export default checkTrends;

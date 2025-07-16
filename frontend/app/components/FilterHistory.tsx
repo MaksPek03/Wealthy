@@ -2,8 +2,14 @@ import React from 'react';
 import { Text, Pressable } from 'react-native';
 import { useTheme } from "@/app/context/ThemeContext";
 
-const FilterHistory = (props: { filterDay: any; filterText: any; selectedFilter: any; setSelectedFilter: any; }) => {
-    const { filterDay, filterText, selectedFilter, setSelectedFilter } = props;
+interface Props {
+    filterDay: string;
+    filterText: string;
+    selectedFilter: string;
+    setSelectedFilter: (filterDay: string) => void;
+}
+
+const FilterHistory = ({ filterDay, filterText, selectedFilter, setSelectedFilter}: Props) => {
     const { isDark, toggleTheme } = useTheme();
     const isSelectedFilter = (filter: string) => filter === selectedFilter;
 
