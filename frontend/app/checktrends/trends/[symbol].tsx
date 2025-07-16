@@ -1,4 +1,4 @@
-import {View, Text, TouchableOpacity, ActivityIndicator, FlatList, TextInput} from 'react-native';
+import { View } from 'react-native';
 import {useLocalSearchParams, useRouter} from 'expo-router';
 import {useTheme} from "@/app/context/ThemeContext";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -91,13 +91,11 @@ const AssetScreen = () => {
                     <FilterHistory filterDay={"365"} filterText={"1y"} selectedFilter={selectedFilter} setSelectedFilter={onSelectedFilter} />
                     <FilterHistory filterDay={"max"} filterText={"All"} selectedFilter={selectedFilter} setSelectedFilter={onSelectedFilter} />
                 </View>
-                {graphPoints.length === 0 ? (
-                    <ActivityIndicator size="large" />
-                ):(
-                    <View >
-                        <Graph points={graphPoints} currentPrice={price} />
-                    </View>
-                )}
+
+                <View >
+                    <Graph points={graphPoints} currentPrice={price} />
+                </View>
+
             </View>
 
             <Footer />
