@@ -115,8 +115,26 @@ def profile(request):
 
 @login_required
 def price(request):
+    currency = request.GET.get('currency', 'usd').lower()  
     prices = CurrentAsset.objects.all()
-    return render(request, 'core/price.html', {'prices': prices})
+
+    try:
+        currency_asset = CurrentAsset.objects.get(symbol=currency)
+        currency_rate = currency_asset.current_price  
+    except CurrentAsset.DoesNotExist:
+        currency_rate = 1  
+
+    for asset in prices:
+        asset.converted_price = round(asset.current_price / currency_rate, 2)
+
+    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']  
+
+    return render(request, 'core/price.html', {
+        'prices': prices,
+        'currency': currency,
+        'currencies': currencies,
+    })
+
 
 @login_required
 def asset_list(request):
