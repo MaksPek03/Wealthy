@@ -24,14 +24,14 @@ const MainMenu = () => {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={() => router.push('/checkprices/checkprices')}
+                    onPress={() => router.push('/checkprices/checkPrices')}
                     className={`px-8 py-4 min-h-14 min-w-72 mt-14 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
                 >
                     <Text className={`text-3xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>CHECK PRICES</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={() => router.push('/checktrends/checktrends')}
+                    onPress={() => router.push('/checktrends/checkTrends')}
                     className={`px-10 py-4 min-h-14 min-w-72 mt-14 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
                 >
                     <Text className={`text-3xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>CHECK TRENDS</Text>

@@ -35,9 +35,9 @@ const Login = () => {
                 return;
             }
 
-            router.replace('/menu/mainmenu');
             await AsyncStorage.setItem('user_id', String(data.user_id));
 
+            router.replace('/menu/mainMenu');
         } catch (error) {
             Alert.alert("Error", "Could not connect to the server.");
             console.error("Login error:", error);
