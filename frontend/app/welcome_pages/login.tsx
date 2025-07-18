@@ -3,6 +3,7 @@ import { useRouter} from 'expo-router';
 import {useTheme} from "@/app/context/ThemeContext";
 import {useState} from "react";
 import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = () => {
     const { isDark, toggleTheme } = useTheme();
@@ -34,7 +35,9 @@ const Login = () => {
                 return;
             }
 
-            router.replace('/menu/mainmenu');
+            await AsyncStorage.setItem('user_id', String(data.user_id));
+
+            router.replace('/menu/mainMenu');
         } catch (error) {
             Alert.alert("Error", "Could not connect to the server.");
             console.error("Login error:", error);
