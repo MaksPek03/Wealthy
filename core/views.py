@@ -103,6 +103,22 @@ def api_wallets(request, user_id):
     wallets = Wallet.objects.filter(user=user_id).values('id', 'name')
     return JsonResponse(list(wallets), safe=False)
 
+def api_add_wallet(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            wallet_name = data.get('name')
+            user_id = data.get('userId')
+            if not wallet_name:
+                return JsonResponse({'error': 'Name is required'}, status=400)
+
+            wallet = Wallet.objects.create(name=wallet_name, user=user_id)
+            return JsonResponse({'id': wallet.id, 'name': wallet.name}, status=201)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    else:
+        return JsonResponse({'error': 'POST method required'}, status=405)
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
