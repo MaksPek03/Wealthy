@@ -96,6 +96,10 @@ def api_asset_name(request, symbol):
     asset = Asset.objects.filter(symbol__iexact=symbol).first()
     return JsonResponse({'name': asset.name})
 
+def api_wallets(request):
+    wallets = Wallet.objects.filter(user=request.user)
+    return JsonResponse({'id': wallets.id, 'name': wallets.name})
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':

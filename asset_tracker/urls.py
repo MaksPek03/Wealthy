@@ -12,6 +12,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('accounts/profile/', views.profile, name='profile'),
     path('accounts/profile/wallets/', views.wallets, name='wallet_list'),
+    path('api/accounts/profile/wallets/', views.api_wallets, name='api_wallet_list'),
     path('accounts/profile/wallets/add_wallet', views.add_wallet, name='add_wallet'),
     path('accounts/profile/wallets/<int:wallet_id>/', views.wallet_detail, name='wallet_detail'),
     path('accounts/profile/wallets/<int:wallet_id>/add_wallet_asset/', views.add_wallet_asset, name='add_wallet_asset'),
