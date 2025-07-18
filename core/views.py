@@ -33,7 +33,10 @@ def api_login(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return JsonResponse({"message": "Logged in successfully"})
+                return JsonResponse({
+                    "message": "Logged in successfully",
+                    "user_id": user.id
+                })
             else:
                 return JsonResponse({"message": "Invalid credentials"}, status=401)
         except Exception as e:
