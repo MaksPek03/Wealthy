@@ -253,6 +253,8 @@ def wallet_asset_detail(request, wallet_id, asset_id):
     except CurrentAsset.DoesNotExist:
         current_price = 0  
 
+    current_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
+
     total_value_transactions = sum(transaction.quantity * current_price for transaction in transactions)
 
     total_difference = float(total_value_transactions) - float(asset_total_purchase_value)
@@ -267,7 +269,8 @@ def wallet_asset_detail(request, wallet_id, asset_id):
         'asset_total_purchase_value': asset_total_purchase_value,
         'total_value_transactions': total_value_transactions,
         'total_difference' : total_difference,
-        'total_difference_percentage': total_difference_percentage
+        'total_difference_percentage': total_difference_percentage,
+        'current_price': current_price
     })
 
 @login_required

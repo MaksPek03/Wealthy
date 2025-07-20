@@ -1,5 +1,6 @@
 {% block content %}
 <h2>{{ asset.name }} transactions in {{ wallet.name }}</h2>
+<p>actual price: {{ current_price }} </p>
 
 <p>Total purchase price for this asset in this wallet: {{ asset_total_purchase_value|floatformat:2 }} </p>
 <p>Total actual price for assets in this wallet: {{ total_value_transactions|floatformat:2 }} </p>
@@ -9,7 +10,7 @@
     <ul>
         {% for tx in transactions %}
             <li>
-                quanity: {{ tx.quantity }} bought for: {{ tx.purchase_price }} on {{ tx.purchase_date }}
+                quantity: {{ tx.quantity }} bought for: {{ tx.purchase_price }} on {{ tx.purchase_date }}
             </li>
         {% endfor %}
     </ul>
