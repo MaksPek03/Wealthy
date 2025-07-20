@@ -1,6 +1,8 @@
 {% block content %}
 <h2>Wallet: {{ wallet.name }}</h2>
 
+<p>total purchase price of all assets in this wallet: {{ total_purchase|floatformat:2 }} </p>
+
 <a href="{% url 'add_wallet_asset' wallet.id %}">add asset</a>
 
 {% if wallet_assets %}

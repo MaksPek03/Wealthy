@@ -18,6 +18,7 @@ from .models import FriendRequest, FriendList, UserGoal
 from django import forms
 from .forms import PriceAlertForm
 from .models import PriceAlert
+from django.db.models import Sum, F, FloatField
 
 def home(request):
     return render(request, 'core/home.html')
@@ -211,19 +212,29 @@ def add_wallet(request):
 def wallet_detail(request, wallet_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     wallet_assets = WalletAsset.objects.filter(wallet=wallet).select_related('asset')
-    return render(request, 'core/wallet_detail.html', {'wallet': wallet, 'wallet_assets': wallet_assets})
+    
+    total_purchase_value = wallet_assets.aggregate(
+        total = Sum(F('purchase_price') * F('quantity'),  output_field=FloatField())
+    )['total'] or 0
+    
+    return render(request, 'core/wallet_detail.html', {'wallet': wallet, 'wallet_assets': wallet_assets, 'total_purchase': total_purchase_value})
 
 def wallet_asset_detail(request, wallet_id, asset_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     asset = get_object_or_404(Asset, id=asset_id)
     transactions = WalletAsset.objects.filter(wallet=wallet, asset=asset)
 
+    asset_total_purchase_value = transactions.aggregate(
+        total = Sum(F('purchase_price') * F('quantity'),  output_field=FloatField())
+    )['total'] or 0
+
     
 
     return render(request, 'core/wallet_asset_detail.html', {
         'wallet': wallet,
         'asset': asset,
-        'transactions': transactions
+        'transactions': transactions,
+        'asset_total_purchase_value': asset_total_purchase_value
     })
 
 @login_required
