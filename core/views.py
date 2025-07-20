@@ -227,11 +227,16 @@ def wallet_detail(request, wallet_id):
         if symbol in asset_prices:
             total_value += wa.quantity * asset_prices[symbol]
 
+    total_difference = float(total_value) - float(total_purchase_value)  
+    differnce_in_percentage = (total_difference/float(total_purchase_value))*100
+
     return render(request, 'core/wallet_detail.html', {
         'wallet': wallet,
         'wallet_assets': wallet_assets,
         'total_purchase': total_purchase_value,
-        'total_value': total_value
+        'total_value': total_value,
+        'total_difference': total_difference,
+        'difference_in_percentage': differnce_in_percentage
     })
 
 def wallet_asset_detail(request, wallet_id, asset_id):
@@ -250,6 +255,9 @@ def wallet_asset_detail(request, wallet_id, asset_id):
 
     total_value_transactions = sum(transaction.quantity * current_price for transaction in transactions)
 
+    total_difference = float(total_value_transactions) - float(asset_total_purchase_value)
+    total_difference_percentage = (float(total_difference)/float(asset_total_purchase_value)) * 100 
+
     
 
     return render(request, 'core/wallet_asset_detail.html', {
@@ -257,7 +265,9 @@ def wallet_asset_detail(request, wallet_id, asset_id):
         'asset': asset,
         'transactions': transactions,
         'asset_total_purchase_value': asset_total_purchase_value,
-        'total_value_transactions': total_value_transactions
+        'total_value_transactions': total_value_transactions,
+        'total_difference' : total_difference,
+        'total_difference_percentage': total_difference_percentage
     })
 
 @login_required

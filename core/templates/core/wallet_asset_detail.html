@@ -1,8 +1,9 @@
 {% block content %}
 <h2>{{ asset.name }} transactions in {{ wallet.name }}</h2>
 
-<p>Total purchase price for this asset in this wallet: {{ asset_total_purchase_value }} </p>
-<p>Total actual price for assets in this wallet: {{ total_value_transactions }} </p>
+<p>Total purchase price for this asset in this wallet: {{ asset_total_purchase_value|floatformat:2 }} </p>
+<p>Total actual price for assets in this wallet: {{ total_value_transactions|floatformat:2 }} </p>
+<p>balance {{ total_difference|floatformat:2 }}, in percentage {{total_difference_percentage| floatformat:2 }}%</p>
 
 {% if transactions %}
     <ul>
