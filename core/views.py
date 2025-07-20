@@ -110,13 +110,23 @@ def api_add_wallet(request):
             data = json.loads(request.body)
             wallet_name = data.get('name')
             user_id = data.get('userId')
-            if not wallet_name:
-                return JsonResponse({'error': 'Name is required'}, status=400)
 
-            wallet = Wallet.objects.create(name=wallet_name, user=user_id)
+            if not wallet_name or not user_id:
+                return JsonResponse({'error': 'Name and userId are required'}, status=400)
+
+            try:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                return JsonResponse({'error': 'User not found'}, status=404)
+
+            wallet = Wallet.objects.create(name=wallet_name, user=user)
+
             return JsonResponse({'id': wallet.id, 'name': wallet.name}, status=201)
+
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
     else:
         return JsonResponse({'error': 'POST method required'}, status=405)
 
