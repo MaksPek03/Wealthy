@@ -212,12 +212,27 @@ def add_wallet(request):
 def wallet_detail(request, wallet_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     wallet_assets = WalletAsset.objects.filter(wallet=wallet).select_related('asset')
-    
+
     total_purchase_value = wallet_assets.aggregate(
-        total = Sum(F('purchase_price') * F('quantity'),  output_field=FloatField())
+        total=Sum(F('purchase_price') * F('quantity'), output_field=FloatField())
     )['total'] or 0
-    
-    return render(request, 'core/wallet_detail.html', {'wallet': wallet, 'wallet_assets': wallet_assets, 'total_purchase': total_purchase_value})
+
+    asset_prices = {
+        asset.symbol: asset.current_price for asset in CurrentAsset.objects.all()
+    }
+
+    total_value = 0
+    for wa in wallet_assets:
+        symbol = wa.asset.symbol
+        if symbol in asset_prices:
+            total_value += wa.quantity * asset_prices[symbol]
+
+    return render(request, 'core/wallet_detail.html', {
+        'wallet': wallet,
+        'wallet_assets': wallet_assets,
+        'total_purchase': total_purchase_value,
+        'total_value': total_value
+    })
 
 def wallet_asset_detail(request, wallet_id, asset_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
@@ -228,13 +243,22 @@ def wallet_asset_detail(request, wallet_id, asset_id):
         total = Sum(F('purchase_price') * F('quantity'),  output_field=FloatField())
     )['total'] or 0
 
+    asset_prices = {
+        asset.symbol: asset.current_price for asset in CurrentAsset.objects.all()
+    }
+
+    total_value = 0
+    for wa in wallet_assets:
+        symbol = wa.asset.symbol
+        if symbol in asset_prices:
+            total_value += wa.quantity * asset_prices[symbol]
     
 
     return render(request, 'core/wallet_asset_detail.html', {
         'wallet': wallet,
         'asset': asset,
         'transactions': transactions,
-        'asset_total_purchase_value': asset_total_purchase_value
+        'asset_total_purchase_value': asset_total_purchase_value,
     })
 
 @login_required
