@@ -103,6 +103,7 @@ def api_wallets(request, user_id):
     wallets = Wallet.objects.filter(user=user_id).values('id', 'name')
     return JsonResponse(list(wallets), safe=False)
 
+@csrf_exempt
 def api_add_wallet(request):
     if request.method == 'POST':
         try:
