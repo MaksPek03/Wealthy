@@ -243,15 +243,13 @@ def wallet_asset_detail(request, wallet_id, asset_id):
         total = Sum(F('purchase_price') * F('quantity'),  output_field=FloatField())
     )['total'] or 0
 
-    asset_prices = {
-        asset.symbol: asset.current_price for asset in CurrentAsset.objects.all()
-    }
+    try:
+        current_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
+    except CurrentAsset.DoesNotExist:
+        current_price = 0  
 
-    total_value = 0
-    for wa in wallet_assets:
-        symbol = wa.asset.symbol
-        if symbol in asset_prices:
-            total_value += wa.quantity * asset_prices[symbol]
+    total_value_transactions = sum(transaction.quantity * current_price for transaction in transactions)
+
     
 
     return render(request, 'core/wallet_asset_detail.html', {
@@ -259,6 +257,7 @@ def wallet_asset_detail(request, wallet_id, asset_id):
         'asset': asset,
         'transactions': transactions,
         'asset_total_purchase_value': asset_total_purchase_value,
+        'total_value_transactions': total_value_transactions
     })
 
 @login_required
