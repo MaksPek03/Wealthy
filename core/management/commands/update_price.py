@@ -3,6 +3,7 @@ import requests
 from datetime import date
 from django.core.management.base import BaseCommand
 from core.models import Asset, CurrentAsset, HistoricAsset
+from django.utils import timezone
 
 
 
@@ -31,11 +32,16 @@ class Command(BaseCommand):
     }
 
     KUCOIN_SYMBOL_MAP = {
-        'ripple': 'XRP',
-        'dogecoin': 'DOGE',
-        'polkadot': 'DOT',
-        'cardano': 'ADA',
+    'ripple': 'XRP',
+    'dogecoin': 'DOGE',
+    'polkadot': 'DOT',
+    'cardano': 'ADA',
+    'bitcoin': 'BTC',
+    'ethereum': 'ETH',
+    'solana': 'SOL',
+    'litecoin': 'LTC',
     }
+
 
     def handle(self, *args, **kwargs):
         assets = Asset.objects.all()
@@ -67,7 +73,12 @@ class Command(BaseCommand):
             response = session.get(self.KUCOIN_URL, timeout=5)
             response.raise_for_status()
             data = response.json()
-            return {item["symbol"]: float(item["last"]) for item in data["data"]["ticker"]}
+            return {
+                item["symbol"]: float(item["last"])
+                for item in data["data"]["ticker"]
+                if item["last"] is not None  
+            }
+
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"Failed to fetch KuCoin data: {e}"))
             return {}
@@ -132,5 +143,6 @@ class Command(BaseCommand):
             type=asset.type,
             symbol=asset.symbol,
             price=price,
-            date_recorded=datetime.now()
+            date_recorded=timezone.now()
+
         ) 
