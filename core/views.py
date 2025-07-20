@@ -213,6 +213,19 @@ def wallet_detail(request, wallet_id):
     wallet_assets = WalletAsset.objects.filter(wallet=wallet).select_related('asset')
     return render(request, 'core/wallet_detail.html', {'wallet': wallet, 'wallet_assets': wallet_assets})
 
+def wallet_asset_detail(request, wallet_id, asset_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    asset = get_object_or_404(Asset, id=asset_id)
+    transactions = WalletAsset.objects.filter(wallet=wallet, asset=asset)
+
+    
+
+    return render(request, 'core/wallet_asset_detail.html', {
+        'wallet': wallet,
+        'asset': asset,
+        'transactions': transactions
+    })
+
 @login_required
 def add_wallet_asset(request, wallet_id):
     assets = Asset.objects.all()
@@ -230,7 +243,7 @@ def add_wallet_asset_details(request, wallet_id, asset_id):
             wallet_asset.wallet = wallet
             wallet_asset.asset = asset
             wallet_asset.save()
-            return redirect('wallet_details', wallet_id=wallet.id)
+            return redirect('wallet_detail', wallet_id=wallet.id)
     else:
         form = WalletAssetForm()
 

@@ -1,14 +1,24 @@
 {% block content %}
-    <h2>wallet {{wallet.name}} details</h2>
-    <a href="{% url 'add_wallet_asset' wallet.id %}">Add Asset</a>
-    {% if wallet_assets %}
-        <ul>
-            {% for asset in wallet_assets %}
-                <li>{{ asset.name }} - {{ asset.quantity}} bought at price {{asset.purchase_price}}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>this wallet has no assets</p>
-    {% endif %}
-    <p><a href = "{% url 'wallet_list' %}"> back to wallet list</a></p>
-    {% endblock%}
+<h2>Wallet: {{ wallet.name }}</h2>
+
+<a href="{% url 'add_wallet_asset' wallet.id %}">add asset</a>
+
+{% if wallet_assets %}
+    <ul>
+        {% for wa in wallet_assets %}
+            {% ifchanged wa.asset.id %}
+                <li>
+                    <a href="{% url 'wallet_asset_detail' wallet.id wa.asset.id %}">
+                        {{ wa.asset.name }} ({{ wa.asset.symbol }})
+                    </a>
+                </li>
+            {% endifchanged %}
+        {% endfor %}
+    </ul>
+
+{% else %}
+    <p>this wallet has no assets yet</p>
+{% endif %}
+
+<p><a href="{% url 'wallet_list' %}">back to wallet list</a></p>
+{% endblock %}

@@ -16,6 +16,7 @@ urlpatterns = [
     path('accounts/profile/wallets/add_wallet/', views.add_wallet, name='add_wallet'),
     path('api/accounts/profile/wallets/add_wallet/', views.api_add_wallet, name='api_add_wallet'),
     path('accounts/profile/wallets/<int:wallet_id>/', views.wallet_detail, name='wallet_detail'),
+    path('accounts/profile/wallets/<int:wallet_id>/<int:asset_id>/', views.wallet_asset_detail, name='wallet_asset_detail'),
     path('accounts/profile/wallets/<int:wallet_id>/add_wallet_asset/', views.add_wallet_asset, name='add_wallet_asset'),
     path('account/profile/wallets/<int:wallet_id>/add_wallet_asset/<int:asset_id>/', views.add_wallet_asset_details, name='add_wallet_asset_details'),
     path('accounts/profile/wallets/remove_wallet/<int:wallet_id>/', views.remove_wallet, name='remove_wallet'),

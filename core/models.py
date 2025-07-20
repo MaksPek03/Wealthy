@@ -8,6 +8,8 @@ class Asset(models.Model):
     type = models.CharField(max_length = 50)
     symbol = models.CharField(max_length = 10)
     price = models.DecimalField(max_digits = 10, decimal_places = 2)
+    def __str__(self):
+        return self.name  
 
 class HistoricAsset(models.Model):
     name = models.CharField(max_length=50)
@@ -33,6 +35,8 @@ class WalletAsset(models.Model):
     quantity = models.DecimalField(max_digits=10, decimal_places=2)
     purchase_price = models.DecimalField(max_digits=10, decimal_places=2)
     purchase_date = models.DateField()
+    def __str__(self):
+        return f"{self.asset.name} - {self.quantity} bought: {self.purchase_date} price: {self.purchase_price}"
 
 class FriendList(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user')
