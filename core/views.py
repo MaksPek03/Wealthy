@@ -131,6 +131,57 @@ def api_add_wallet(request):
     else:
         return JsonResponse({'error': 'POST method required'}, status=405)
 
+def api_wallet_detail(request, wallet_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    wallet_assets = WalletAsset.objects.filter(wallet=wallet).select_related('asset')
+
+    total_purchase_value = wallet_assets.aggregate(
+        total=Sum(F('purchase_price') * F('quantity'), output_field=FloatField())
+    )['total'] or 0
+
+    asset_prices = {
+        asset.symbol: asset.current_price for asset in CurrentAsset.objects.all()
+    }
+
+    total_value = 0
+    assets_list = []
+
+    for wa in wallet_assets:
+        symbol = wa.asset.symbol
+        current_price = asset_prices.get(symbol, 0)
+        current_value = wa.quantity * current_price
+        total_value += current_value
+
+        assets_list.append({
+            "asset": wa.asset.name,
+            "symbol": symbol,
+            "quantity": wa.quantity,
+            "purchase_price": float(wa.purchase_price),
+            "current_price": float(current_price),
+            "current_value": float(current_value)
+        })
+
+    total_difference = float(total_value) - float(total_purchase_value)
+    difference_in_percentage = (
+        (total_difference / float(total_purchase_value)) * 100
+        if total_purchase_value > 0 else 0
+    )
+
+    data = {
+        "wallet": {
+            "id": wallet.id,
+            "name": wallet.name,
+            "user": wallet.user.username,
+        },
+        "assets": assets_list,
+        "total_purchase": float(total_purchase_value),
+        "total_value": float(total_value),
+        "total_difference": float(total_difference),
+        "difference_in_percentage": float(difference_in_percentage)
+    }
+
+    return JsonResponse(data, safe=False)
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
@@ -150,19 +201,19 @@ def profile(request):
 
 @login_required
 def price(request):
-    currency = request.GET.get('currency', 'usd').lower()  
+    currency = request.GET.get('currency', 'usd').lower()
     prices = CurrentAsset.objects.all()
 
     try:
         currency_asset = CurrentAsset.objects.get(symbol=currency)
-        currency_rate = currency_asset.current_price  
+        currency_rate = currency_asset.current_price
     except CurrentAsset.DoesNotExist:
-        currency_rate = 1  
+        currency_rate = 1
 
     for asset in prices:
         asset.converted_price = round(asset.current_price / currency_rate, 2)
 
-    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']  
+    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']
 
     return render(request, 'core/price.html', {
         'prices': prices,
@@ -227,7 +278,7 @@ def wallet_detail(request, wallet_id):
         if symbol in asset_prices:
             total_value += wa.quantity * asset_prices[symbol]
 
-    total_difference = float(total_value) - float(total_purchase_value)  
+    total_difference = float(total_value) - float(total_purchase_value)
     differnce_in_percentage = (total_difference/float(total_purchase_value))*100
 
     return render(request, 'core/wallet_detail.html', {
@@ -251,16 +302,16 @@ def wallet_asset_detail(request, wallet_id, asset_id):
     try:
         current_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
     except CurrentAsset.DoesNotExist:
-        current_price = 0  
+        current_price = 0
 
     current_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
 
     total_value_transactions = sum(transaction.quantity * current_price for transaction in transactions)
 
     total_difference = float(total_value_transactions) - float(asset_total_purchase_value)
-    total_difference_percentage = (float(total_difference)/float(asset_total_purchase_value)) * 100 
+    total_difference_percentage = (float(total_difference)/float(asset_total_purchase_value)) * 100
 
-    
+
 
     return render(request, 'core/wallet_asset_detail.html', {
         'wallet': wallet,
