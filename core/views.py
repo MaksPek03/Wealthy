@@ -153,12 +153,9 @@ def api_wallet_detail(request, wallet_id):
         total_value += current_value
 
         assets_list.append({
+            "id": wa.asset.id,
             "asset": wa.asset.name,
             "symbol": symbol,
-            "quantity": wa.quantity,
-            "purchase_price": float(wa.purchase_price),
-            "current_price": float(current_price),
-            "current_value": float(current_value)
         })
 
     total_difference = float(total_value) - float(total_purchase_value)
