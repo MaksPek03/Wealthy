@@ -18,6 +18,7 @@ from .models import FriendRequest, FriendList, UserGoal
 from django import forms
 from .forms import PriceAlertForm
 from .models import PriceAlert
+from django.db.models import Sum, F, FloatField
 
 def home(request):
     return render(request, 'core/home.html')
@@ -211,19 +212,65 @@ def add_wallet(request):
 def wallet_detail(request, wallet_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     wallet_assets = WalletAsset.objects.filter(wallet=wallet).select_related('asset')
-    return render(request, 'core/wallet_detail.html', {'wallet': wallet, 'wallet_assets': wallet_assets})
+
+    total_purchase_value = wallet_assets.aggregate(
+        total=Sum(F('purchase_price') * F('quantity'), output_field=FloatField())
+    )['total'] or 0
+
+    asset_prices = {
+        asset.symbol: asset.current_price for asset in CurrentAsset.objects.all()
+    }
+
+    total_value = 0
+    for wa in wallet_assets:
+        symbol = wa.asset.symbol
+        if symbol in asset_prices:
+            total_value += wa.quantity * asset_prices[symbol]
+
+    total_difference = float(total_value) - float(total_purchase_value)  
+    differnce_in_percentage = (total_difference/float(total_purchase_value))*100
+
+    return render(request, 'core/wallet_detail.html', {
+        'wallet': wallet,
+        'wallet_assets': wallet_assets,
+        'total_purchase': total_purchase_value,
+        'total_value': total_value,
+        'total_difference': total_difference,
+        'difference_in_percentage': differnce_in_percentage
+    })
 
 def wallet_asset_detail(request, wallet_id, asset_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     asset = get_object_or_404(Asset, id=asset_id)
     transactions = WalletAsset.objects.filter(wallet=wallet, asset=asset)
 
+    asset_total_purchase_value = transactions.aggregate(
+        total = Sum(F('purchase_price') * F('quantity'),  output_field=FloatField())
+    )['total'] or 0
+
+    try:
+        current_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
+    except CurrentAsset.DoesNotExist:
+        current_price = 0  
+
+    current_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
+
+    total_value_transactions = sum(transaction.quantity * current_price for transaction in transactions)
+
+    total_difference = float(total_value_transactions) - float(asset_total_purchase_value)
+    total_difference_percentage = (float(total_difference)/float(asset_total_purchase_value)) * 100 
+
     
 
     return render(request, 'core/wallet_asset_detail.html', {
         'wallet': wallet,
         'asset': asset,
-        'transactions': transactions
+        'transactions': transactions,
+        'asset_total_purchase_value': asset_total_purchase_value,
+        'total_value_transactions': total_value_transactions,
+        'total_difference' : total_difference,
+        'total_difference_percentage': total_difference_percentage,
+        'current_price': current_price
     })
 
 @login_required
