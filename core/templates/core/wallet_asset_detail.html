@@ -1,0 +1,17 @@
+{% block content %}
+<h2>{{ asset.name }} transactions in {{ wallet.name }}</h2>
+
+{% if transactions %}
+    <ul>
+        {% for tx in transactions %}
+            <li>
+                quanity: {{ tx.quantity }} bought for: {{ tx.purchase_price }} on {{ tx.purchase_date }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No transactions for this asset in this wallet.</p>
+{% endif %}
+
+<p><a href="{% url 'wallet_detail' wallet.id %}">back to wallet</a></p>
+{% endblock %}
