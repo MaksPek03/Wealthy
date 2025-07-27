@@ -179,6 +179,11 @@ def api_wallet_detail(request, wallet_id):
 
     return JsonResponse(data, safe=False)
 
+def api_remove_wallet(request, wallet_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    wallet.delete()
+    return JsonResponse({"message": "Wallet removed successfully"})
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
