@@ -28,6 +28,8 @@
             <td colspan="4">you have no alerts</td>
         </tr>
         {% endfor %}
+        <a href="{% url 'asset_list' %}">add new alert</a>
         
     </tbody>
 </table>
+<a href="{% url 'profile' %}">back to profile</a>
