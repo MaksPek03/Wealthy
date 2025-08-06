@@ -125,3 +125,12 @@ class PriceAlert(models.Model):
     def __str__(self):
         direction = "above" if self.above else "below"
         return f"{self.asset.symbol} {direction} {self.target_price}"
+    
+
+class shared_wallet(models.Model):
+    wallet = models.ForegignKey(Wallet, on_delete = models.CASCADE)
+    shared_with = models.ForeignKey(User, on_delete = models.CASCADE)
+    shared_on = models.Datetime(auto_now_add = True)
+    
+    class Meta:
+        unique_together = ('wallet', 'shared_with')
