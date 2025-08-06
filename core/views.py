@@ -19,7 +19,7 @@ from django import forms
 from .forms import PriceAlertForm
 from .models import PriceAlert
 from django.db.models import Sum, F, FloatField
-
+from .models import SharedWallet
 def home(request):
     return render(request, 'core/home.html')
 
@@ -500,4 +500,48 @@ def my_alerts(request):
 
     return render(request, 'core/my_alerts.html', {
         'alerts_with_diff': alerts_with_diff
+    })
+
+@login_required
+def share_wallet(request, wallet_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user = request.user)
+    friends = FriendList.objects.get(user=request.user).friends.all()
+
+    if request.method == "POST":
+        friend_id = request.POST.get('friend_id')
+        friend_user = get_object_or_404(User, id=friend_id)
+
+        SharedWallet.object.get_or_create(wallet=wallet, shared_with=friend_user)
+        messages.success(request, f'you shared a wallet to user: {friend_user.username}')
+        return redirect('wallet_detail', wallet_id=wallet.id)
+    return render(request, 'core/share_wallet.html',{
+        'wallet': wallet,
+        'friends': friends
+    })
+
+@login_requiredd
+def shared_wallets(request):
+    shared_wall = SharedWallet.objects.filter(shared_with=request.user).select_related('wallet')
+    wallets = [shared.wallet for shared in shared_wall]
+
+    return render(request, 'core/shared_wallets.html', {
+        'shared_wallets': wallets
+    })
+
+@login_required
+def shared_wallet_detail(request, wallet_id):
+    shared = get_object_or_404(SharedWallet, wallet__id=wallet_id, shared_with=request.user)
+    wallet = shared.wallet
+    wallet_assets = WalletAsset.objects.filter(wallet=wallet).select_related('asset')
+
+    asset_prices = {
+        asset.symbol: asset.current_price for asset in CurrentAsset.objects.all()
+    }
+
+    total_value = sum(wa.quantity * asset_prices.get(wa.asset.symbol, 0) for wa in wallet_assets)
+
+    return render(request, 'core/shared_wallet_detail.html', {
+        'wallet': wallet,
+        'wallet_assets': wallet_assets,
+        'total_value': total_value
     })
