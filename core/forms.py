@@ -23,4 +23,5 @@ class PriceAlertForm(forms.ModelForm):
         widgets = {
             'target_price': forms.NumberInput(attrs={'step': '0.01', 'class': 'form-control'}),
             'above': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+
         }

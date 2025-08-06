@@ -1,0 +1,17 @@
+
+
+{% block content %}
+  <h2>wallets shared to You</h2>
+
+  {% if shared_wallets %}
+    <ul>
+      {% for wallet in shared_wallets %}
+        <li><a href="{% url 'shared_wallet_detail' wallet.id %}">{{ wallet.name }}</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>You have no shared wallets</p>
+  {% endif %}
+
+  <p><a href="{% url 'wallet_list' %}">Your wallets</a></p>
+{% endblock %}

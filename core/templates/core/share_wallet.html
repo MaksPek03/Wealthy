@@ -1,0 +1,21 @@
+
+
+{% block content %}
+  <h2>shared wallet: {{ wallet.name }}</h2>
+
+  <form method="post">
+    {% csrf_token %}
+    <label for="friend">choose friend to share: </label>
+    <select name="friend_id" id="friend" required>
+      {% for friend in friends %}
+        <option value="{{ friend.id }}">{{ friend.username }}</option>
+      {% empty %}
+        <option disabled>You have no friends to shared</option>
+      {% endfor %}
+    </select>
+    <br><br>
+    <button type="submit">share</button>
+  </form>
+
+  <p><a href="{% url 'wallet_detail' wallet.id %}">come back to wallet</a></p>
+{% endblock %}

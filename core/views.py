@@ -19,7 +19,7 @@ from django import forms
 from .forms import PriceAlertForm
 from .models import PriceAlert
 from django.db.models import Sum, F, FloatField
-
+from .models import SharedWallet
 def home(request):
     return render(request, 'core/home.html')
 
@@ -283,48 +283,85 @@ def wallet_detail(request, wallet_id):
     total_difference = float(total_value) - float(total_purchase_value)
     differnce_in_percentage = (total_difference/float(total_purchase_value))*100
 
+
+    currency = request.GET.get('currency', 'usd').lower()  
+    prices = CurrentAsset.objects.all()
+    try:
+        currency_asset = CurrentAsset.objects.get(symbol=currency)
+        currency_rate = currency_asset.current_price  
+    except CurrentAsset.DoesNotExist:
+        currency_rate = 1  
+    for asset in prices:
+        asset.converted_price = round(asset.current_price / currency_rate, 2)
+    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']  
+
+    converted_total_value = total_value / currency_rate
+    converted_total_purchase_value = float(total_purchase_value) / float(currency_rate)
+    converted_total_difference = float(converted_total_value) - float(converted_total_purchase_value)
+    converted_difference_in_percentage = (
+        (converted_total_difference / converted_total_purchase_value) * 100 if total_purchase_value else 0
+    )
+
     return render(request, 'core/wallet_detail.html', {
         'wallet': wallet,
         'wallet_assets': wallet_assets,
-        'total_purchase': total_purchase_value,
-        'total_value': total_value,
-        'total_difference': total_difference,
-        'difference_in_percentage': differnce_in_percentage
+        'total_purchase': converted_total_purchase_value,
+        'total_value': converted_total_value,
+        'total_difference': converted_total_difference,
+        'difference_in_percentage': converted_difference_in_percentage,
+        'prices': prices,
+        'currency': currency,
+        'currencies': currencies,
     })
 
+
+@login_required
 def wallet_asset_detail(request, wallet_id, asset_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     asset = get_object_or_404(Asset, id=asset_id)
     transactions = WalletAsset.objects.filter(wallet=wallet, asset=asset)
 
     asset_total_purchase_value = transactions.aggregate(
-        total = Sum(F('purchase_price') * F('quantity'),  output_field=FloatField())
+        total=Sum(F('purchase_price') * F('quantity'), output_field=FloatField())
     )['total'] or 0
 
     try:
-        current_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
+        base_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
     except CurrentAsset.DoesNotExist:
-        current_price = 0
+        base_price = 0
 
-    current_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
+    currency = request.GET.get('currency', 'usd').lower()
+    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']
 
-    total_value_transactions = sum(transaction.quantity * current_price for transaction in transactions)
+    try:
+        currency_asset = CurrentAsset.objects.get(symbol=currency)
+        currency_rate = currency_asset.current_price
+    except CurrentAsset.DoesNotExist:
+        currency_rate = 1
 
-    total_difference = float(total_value_transactions) - float(asset_total_purchase_value)
-    total_difference_percentage = (float(total_difference)/float(asset_total_purchase_value)) * 100
+    converted_price = round(base_price / currency_rate, 2)
 
+    total_value_transactions = sum(tx.quantity * converted_price for tx in transactions)
+    converted_total_purchase = float(asset_total_purchase_value) / float(currency_rate)
 
+    total_difference = float(total_value_transactions) - float(converted_total_purchase)
+    total_difference_percentage = (
+        (total_difference / converted_total_purchase) * 100 if converted_total_purchase else 0
+    )
 
     return render(request, 'core/wallet_asset_detail.html', {
         'wallet': wallet,
         'asset': asset,
         'transactions': transactions,
-        'asset_total_purchase_value': asset_total_purchase_value,
+        'converted_price': converted_price,
+        'asset_total_purchase_value': converted_total_purchase,
         'total_value_transactions': total_value_transactions,
-        'total_difference' : total_difference,
+        'total_difference': total_difference,
         'total_difference_percentage': total_difference_percentage,
-        'current_price': current_price
+        'currency': currency,
+        'currencies': currencies,
     })
+
 
 @login_required
 def add_wallet_asset(request, wallet_id):
@@ -359,6 +396,34 @@ def remove_wallet(request, wallet_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     wallet.delete()
     return redirect('wallet_list')
+
+@login_required
+def remove_wallet_asset(request, wallet_id, asset_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    asset = get_object_or_404(Asset, id=asset_id)
+    transactions = WalletAsset.objects.filter(wallet=wallet, asset=asset)
+
+    if transactions.exists():
+        transactions.delete()
+        messages.success(request, f"{asset.name} removed from your wallet.")
+    else:
+        messages.error(request, "no such asset in your wallet")
+
+    return redirect('wallet_detail', wallet_id=wallet_id)
+
+from django.views.decorators.http import require_POST
+
+@login_required
+def delete_wallet_transaction(request, wallet_id, asset_id, transaction_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    asset = get_object_or_404(Asset, id=asset_id)
+    transaction = get_object_or_404(WalletAsset, id=transaction_id, wallet=wallet, asset=asset)
+
+    transaction.delete()
+    messages.success(request, "transaction deleted successfully")
+
+    return redirect('wallet_asset_detail', wallet_id=wallet.id, asset_id=asset.id)
+
 
 @login_required
 def send_friend_request(request, user_id):
@@ -463,3 +528,76 @@ def add_price_alert(request, asset_id):
         'asset': asset
     })
 
+@login_required
+def my_alerts(request):
+    user_alerts = PriceAlert.objects.filter(user=request.user).select_related('asset')
+
+    alerts_with_diff = []
+    for alert in user_alerts:
+        try:
+            current_asset = CurrentAsset.objects.get(symbol=alert.asset.symbol)
+            current_price = current_asset.current_price
+        except CurrentAsset.DoesNotExist:
+            current_price = None 
+
+        if current_price is not None:
+            difference = round(alert.target_price - current_price, 2)
+        else:
+            difference = "no data"
+
+        alerts_with_diff.append({
+            'alert': alert,
+            'current_price': current_price,
+            'difference': difference,
+        })
+
+    return render(request, 'core/my_alerts.html', {
+        'alerts_with_diff': alerts_with_diff
+    })
+
+@login_required
+def share_wallet(request, wallet_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user = request.user)
+    friends = FriendList.objects.get(user=request.user).friends.all()
+
+    if request.method == "POST":
+        friend_id = request.POST.get('friend_id')
+        friend_user = get_object_or_404(User, id=friend_id)
+
+        SharedWallet.objects.get_or_create(wallet=wallet, shared_with=friend_user)
+        messages.success(request, f'you shared a wallet to user: {friend_user.username}')
+        return redirect('wallet_detail', wallet_id=wallet.id)
+    return render(request, 'core/share_wallet.html',{
+        'wallet': wallet,
+        'friends': friends
+    })
+
+@login_required
+def shared_wallets(request):
+    shared_wall = SharedWallet.objects.filter(shared_with=request.user).select_related('wallet')
+    wallets = [shared.wallet for shared in shared_wall]
+
+    return render(request, 'core/shared_wallets.html', {
+        'shared_wallets': wallets
+    })
+
+@login_required
+def shared_wallet_detail(request, wallet_id):
+    shared = get_object_or_404(SharedWallet, wallet__id=wallet_id, shared_with=request.user)
+    wallet = shared.wallet
+    wallet_assets = WalletAsset.objects.filter(wallet=wallet).select_related('asset')
+
+    asset_prices = {
+        asset.symbol: asset.current_price for asset in CurrentAsset.objects.all()
+    }
+
+    for wa in wallet_assets:
+        wa.current_price = asset_prices.get(wa.asset.symbol, 0)
+
+    total_value = sum(wa.quantity * wa.current_price for wa in wallet_assets)
+
+    return render(request, 'core/shared_wallet_detail.html', {
+        'wallet': wallet,
+        'wallet_assets': wallet_assets,
+        'total_value': total_value
+    })
