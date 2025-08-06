@@ -511,7 +511,7 @@ def share_wallet(request, wallet_id):
         friend_id = request.POST.get('friend_id')
         friend_user = get_object_or_404(User, id=friend_id)
 
-        SharedWallet.object.get_or_create(wallet=wallet, shared_with=friend_user)
+        SharedWallet.objects.get_or_create(wallet=wallet, shared_with=friend_user)
         messages.success(request, f'you shared a wallet to user: {friend_user.username}')
         return redirect('wallet_detail', wallet_id=wallet.id)
     return render(request, 'core/share_wallet.html',{
@@ -519,7 +519,7 @@ def share_wallet(request, wallet_id):
         'friends': friends
     })
 
-@login_requiredd
+@login_required
 def shared_wallets(request):
     shared_wall = SharedWallet.objects.filter(shared_with=request.user).select_related('wallet')
     wallets = [shared.wallet for shared in shared_wall]
@@ -538,7 +538,10 @@ def shared_wallet_detail(request, wallet_id):
         asset.symbol: asset.current_price for asset in CurrentAsset.objects.all()
     }
 
-    total_value = sum(wa.quantity * asset_prices.get(wa.asset.symbol, 0) for wa in wallet_assets)
+    for wa in wallet_assets:
+        wa.current_price = asset_prices.get(wa.asset.symbol, 0)
+
+    total_value = sum(wa.quantity * wa.current_price for wa in wallet_assets)
 
     return render(request, 'core/shared_wallet_detail.html', {
         'wallet': wallet,

@@ -41,6 +41,9 @@ urlpatterns = [
     path('api/asset/name/<str:symbol>/', views.api_asset_name, name='api_asset_name'),
     path('wallet/<int:wallet_id>/asset/<int:asset_id>/remove/', views.remove_wallet_asset, name='remove_wallet_asset'),
     path('wallet/<int:wallet_id>/asset/<int:asset_id>/transaction/<int:transaction_id>/delete/',views.delete_wallet_transaction,name='delete_wallet_transaction'),
+    path('wallet/<int:wallet_id>/share/', views.share_wallet, name='share_wallet'),
+    path('shared-wallets/', views.shared_wallets, name='shared_wallets'),
+    path('shared-wallet/<int:wallet_id>/', views.shared_wallet_detail, name='shared_wallet_detail'),
 
 
 
