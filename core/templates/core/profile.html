@@ -1,7 +1,8 @@
+{% extends 'core/base.html' %}
 {% block content %}
-  <h2>Hey, {{ user.username }}!</h2>
+  <h2 class="main_h2">Hey, {{ user.username }}!</h2>
 
-  <ul>
+  <ul class="profile">
     <li><a href="{% url 'wallet_list' %}">check your wallets</a></li>
     <li><a href="{% url 'shared_wallets' %}">shared wallets</a></li>
     <li><a href="{% url 'price' %}">check prices</a></li>
@@ -11,6 +12,7 @@
     <li><a href="{% url 'user_goals' %}">my goals</a></li>
     <li><a href="{% url 'my_alerts' %}">my alerts</a></li>
   </ul>
-
+  <div class="form-link">
   <a href="{% url 'home' %}">log out</a>
+  </div>
 {% endblock %}

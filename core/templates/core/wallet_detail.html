@@ -1,6 +1,9 @@
+{% extends 'core/base.html' %}
 {% block content %}
-  <h2>Wallet: {{ wallet.name }}</h2>
+  <h2 class="main_h2">Wallet: {{ wallet.name }}</h2>
 
+
+  <div class="wallet-summary">
   <form method="get" action="">
     <label for="currency">Choose currency:</label>
     <select name="currency" id="currency" onchange="this.form.submit()">
@@ -10,15 +13,15 @@
     </select>
   </form>
 
-  <p>total purchase price of all assets in this wallet: {{ total_purchase|floatformat:2 }} {{ currency|upper }}</p>
-  <p>total actual price of all assets in this wallet: {{ total_value|floatformat:2 }} {{ currency|upper }}</p>
-  <p>balance: {{ total_difference|floatformat:2 }} {{ currency|upper }} 
-     ({{ difference_in_percentage|floatformat:2 }}%)</p>
+  <p>total purchase price of all assets in this wallet: <bold>{{ total_purchase|floatformat:2 }} {{ currency|upper }}</bold></p>
+  <p>total actual price of all assets in this wallet:<bold> {{ total_value|floatformat:2 }} {{ currency|upper }}</bold></p>
+  <p>balance: <bold>{{ total_difference|floatformat:2 }} {{ currency|upper }} 
+     ({{ difference_in_percentage|floatformat:2 }}%)</bold></p>
+  </div>
 
-  <a href="{% url 'add_wallet_asset' wallet.id %}">add asset</a>
 
   {% if wallet_assets %}
-    <ul>
+    <ul class="wallet-assets">
       {% for wa in wallet_assets %}
         {% ifchanged wa.asset.id %}
           <li>
@@ -30,12 +33,15 @@
       {% endfor %}
     </ul>
   {% else %}
-    <p>this wallet has no assets yet</p>
+    <p>This wallet has no assets yet</p>
   {% endif %}
-  <p>
-  <a href="{% url 'share_wallet' wallet.id %}">share wallet</a>
-  </p>
+
+  
+<div class="wallet-links">
+    <a href="{% url 'add_wallet_asset' wallet.id %}">Add an asset</a>
+    <a href="{% url 'share_wallet' wallet.id %}">Share a wallet</a>
+    <a href="{% url 'wallet_list' %}">Back to wallet list</a>
+</div>
 
 
-  <p><a href="{% url 'wallet_list' %}">back to wallet list</a></p>
 {% endblock %}

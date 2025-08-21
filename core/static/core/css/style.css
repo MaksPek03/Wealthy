@@ -65,3 +65,90 @@
 .form-link a:hover{
     color: #555;
 }
+
+.profile{
+    list-style:none;
+    margin: 50px auto;
+
+}
+.profile li{
+    margin-bottom: 15px;
+}
+.profile li a{
+    text-decoration: none;
+    color: white;
+    font-size: 25px;
+    width: 100%;
+    text-align: center;
+    padding: auto auto;
+    border-radius: 10px;
+
+
+}
+.profile li a:hover{
+    color: #555;
+}
+
+
+.wallets{
+    max-width: 400px;
+    margin: 50px auto;
+}
+.wallets li{
+    text-decoration: none;
+    list-style:none;
+    margin-bottom: 15px;
+}
+.wallets li a{
+    display: block;
+    list-style:none;
+    margin-bottom: 130px;
+    text-decoration: none;
+    color: white;
+    font-size: 40px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+.wallets li a:hover{
+    color: #555;
+}
+
+.wallet-summary{
+    max-width: 500px;
+    margin: 30px auto;
+    color: white;
+    text-align: center;
+}
+.wallet-links a{
+    margin: 20px auto;
+    display: block;
+    width: 50%;
+    text-decoration: none;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    font-size: 30px;
+    
+}
+.wallet-links a:hover{
+    color: #555;
+
+}
+.wallet-assets{
+    list-style: none;
+    margin: 20px auto;
+    max-width: 500px;
+}
+.wallet-assets li{
+    text-align: center;
+}
+.wallet-assets li a{
+    text-decoration: none;
+    color: white;
+    font-size: 25px;
+    display: inline-block;
+    text-align: center;
+}
+.wallet-assets li a:hover{
+    color: #555;
+}

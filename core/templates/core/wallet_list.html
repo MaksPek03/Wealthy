@@ -1,28 +1,30 @@
 
+{% extends 'core/base.html' %}
 {% block content %}
-    <h2>Your Wallets</h2>
+    <h2 class="main_h2">Your wallets</h2>
     {% if wallets %}
-        <ul>
+        <ul class="wallets">
             {% for wallet in wallets %}
                 <li>
                     <a href = "{% url 'wallet_detail' wallet.id %}"> {{wallet.name }}</a>
                     <form action="{% url 'remove_wallet' wallet.id %}" method="post" style="display:inline;">
                         {% csrf_token %}
-                        <button type="submit">Remove Wallet</button>
+                        <button type="submit" class="btn">Remove Wallet</button>
                     </form>
                 </li>
             {% endfor %}
         </ul>
     {% else %}
-        <p>You have no wallets yet.</p>
+        <h2 class="main_h2">You have no wallets yet.</h2 class="main_h2">
     {% endif %}
     
-    <h3>Add New Wallet</h3>
+    <h2 class="main_h2">Add New Wallet</h2>
+    <div class="form-container">
     <form action="{% url 'add_wallet' %}" method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Add Wallet</button>
+        <button type="submit" class="btn">Add Wallet</button>
     </form>
-
-    <p><a href="{% url 'profile' %}">Back to profile</a></p>
+</div>
+    <p class="form-link"><a href="{% url 'profile' %}">Back to profile</a></p>
 {% endblock %}
