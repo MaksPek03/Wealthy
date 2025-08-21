@@ -1,0 +1,21 @@
+{% block content %}
+  <h2>wallet: {{ wallet.name }} (shared to You)</h2>
+
+  {% if wallet_assets %}
+    <ul>
+      {% for wa in wallet_assets %}
+        <li>
+          {{ wa.asset.name }} ({{ wa.asset.symbol }}) quantity: {{ wa.quantity }}<br>
+          purchase price: {{ wa.purchase_price }} $<br>
+          actual price: {{ wa.current_price }} $
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>This wallet has no assets</p>
+  {% endif %}
+
+  <p>Whole value of a wallet: {{ total_value|floatformat:2 }}</p>
+
+  <p><a href="{% url 'shared_wallets' %}">Come back to wallets</a></p>
+{% endblock %}

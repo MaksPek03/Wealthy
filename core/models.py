@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.utils import timezone
 
+
 class Asset(models.Model):
     name = models.CharField(max_length = 50)
     type = models.CharField(max_length = 50)
@@ -125,3 +126,12 @@ class PriceAlert(models.Model):
     def __str__(self):
         direction = "above" if self.above else "below"
         return f"{self.asset.symbol} {direction} {self.target_price}"
+    
+
+class SharedWallet(models.Model):
+    wallet = models.ForeignKey(Wallet, on_delete = models.CASCADE)
+    shared_with = models.ForeignKey(User, on_delete = models.CASCADE)
+    shared_on = models.DateTimeField(auto_now_add = True)
+    
+    class Meta:
+        unique_together = ('wallet', 'shared_with')
