@@ -283,48 +283,88 @@ def wallet_detail(request, wallet_id):
     total_difference = float(total_value) - float(total_purchase_value)
     differnce_in_percentage = (total_difference/float(total_purchase_value))*100
 
+
+    currency = request.GET.get('currency', 'usd').lower()  
+    prices = CurrentAsset.objects.all()
+    try:
+        currency_asset = CurrentAsset.objects.get(symbol=currency)
+        currency_rate = currency_asset.current_price  
+    except CurrentAsset.DoesNotExist:
+        currency_rate = 1  
+    for asset in prices:
+        asset.converted_price = round(asset.current_price / currency_rate, 2)
+    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']  
+
+    converted_total_value = total_value / currency_rate
+    converted_total_purchase_value = float(total_purchase_value) / float(currency_rate)
+    converted_total_difference = float(converted_total_value) - float(converted_total_purchase_value)
+    converted_difference_in_percentage = (
+        (converted_total_difference / converted_total_purchase_value) * 100 if total_purchase_value else 0
+    )
+
     return render(request, 'core/wallet_detail.html', {
         'wallet': wallet,
         'wallet_assets': wallet_assets,
-        'total_purchase': total_purchase_value,
-        'total_value': total_value,
-        'total_difference': total_difference,
-        'difference_in_percentage': differnce_in_percentage
+        'total_purchase': converted_total_purchase_value,
+        'total_value': converted_total_value,
+        'total_difference': converted_total_difference,
+        'difference_in_percentage': converted_difference_in_percentage,
+        'prices': prices,
+        'currency': currency,
+        'currencies': currencies,
     })
 
+
+@login_required
 def wallet_asset_detail(request, wallet_id, asset_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     asset = get_object_or_404(Asset, id=asset_id)
     transactions = WalletAsset.objects.filter(wallet=wallet, asset=asset)
 
     asset_total_purchase_value = transactions.aggregate(
-        total = Sum(F('purchase_price') * F('quantity'),  output_field=FloatField())
+        total=Sum(F('purchase_price') * F('quantity'), output_field=FloatField())
     )['total'] or 0
 
     try:
-        current_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
+        base_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
     except CurrentAsset.DoesNotExist:
-        current_price = 0
+        base_price = 0
 
-    current_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
+    currency = request.GET.get('currency', 'usd').lower()
+    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']
 
-    total_value_transactions = sum(transaction.quantity * current_price for transaction in transactions)
+    try:
+        currency_asset = CurrentAsset.objects.get(symbol=currency)
+        currency_rate = currency_asset.current_price
+    except CurrentAsset.DoesNotExist:
+        currency_rate = 1
 
+    converted_price = round(base_price / currency_rate, 2)
+
+    total_value_transactions = sum(tx.quantity * converted_price for tx in transactions)
+    converted_total_purchase = float(asset_total_purchase_value) / float(currency_rate)
+
+    total_difference = float(total_value_transactions) - float(converted_total_purchase)
+    total_difference_percentage = (
+        (total_difference / converted_total_purchase) * 100 if converted_total_purchase else 0
+    )
     total_difference = float(total_value_transactions) - float(asset_total_purchase_value)
     total_difference_percentage = (float(total_difference)/float(asset_total_purchase_value)) * 100
-
 
 
     return render(request, 'core/wallet_asset_detail.html', {
         'wallet': wallet,
         'asset': asset,
         'transactions': transactions,
-        'asset_total_purchase_value': asset_total_purchase_value,
+        'converted_price': converted_price,
+        'asset_total_purchase_value': converted_total_purchase,
         'total_value_transactions': total_value_transactions,
-        'total_difference' : total_difference,
+        'total_difference': total_difference,
         'total_difference_percentage': total_difference_percentage,
-        'current_price': current_price
+        'currency': currency,
+        'currencies': currencies,
     })
+
 
 @login_required
 def add_wallet_asset(request, wallet_id):

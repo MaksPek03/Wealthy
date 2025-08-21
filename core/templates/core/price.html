@@ -15,7 +15,7 @@
       {% for price in prices %}
         <li>
           name: {{ price.name }}<br>
-          symbol: {{ price.symbol }}<br>
+          <!-- symbol: {{ price.symbol }}<br> -->
           current price: {{ price.converted_price }} {{ currency|upper }}
         </li>
       {% endfor %}

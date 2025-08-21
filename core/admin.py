@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from core.models import FriendList, FriendRequest
+from core.models import FriendList, FriendRequest, Asset, UserGoal, PriceAlert,HistoricAsset, CurrentAsset, Wallet, WalletAsset
 
 class FriendListAdmin(admin.ModelAdmin):
     list_filter = ['user']
@@ -12,7 +12,6 @@ class FriendListAdmin(admin.ModelAdmin):
     class Meta:
         model = FriendList
 
-admin.site.register(FriendList, FriendListAdmin)
 
 class FriendRequestAdmin(admin.ModelAdmin):
     list_filter = ['sender', 'receiver']
@@ -21,6 +20,12 @@ class FriendRequestAdmin(admin.ModelAdmin):
 
     class Meta:
         model = FriendRequest
-
 admin.site.register(FriendRequest, FriendRequestAdmin)
+admin.site.register(Asset)
+admin.site.register(UserGoal)
+admin.site.register(PriceAlert)
+admin.site.register(HistoricAsset)
+admin.site.register(CurrentAsset)
+admin.site.register(Wallet)
+admin.site.register(WalletAsset)
 
