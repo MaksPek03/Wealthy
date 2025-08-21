@@ -583,7 +583,9 @@ def shared_wallets(request):
 
 @login_required
 def shared_wallet_detail(request, wallet_id):
-    shared = get_object_or_404(SharedWallet, wallet__id=wallet_id, shared_with=request.user)
+    shared = get_object_or_404(
+        SharedWallet, wallet__id=wallet_id, shared_with=request.user
+    )
     wallet = shared.wallet
     wallet_assets = WalletAsset.objects.filter(wallet=wallet).select_related('asset')
 
@@ -599,5 +601,6 @@ def shared_wallet_detail(request, wallet_id):
     return render(request, 'core/shared_wallet_detail.html', {
         'wallet': wallet,
         'wallet_assets': wallet_assets,
-        'total_value': total_value
+        'total_value': total_value,
     })
+
