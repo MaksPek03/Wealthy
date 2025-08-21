@@ -1,0 +1,35 @@
+<h2>Your alert prices: </h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Asset</th>
+            <th>Alert price</th>
+            <th>Actual price</th>
+            <th>difference</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in alerts_with_diff %}
+        <tr>
+            <td>{{ item.alert.asset.name }} ({{ item.alert.asset.symbol }})</td>
+            <td>{{ item.alert.target_price }}</td>
+            <td>
+                {% if item.current_price %}
+                    {{ item.current_price }}
+                {% else %}
+                    Brak danych
+                {% endif %}
+            </td>
+            <td>{{ item.difference }} {{ item.direction }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">you have no alerts</td>
+        </tr>
+        {% endfor %}
+        <a href="{% url 'asset_list' %}">add new alert</a>
+        
+    </tbody>
+</table>
+<a href="{% url 'profile' %}">back to profile</a>

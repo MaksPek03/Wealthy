@@ -503,3 +503,29 @@ def add_price_alert(request, asset_id):
         'asset': asset
     })
 
+@login_required
+def my_alerts(request):
+    user_alerts = PriceAlert.objects.filter(user=request.user).select_related('asset')
+
+    alerts_with_diff = []
+    for alert in user_alerts:
+        try:
+            current_asset = CurrentAsset.objects.get(symbol=alert.asset.symbol)
+            current_price = current_asset.current_price
+        except CurrentAsset.DoesNotExist:
+            current_price = None 
+
+        if current_price is not None:
+            difference = round(alert.target_price - current_price, 2)
+        else:
+            difference = "no data"
+
+        alerts_with_diff.append({
+            'alert': alert,
+            'current_price': current_price,
+            'difference': difference,
+        })
+
+    return render(request, 'core/my_alerts.html', {
+        'alerts_with_diff': alerts_with_diff
+    })
