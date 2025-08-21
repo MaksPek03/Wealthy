@@ -1,0 +1,154 @@
+.main_menu{
+    list-style:none;
+    display:flex;
+    gap: 30px;
+    justify-content: center;
+    margin-top: 100px;
+
+}
+.main_menu li a{
+    text-decoration: none;
+    background: #333;
+    color:white;
+    border-radius:5px;
+    padding: 15px 30px;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.main_h2{
+    justify-content: center;
+}
+.main_h2{
+    text-align: center;
+    font-size: 40px;
+    color: white;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-top: 50px;
+}
+
+.form-container{
+    max-width: 450px;
+    margin: auto auto;
+    padding: 30px 30px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+
+}
+
+
+.form-container input{
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.btn{
+    background-color: #333;
+    color:white;
+    border-radius: 5px;
+    font-size: 20px;
+    padding: 15px;
+    width: 100%;
+    margin-top: 10px;
+}
+.btn:hover{
+    background-color: black;
+}
+.form-link{
+    text-align: center;
+}
+.form-link a{
+    text-decoration: none;
+    color: white;
+}
+.form-link a:hover{
+    color: #555;
+}
+
+.profile{
+    list-style:none;
+    margin: 50px auto;
+
+}
+.profile li{
+    margin-bottom: 15px;
+}
+.profile li a{
+    text-decoration: none;
+    color: white;
+    font-size: 25px;
+    width: 100%;
+    text-align: center;
+    padding: auto auto;
+    border-radius: 10px;
+
+
+}
+.profile li a:hover{
+    color: #555;
+}
+
+
+.wallets{
+    max-width: 400px;
+    margin: 50px auto;
+}
+.wallets li{
+    text-decoration: none;
+    list-style:none;
+    margin-bottom: 15px;
+}
+.wallets li a{
+    display: block;
+    list-style:none;
+    margin-bottom: 130px;
+    text-decoration: none;
+    color: white;
+    font-size: 40px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+.wallets li a:hover{
+    color: #555;
+}
+
+.wallet-summary{
+    max-width: 500px;
+    margin: 30px auto;
+    color: white;
+    text-align: center;
+}
+.wallet-links a{
+    margin: 20px auto;
+    display: block;
+    width: 50%;
+    text-decoration: none;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    font-size: 30px;
+    
+}
+.wallet-links a:hover{
+    color: #555;
+
+}
+.wallet-assets{
+    list-style: none;
+    margin: 20px auto;
+    max-width: 500px;
+}
+.wallet-assets li{
+    text-align: center;
+}
+.wallet-assets li a{
+    text-decoration: none;
+    color: white;
+    font-size: 25px;
+    display: inline-block;
+    text-align: center;
+}
+.wallet-assets li a:hover{
+    color: #555;
+}
