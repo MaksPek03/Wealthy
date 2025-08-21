@@ -349,6 +349,7 @@ def wallet_asset_detail(request, wallet_id, asset_id):
         (total_difference / converted_total_purchase) * 100 if converted_total_purchase else 0
     )
 
+
     return render(request, 'core/wallet_asset_detail.html', {
         'wallet': wallet,
         'asset': asset,
@@ -600,4 +601,5 @@ def shared_wallet_detail(request, wallet_id):
         'wallet': wallet,
         'wallet_assets': wallet_assets,
         'total_value': total_value
+    })
     })
