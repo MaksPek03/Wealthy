@@ -27,3 +27,41 @@
     letter-spacing: 1px;
     margin-top: 50px;
 }
+
+.form-container{
+    max-width: 450px;
+    margin: auto auto;
+    padding: 30px 30px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+
+}
+
+
+.form-container input{
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.btn{
+    background-color: #333;
+    color:white;
+    border-radius: 5px;
+    font-size: 20px;
+    padding: 15px;
+    width: 100%;
+    margin-top: 10px;
+}
+.btn:hover{
+    background-color: black;
+}
+.form-link{
+    text-align: center;
+}
+.form-link a{
+    text-decoration: none;
+    color: white;
+}
+.form-link a:hover{
+    color: #555;
+}
