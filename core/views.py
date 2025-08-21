@@ -401,6 +401,34 @@ def remove_wallet(request, wallet_id):
     return redirect('wallet_list')
 
 @login_required
+def remove_wallet_asset(request, wallet_id, asset_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    asset = get_object_or_404(Asset, id=asset_id)
+    transactions = WalletAsset.objects.filter(wallet=wallet, asset=asset)
+
+    if transactions.exists():
+        transactions.delete()
+        messages.success(request, f"{asset.name} removed from your wallet.")
+    else:
+        messages.error(request, "no such asset in your wallet")
+
+    return redirect('wallet_detail', wallet_id=wallet_id)
+
+from django.views.decorators.http import require_POST
+
+@login_required
+def delete_wallet_transaction(request, wallet_id, asset_id, transaction_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    asset = get_object_or_404(Asset, id=asset_id)
+    transaction = get_object_or_404(WalletAsset, id=transaction_id, wallet=wallet, asset=asset)
+
+    transaction.delete()
+    messages.success(request, "transaction deleted successfully")
+
+    return redirect('wallet_asset_detail', wallet_id=wallet.id, asset_id=asset.id)
+
+
+@login_required
 def send_friend_request(request, user_id):
     receiver = get_object_or_404(User, id=user_id)
     existing_request = FriendRequest.objects.filter(sender=request.user, receiver=receiver, is_active = True)

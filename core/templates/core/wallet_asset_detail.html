@@ -10,7 +10,6 @@
     </select>
 </form>
 
-
 <p>Total purchase price for this asset: {{ asset_total_purchase_value|floatformat:2 }} {{ currency|upper }}</p>
 <p>Total actual value of assets: {{ total_value_transactions|floatformat:2 }} {{ currency|upper }}</p>
 <p>balance: {{ total_difference|floatformat:2 }} {{ currency|upper }},
@@ -21,8 +20,15 @@
         {% for tx in transactions %}
             <li>
                 Quantity: {{ tx.quantity }} bought for: 
-                {{ tx.purchase_price|floatformat:2 }} $
-                on {{ tx.purchase_date }}
+                {{ tx.purchase_price|floatformat:2 }} $ on {{ tx.purchase_date }}
+                <form method="post"
+                      action="{% url 'delete_wallet_transaction' wallet.id asset.id tx.id %}"
+                      onsubmit="return confirm('delete this transaction?');">
+                    {% csrf_token %}
+                    <button type="submit">
+                        Delete transaction
+                    </button>
+                </form>
             </li>
         {% endfor %}
     </ul>
@@ -30,5 +36,11 @@
     <p>No transactions for this asset in this wallet.</p>
 {% endif %}
 
-<p><a href="{% url 'wallet_detail' wallet.id %}">Back to wallet</a></p>
+<form method="post" action="{% url 'remove_wallet_asset' wallet.id asset.id %}"
+      onsubmit="return confirm('Are you sure to remove this asset and all its transactions?');">
+    {% csrf_token %}
+    <button type="submit">remove asset</button>
+</form>
+
+<p><a href="{% url 'wallet_detail' wallet.id %}">back to wallet</a></p>
 {% endblock %}
