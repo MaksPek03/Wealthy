@@ -1,3 +1,4 @@
+{% extends 'core/base.html' %}
 {% block content %}
     <h2>Login</h2>
     <form method = "POST">
@@ -6,4 +7,4 @@
         <button type="submit">Login</button>
     </form>
     <p>dont have an account? <a href="{% url 'register' %}">Register</a></p>
-    {% endblock %}
+{% endblock %}
