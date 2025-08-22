@@ -229,9 +229,9 @@ def api_add_wallet_asset_details(request, wallet_id, asset_id):
     except json.JSONDecodeError as e:
             print("JSON decode error:", e)
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
-        except Exception as e:
-            print("Other error:", e)
-            return JsonResponse({'error': str(e)}, status=500)
+    except Exception as e:
+        print("Other error:", e)
+        return JsonResponse({'error': str(e)}, status=500)
 
 def register(request):
     form = UserCreationForm(request.POST or None)
