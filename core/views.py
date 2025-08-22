@@ -188,6 +188,40 @@ def api_list_of_assets(request):
     assets = Asset.objects.all().values('id', 'name')
     return JsonResponse(list(assets), safe=False)
 
+@csrf_exempt
+def api_add_wallet_asset(request, wallet_id, asset_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id)
+    asset = get_object_or_404(Asset, id=asset_id)
+
+    if request.method != "POST":
+        return JsonResponse({'error': 'POST method required'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        quantity = data.get('quantity')
+        purchase_price = data.get('purchase_price')
+        purchase_date = data.get('purchase_date')
+
+        wallet_asset = WalletAsset.objects.create(
+            wallet=wallet,
+            asset=asset,
+            quantity=quantity,
+            purchase_price=purchase_price,
+            purchase_date=purchase_date
+        )
+
+        return JsonResponse({
+            'id': wallet_asset.id,
+            'wallet_id': wallet.id,
+            'asset_id': asset.id,
+            'quantity': wallet_asset.quantity,
+            'purchase_price': wallet_asset.purchase_price,
+            'purchase_date': str(wallet_asset.purchase_date)
+        }, status=201)
+
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
