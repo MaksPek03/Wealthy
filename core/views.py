@@ -190,6 +190,8 @@ def api_list_of_assets(request):
 
 @csrf_exempt
 def api_add_wallet_asset_details(request, wallet_id, asset_id):
+    print("Received request:", request.method, "to wallet_id:", wallet_id, "asset_id:", asset_id)
+
     wallet = get_object_or_404(Wallet, id=wallet_id)
     asset = get_object_or_404(Asset, id=asset_id)
 
@@ -201,6 +203,11 @@ def api_add_wallet_asset_details(request, wallet_id, asset_id):
         quantity = data.get('quantity')
         purchase_price = data.get('purchase_price')
         purchase_date = data.get('purchase_date')
+
+        print("Parsed values:")
+        print("quantity:", quantity, type(quantity))
+        print("purchase_price:", purchase_price, type(purchase_price))
+        print("purchase_date:", purchase_date, type(purchase_date))
 
         wallet_asset = WalletAsset.objects.create(
             wallet=wallet,
@@ -219,8 +226,12 @@ def api_add_wallet_asset_details(request, wallet_id, asset_id):
             'purchase_date': str(wallet_asset.purchase_date)
         }, status=201)
 
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except json.JSONDecodeError as e:
+            print("JSON decode error:", e)
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            print("Other error:", e)
+            return JsonResponse({'error': str(e)}, status=500)
 
 def register(request):
     form = UserCreationForm(request.POST or None)
