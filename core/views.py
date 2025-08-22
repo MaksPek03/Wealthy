@@ -189,7 +189,7 @@ def api_list_of_assets(request):
     return JsonResponse(list(assets), safe=False)
 
 @csrf_exempt
-def api_add_wallet_asset(request, wallet_id, asset_id):
+def api_add_wallet_asset_details(request, wallet_id, asset_id):
     wallet = get_object_or_404(Wallet, id=wallet_id)
     asset = get_object_or_404(Asset, id=asset_id)
 
