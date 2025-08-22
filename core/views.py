@@ -185,7 +185,7 @@ def api_remove_wallet(request, wallet_id):
     return JsonResponse({"message": "Wallet removed successfully"})
 
 def api_list_of_assets(request):
-    assets = Asset.objects.all()
+    assets = Asset.objects.all().values('id', 'name')
     return JsonResponse(list(assets), safe=False)
 
 def register(request):
