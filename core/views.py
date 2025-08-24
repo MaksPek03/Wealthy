@@ -275,6 +275,25 @@ def api_wallet_asset_detail(request, wallet_id, asset_id):
         'current_price': float(current_price),
     }, status=200)
 
+
+def api_delete_wallet_transaction(request, wallet_id, asset_id, transaction_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    asset = get_object_or_404(Asset, id=asset_id)
+    transaction = get_object_or_404(WalletAsset, id=transaction_id, wallet=wallet, asset=asset)
+
+    transaction.delete()
+
+    return JsonResponse({"message": "Transaction removed successfully"})
+
+def api_remove_wallet_asset(request, wallet_id, asset_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    asset = get_object_or_404(Asset, id=asset_id)
+    transactions = WalletAsset.objects.filter(wallet=wallet, asset=asset)
+
+    transactions.delete()
+
+    return JsonResponse({"message": "Asset removed successfully"})
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
@@ -375,16 +394,16 @@ def wallet_detail(request, wallet_id):
     differnce_in_percentage = (total_difference/float(total_purchase_value))*100
 
 
-    currency = request.GET.get('currency', 'usd').lower()  
+    currency = request.GET.get('currency', 'usd').lower()
     prices = CurrentAsset.objects.all()
     try:
         currency_asset = CurrentAsset.objects.get(symbol=currency)
-        currency_rate = currency_asset.current_price  
+        currency_rate = currency_asset.current_price
     except CurrentAsset.DoesNotExist:
-        currency_rate = 1  
+        currency_rate = 1
     for asset in prices:
         asset.converted_price = round(asset.current_price / currency_rate, 2)
-    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']  
+    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']
 
     converted_total_value = total_value / currency_rate
     converted_total_purchase_value = float(total_purchase_value) / float(currency_rate)
@@ -630,7 +649,7 @@ def my_alerts(request):
             current_asset = CurrentAsset.objects.get(symbol=alert.asset.symbol)
             current_price = current_asset.current_price
         except CurrentAsset.DoesNotExist:
-            current_price = None 
+            current_price = None
 
         if current_price is not None:
             difference = round(alert.target_price - current_price, 2)
