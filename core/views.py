@@ -225,6 +225,56 @@ def api_add_wallet_asset_details(request, wallet_id, asset_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+def api_wallet_asset_detail(request, wallet_id, asset_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    asset = get_object_or_404(Asset, id=asset_id)
+    transactions = WalletAsset.objects.filter(wallet=wallet, asset=asset)
+
+    asset_total_purchase_value = transactions.aggregate(
+        total=Sum(F('purchase_price') * F('quantity'), output_field=FloatField())
+    )['total'] or 0
+
+    try:
+        current_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
+    except CurrentAsset.DoesNotExist:
+        current_price = 0
+
+    total_value_transactions = sum(
+        transaction.quantity * current_price for transaction in transactions
+    )
+
+    total_difference = float(total_value_transactions) - float(asset_total_purchase_value)
+    total_difference_percentage = (
+        (float(total_difference) / float(asset_total_purchase_value)) * 100
+        if asset_total_purchase_value != 0 else 0
+    )
+
+    return JsonResponse({
+        'wallet': {
+            'id': wallet.id,
+            'name': wallet.name,
+        },
+        'asset': {
+            'id': asset.id,
+            'name': asset.name,
+            'symbol': asset.symbol,
+        },
+        'transactions': [
+            {
+                'id': t.id,
+                'quantity': float(t.quantity),
+                'purchase_price': float(t.purchase_price),
+                'purchase_date': str(t.purchase_date)
+            }
+            for t in transactions
+        ],
+        'asset_total_purchase_value': float(asset_total_purchase_value),
+        'total_value_transactions': float(total_value_transactions),
+        'total_difference': float(total_difference),
+        'total_difference_percentage': float(total_difference_percentage),
+        'current_price': float(current_price),
+    }, status=200)
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
