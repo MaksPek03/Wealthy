@@ -3,6 +3,10 @@ from django.contrib import admin
 # Register your models here.
 from core.models import FriendList, FriendRequest, Asset, UserGoal, PriceAlert,HistoricAsset, CurrentAsset, Wallet, WalletAsset
 
+# filter - how we can filter among the fields
+# display - what is showed on a page
+# search - by which field we can search
+# readonly - means that this field is only to read(even admin cannot change it)
 class FriendListAdmin(admin.ModelAdmin):
     list_filter = ['user']
     list_display = ['user']
@@ -20,6 +24,8 @@ class FriendRequestAdmin(admin.ModelAdmin):
 
     class Meta:
         model = FriendRequest
+
+# thanks to the admin.site.register every model is showed in a admin panel
 admin.site.register(FriendRequest, FriendRequestAdmin)
 admin.site.register(Asset)
 admin.site.register(UserGoal)
