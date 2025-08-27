@@ -212,7 +212,118 @@ def api_remove_wallet(request, wallet_id):
     wallet.delete()
     return JsonResponse({"message": "Wallet removed successfully"})
 
-# classic register of a user
+
+def api_list_of_assets(request):
+    assets = Asset.objects.all().values('id', 'name')
+    return JsonResponse(list(assets), safe=False)
+
+@csrf_exempt
+def api_add_wallet_asset_details(request, wallet_id, asset_id):
+
+    wallet = get_object_or_404(Wallet, id=wallet_id)
+    asset = get_object_or_404(Asset, id=asset_id)
+
+    if request.method != "POST":
+        return JsonResponse({'error': 'POST method required'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        quantity = data.get('quantity')
+        purchase_price = data.get('purchase_price')
+        purchase_date = data.get('purchase_date')
+
+        wallet_asset = WalletAsset.objects.create(
+            wallet=wallet,
+            asset=asset,
+            quantity=quantity,
+            purchase_price=purchase_price,
+            purchase_date=purchase_date
+        )
+
+        return JsonResponse({
+            'id': wallet_asset.id,
+            'wallet_id': wallet.id,
+            'asset_id': asset.id,
+            'quantity': wallet_asset.quantity,
+            'purchase_price': wallet_asset.purchase_price,
+            'purchase_date': str(wallet_asset.purchase_date)
+        }, status=201)
+
+    except json.JSONDecodeError as e:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+def api_wallet_asset_detail(request, wallet_id, asset_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    asset = get_object_or_404(Asset, id=asset_id)
+    transactions = WalletAsset.objects.filter(wallet=wallet, asset=asset)
+
+    asset_total_purchase_value = transactions.aggregate(
+        total=Sum(F('purchase_price') * F('quantity'), output_field=FloatField())
+    )['total'] or 0
+
+    try:
+        current_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
+    except CurrentAsset.DoesNotExist:
+        current_price = 0
+
+    total_value_transactions = sum(
+        transaction.quantity * current_price for transaction in transactions
+    )
+
+    total_difference = float(total_value_transactions) - float(asset_total_purchase_value)
+    total_difference_percentage = (
+        (float(total_difference) / float(asset_total_purchase_value)) * 100
+        if asset_total_purchase_value != 0 else 0
+    )
+
+    return JsonResponse({
+        'wallet': {
+            'id': wallet.id,
+            'name': wallet.name,
+        },
+        'asset': {
+            'id': asset.id,
+            'name': asset.name,
+            'symbol': asset.symbol,
+        },
+        'transactions': [
+            {
+                'id': t.id,
+                'quantity': float(t.quantity),
+                'purchase_price': float(t.purchase_price),
+                'purchase_date': str(t.purchase_date)
+            }
+            for t in transactions
+        ],
+        'asset_total_purchase_value': float(asset_total_purchase_value),
+        'total_value_transactions': float(total_value_transactions),
+        'total_difference': float(total_difference),
+        'total_difference_percentage': float(total_difference_percentage),
+        'current_price': float(current_price),
+    }, status=200)
+
+
+def api_delete_wallet_transaction(request, wallet_id, asset_id, transaction_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    asset = get_object_or_404(Asset, id=asset_id)
+    transaction = get_object_or_404(WalletAsset, id=transaction_id, wallet=wallet, asset=asset)
+
+    transaction.delete()
+
+    return JsonResponse({"message": "Transaction removed successfully"})
+
+def api_remove_wallet_asset(request, wallet_id, asset_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    asset = get_object_or_404(Asset, id=asset_id)
+    transactions = WalletAsset.objects.filter(wallet=wallet, asset=asset)
+
+    transactions.delete()
+
+    return JsonResponse({"message": "Asset removed successfully"})
+
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
@@ -327,16 +438,16 @@ def wallet_detail(request, wallet_id):
     differnce_in_percentage = (total_difference/float(total_purchase_value))*100
 
 
-    currency = request.GET.get('currency', 'usd').lower()  
+    currency = request.GET.get('currency', 'usd').lower()
     prices = CurrentAsset.objects.all()
     try:
         currency_asset = CurrentAsset.objects.get(symbol=currency)
-        currency_rate = currency_asset.current_price  
+        currency_rate = currency_asset.current_price
     except CurrentAsset.DoesNotExist:
-        currency_rate = 1  
+        currency_rate = 1
     for asset in prices:
         asset.converted_price = round(asset.current_price / currency_rate, 2)
-    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']  
+    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']
 
     converted_total_value = total_value / currency_rate
     converted_total_purchase_value = float(total_purchase_value) / float(currency_rate)
@@ -590,7 +701,7 @@ def my_alerts(request):
             current_asset = CurrentAsset.objects.get(symbol=alert.asset.symbol)
             current_price = current_asset.current_price
         except CurrentAsset.DoesNotExist:
-            current_price = None 
+            current_price = None
 
         if current_price is not None:
             difference = round(alert.target_price - current_price, 2)
