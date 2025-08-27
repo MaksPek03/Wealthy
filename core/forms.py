@@ -1,6 +1,6 @@
 from django import forms
 from .models import Wallet, WalletAsset
-from .models import PriceAlert
+from .models import PriceAlert, UserGoal
 
 class WalletForm(forms.ModelForm):
     class Meta:
@@ -25,3 +25,10 @@ class PriceAlertForm(forms.ModelForm):
             'above': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
 
         }
+
+
+
+class UserGoalForm(forms.ModelForm):
+    class Meta:
+        model = UserGoal
+        fields = ['name', 'description', 'target_amount', 'current_amount', 'deadline']
