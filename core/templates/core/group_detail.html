@@ -1,31 +1,52 @@
 {% extends 'core/base.html' %}
-{% block title %}Group: {{Group.name}}{% endblock %}
+{% block title %}Group: {{ group.name }}{% endblock %}
 
 {% block content %}
-<h1>{{group.name}}</h1>
-<p>{{group.description}}</p>
-<a href="{% url 'join_group' group.id %}">join to the group</a>
+<h1>{{ group.name }}</h1>
+<p>{{ group.description }}</p>
+
+{% if request.user != group.created_by %}
+  <a href="{% url 'request_to_join' group.id %}">please to join</a>
+{% endif %}
+
+{% if request.user == group.created_by %}
+  <h2>Requests</h2>
+  <ul>
+    {% for req in group.join_requests.all %}
+      {% if not req.is_approved %}
+        <li>
+          {{ req.user.username }}
+          <a href="{% url 'approve_request' group.id req.id %}">accept</a>
+        <a href="{% url 'reject_request' group.id req.id %}">reject</a>
+        </li>
+      {% endif %}
+    {% empty %}
+      <li>no pending requests</li>
+    {% endfor %}
+  </ul>
+{% endif %}
 
 <h2>Ranking</h2>
 <table>
-    <tr>
-        <th>User</th>
-        <th>Balance</th>
-    </tr>
-    {% for member in members %}
-    <tr>
-        <td>{{members.user.username}}</td>
-        <td>{{member.balance}}</td>
-        <td>
-            {% if member.user == request.user %}
-            <a href="{% url 'add_transaction' member.id %}">add a transaction</a>
-            {% endif %}
-        </td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="3">no members</td>
-    </tr>
-    {% endfor %}
+  <tr>
+    <th>User</th>
+    <th>Balance</th>
+    <th>Action</th>
+  </tr>
+  {% for member in members %}
+  <tr>
+    <td>{{ member.user.username }}</td>
+    <td>{{ member.balance }}</td>
+    <td>
+      {% if member.user == request.user %}
+        <a href="{% url 'add_transaction' member.id %}">add a transaction</a>
+      {% endif %}
+    </td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="3">no members</td>
+  </tr>
+  {% endfor %}
 </table>
 {% endblock %}

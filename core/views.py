@@ -20,7 +20,7 @@ from .forms import PriceAlertForm
 from .models import PriceAlert
 from django.db.models import Sum, F, FloatField
 from .models import SharedWallet
-from .models import Group, Membership, GroupTransaction
+from .models import Group, Membership, GroupTransaction, JoinRequest
 
 # it returns the main page, it does not require log in
 def home(request):
@@ -680,3 +680,36 @@ def join_group(request, group_id):
     membership, created = Membership.objects.get_or_create(user=request.user, group=group)
     return redirect("group_detail", group_id = group.id)
 
+
+@login_required
+def request_to_join(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
+    JoinRequest.objects.get_or_create(user=request.user, group=group)
+    return redirect("group_detail", group_id=group.id)
+
+# owner can approve
+@login_required
+def approve_request(request, request_id):
+    join_request = get_object_or_404(JoinRequest, id=request_id)
+    group = join_request.group
+
+    if request.user != group.created_by:
+        return redirect('group_detail', group_id=group.id)
+    
+    join_request.is_approved = True
+    join_request.save()
+    
+    Membership.objects.get_or_create(user=join_request.user, group=group)
+
+    return redirect("group_detail", group_id=group.id)
+
+# owner can reject
+@login_required
+def reject_request(request, request_id):
+    join_request = get_object_or_404(JoinRequest, id=request_id)
+    group = join_request.group
+
+    if request.user == group.created_by:
+        join_request.delete()
+    
+    return redirect("group_detail", group_id=group.id)
