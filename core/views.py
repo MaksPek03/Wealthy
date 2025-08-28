@@ -20,6 +20,7 @@ from .forms import PriceAlertForm
 from .models import PriceAlert
 from django.db.models import Sum, F, FloatField
 from .models import SharedWallet
+from .models import Group, Membership, GroupTransaction
 
 # it returns the main page, it does not require log in
 def home(request):
