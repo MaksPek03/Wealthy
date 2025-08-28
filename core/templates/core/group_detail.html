@@ -1,0 +1,31 @@
+{% extends 'core/base.html' %}
+{% block title %}Group: {{Group.name}}{% endblock %}
+
+{% block content %}
+<h1>{{group.name}}</h1>
+<p>{{group.description}}</p>
+<a href="{% url 'join_group' group.id %}">join to the group</a>
+
+<h2>Ranking</h2>
+<table>
+    <tr>
+        <th>User</th>
+        <th>Balance</th>
+    </tr>
+    {% for member in members %}
+    <tr>
+        <td>{{members.user.username}}</td>
+        <td>{{member.balance}}</td>
+        <td>
+            {% if member.user == request.user %}
+            <a href="{% url 'add_transaction' member.id %}">add a transaction</a>
+            {% endif %}
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="3">no members</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

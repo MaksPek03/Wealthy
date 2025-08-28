@@ -185,3 +185,14 @@ class GroupTransaction(models.Model):
     def apply(self):
         self.membership.balance += self.amount
         self.membership.save()
+
+# user can try to join the group, by this model
+class JoinRequest(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="join_requests")
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_approved = models.BooleanField(default=False)
+
+    # to not send the same join approve
+    class Meta:
+        unique_together = ('user', 'group')

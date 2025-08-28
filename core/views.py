@@ -660,3 +660,23 @@ def shared_wallet_detail(request, wallet_id):
         'total_value': total_value
     })
 
+# list all groups 
+@login_required
+def group_list(request):
+    groups = Group.objects.all()
+    return render(request, 'core/group_list.html', {"groups": groups})
+
+# details of group and ladeboard
+@login_required
+def group_detail(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
+    members = Membership.objects.filter(group=group).order_by('-balance')
+    return render(request, 'core/group_detail.html', {"group": group, "members":  members})
+
+
+@login_required
+def join_group(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
+    membership, created = Membership.objects.get_or_create(user=request.user, group=group)
+    return redirect("group_detail", group_id = group.id)
+
