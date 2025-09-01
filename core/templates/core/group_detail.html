@@ -17,7 +17,7 @@
         <li>
           {{ req.user.username }}
           <a href="{% url 'approve_request' group.id req.id %}">accept</a>
-        <a href="{% url 'reject_request' group.id req.id %}">reject</a>
+          <a href="{% url 'reject_request' group.id req.id %}">reject</a>
         </li>
       {% endif %}
     {% empty %}
@@ -37,16 +37,19 @@
   <tr>
     <td>{{ member.user.username }}</td>
     <td>{{ member.balance }}</td>
-    <td>
-      {% if member.user == request.user %}
-        <a href="{% url 'add_transaction' member.id %}">add a transaction</a>
-      {% endif %}
-    </td>
   </tr>
+  <a href="{% url 'buy_asset_in_group' group.id %}">Buy assets</a>
   {% empty %}
   <tr>
     <td colspan="3">no members</td>
   </tr>
   {% endfor %}
 </table>
+
+{% if member.user == request.user %}
+    <a href="{% url 'buy_asset_in_group' group.id %}">Buy assets</a>
+{% endif %}
+
+
+
 {% endblock %}

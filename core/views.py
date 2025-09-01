@@ -20,7 +20,7 @@ from .forms import PriceAlertForm
 from .models import PriceAlert
 from django.db.models import Sum, F, FloatField
 from .models import SharedWallet
-from .models import Group, Membership, GroupTransaction, JoinRequest
+from .models import Group, Membership, GroupTransaction, JoinRequest, GroupAssetPurchase
 
 # it returns the main page, it does not require log in
 def home(request):
@@ -671,7 +671,18 @@ def group_list(request):
 def group_detail(request, group_id):
     group = get_object_or_404(Group, id=group_id)
     members = Membership.objects.filter(group=group).order_by('-balance')
-    return render(request, 'core/group_detail.html', {"group": group, "members":  members})
+    assets = CurrentAsset.objects.all()
+
+    membership = Membership.objects.filter(group=group, user=request.user).first()
+
+    return render(request, 'core/group_detail.html', {
+        "group": group,
+        "members": members,
+        "assets": assets,
+        "membership": membership,  # <-- dodane
+    })
+
+
 
 
 @login_required
@@ -689,13 +700,13 @@ def request_to_join(request, group_id):
 
 # owner can approve
 @login_required
-def approve_request(request, request_id):
-    join_request = get_object_or_404(JoinRequest, id=request_id)
+def approve_request(request, group_id, request_id):
+    join_request = get_object_or_404(JoinRequest, id=request_id, group_id=group_id)
     group = join_request.group
 
     if request.user != group.created_by:
         return redirect('group_detail', group_id=group.id)
-    
+
     join_request.is_approved = True
     join_request.save()
     
@@ -703,13 +714,55 @@ def approve_request(request, request_id):
 
     return redirect("group_detail", group_id=group.id)
 
-# owner can reject
+
 @login_required
-def reject_request(request, request_id):
-    join_request = get_object_or_404(JoinRequest, id=request_id)
+def reject_request(request, group_id, request_id):
+    join_request = get_object_or_404(JoinRequest, id=request_id, group_id=group_id)
     group = join_request.group
 
     if request.user == group.created_by:
         join_request.delete()
-    
+
     return redirect("group_detail", group_id=group.id)
+
+
+@login_required
+def buy_asset_in_group(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
+    membership = get_object_or_404(Membership, group=group, user=request.user)
+    assets = CurrentAsset.objects.all()
+
+    if request.method == "POST":
+        asset_id = request.POST.get("asset_id")
+        quantity = request.POST.get("quantity")
+
+        asset = get_object_or_404(Asset, id=asset_id)
+        current_asset = get_object_or_404(CurrentAsset, symbol=asset.symbol)
+
+        quantity = float(quantity)
+        price_at_purchase = current_asset.current_price
+        total_cost = quantity * price_at_purchase
+
+        if membership.balance < total_cost:
+            messages.error(request, "not enough balance in group account!")
+            return redirect("group_detail", group_id=group.id)
+
+        GroupAssetPurchase.objects.create(
+            membership=membership,
+            asset=asset,
+            quantity=quantity,
+            price_at_purchase=price_at_purchase,
+        )
+
+        membership.balance -= total_cost
+        membership.save()
+
+        messages.success(request, f"Bought {quantity} {asset.symbol} for {total_cost}$")
+        return redirect("group_detail", group_id=group.id)
+
+    return render(request, "core/buy_asset_in_group.html", {
+        "group": group,
+        "membership": membership,
+        "assets": assets,
+    })
+

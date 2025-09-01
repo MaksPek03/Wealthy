@@ -1,0 +1,25 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Buy asset in {{ group.name }}{% endblock %}
+
+{% block content %}
+<h2>Buy asset in {{ group.name }}</h2>
+<p>Your balance: {{ membership.balance }} $</p>
+
+<form method="post">
+    {% csrf_token %}
+    <label for="asset">Choose asset:</label>
+    <select name="asset_id">
+        {% for asset in assets %}
+            <option value="{{ asset.id }}">
+                {{ asset.name }} ({{ asset.symbol }}) - Current price: {{ asset.current_price }}$
+            </option>
+        {% endfor %}
+    </select>
+
+    <label for="quantity">Quantity:</label>
+    <input type="number" step="0.01" name="quantity" required>
+
+    <button type="submit">Buy</button>
+</form>
+{% endblock %}
