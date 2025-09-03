@@ -1,6 +1,7 @@
 from django import forms
 from .models import Wallet, WalletAsset
-from .models import PriceAlert, UserGoal
+from .models import PriceAlert, UserGoal, Group
+from .models import CurrentAsset
 
 # it only get the name, and creates new empty wallet, connected to a specific user
 class WalletForm(forms.ModelForm):
@@ -35,3 +36,27 @@ class UserGoalForm(forms.ModelForm):
     class Meta:
         model = UserGoal
         fields = ['name', 'description', 'target_amount', 'current_amount', 'deadline']
+
+
+class GroupForm(forms.ModelForm):
+    class Meta:
+        model = Group
+        fields = ["name", "description"]
+
+
+class BuyAssetForm(forms.Form):
+    asset = forms.ModelChoiceField(
+        queryset=CurrentAsset.objects.all(),
+        empty_label="select asset ",
+        widget=forms.Select(attrs={"class": "form-select"})
+    )
+    quantity = forms.DecimalField(
+        max_digits=20,
+        decimal_places=8,
+        min_value=0.01,
+        widget=forms.NumberInput(attrs={"step": "0.01", "class": "form-control"})
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['asset'].label_from_instance = lambda obj: f"{obj.name} ({obj.symbol}) - {obj.current_price}$"

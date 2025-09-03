@@ -8,18 +8,7 @@
 
 <form method="post">
     {% csrf_token %}
-    <label for="asset">Choose asset:</label>
-    <select name="asset_id">
-        {% for asset in assets %}
-            <option value="{{ asset.id }}">
-                {{ asset.name }} ({{ asset.symbol }}) - Current price: {{ asset.current_price }}$
-            </option>
-        {% endfor %}
-    </select>
-
-    <label for="quantity">Quantity:</label>
-    <input type="number" step="0.01" name="quantity" required>
-
+    {{ form.as_p }}
     <button type="submit">Buy</button>
 </form>
 {% endblock %}

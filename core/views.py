@@ -16,11 +16,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from .models import FriendRequest, FriendList, UserGoal
 from django import forms
-from .forms import PriceAlertForm
+from .forms import PriceAlertForm, GroupForm
 from .models import PriceAlert
 from django.db.models import Sum, F, FloatField
 from .models import SharedWallet
 from .models import Group, Membership, GroupTransaction, JoinRequest, GroupAssetPurchase
+from decimal import Decimal, InvalidOperation
+from .forms import BuyAssetForm
+from decimal import Decimal
 
 # it returns the main page, it does not require log in
 def home(request):
@@ -726,43 +729,85 @@ def reject_request(request, group_id, request_id):
     return redirect("group_detail", group_id=group.id)
 
 
+
 @login_required
 def buy_asset_in_group(request, group_id):
     group = get_object_or_404(Group, id=group_id)
     membership = get_object_or_404(Membership, group=group, user=request.user)
-    assets = CurrentAsset.objects.all()
 
     if request.method == "POST":
-        asset_id = request.POST.get("asset_id")
-        quantity = request.POST.get("quantity")
+        form = BuyAssetForm(request.POST)
+        if form.is_valid():
+            current_asset = form.cleaned_data["asset"]
+            asset = get_object_or_404(Asset, symbol=current_asset.symbol)
+            quantity = form.cleaned_data["quantity"]
 
-        asset = get_object_or_404(Asset, id=asset_id)
-        current_asset = get_object_or_404(CurrentAsset, symbol=asset.symbol)
+            total_cost = Decimal(quantity) * current_asset.current_price
 
-        quantity = float(quantity)
-        price_at_purchase = current_asset.current_price
-        total_cost = quantity * price_at_purchase
+            if membership.balance < total_cost:
+                messages.error(request, "Not enough balance in group account!")
+                return redirect("group_detail", group_id=group.id)
 
-        if membership.balance < total_cost:
-            messages.error(request, "not enough balance in group account!")
+            GroupAssetPurchase.objects.create(
+                membership=membership,
+                asset=asset,
+                quantity=quantity,
+                price_at_purchase=current_asset.current_price,
+            )
+
+            membership.balance -= total_cost
+            membership.save()
+
+            messages.success(request, f"Bought {quantity} {asset.symbol} for {total_cost}$")
             return redirect("group_detail", group_id=group.id)
-
-        GroupAssetPurchase.objects.create(
-            membership=membership,
-            asset=asset,
-            quantity=quantity,
-            price_at_purchase=price_at_purchase,
-        )
-
-        membership.balance -= total_cost
-        membership.save()
-
-        messages.success(request, f"Bought {quantity} {asset.symbol} for {total_cost}$")
-        return redirect("group_detail", group_id=group.id)
+    else:
+        form = BuyAssetForm()
 
     return render(request, "core/buy_asset_in_group.html", {
         "group": group,
         "membership": membership,
-        "assets": assets,
+        "form": form,
     })
 
+
+@login_required
+def group_create(request):
+    if request.method == "POST":
+        form = GroupForm(request.POST)
+        if form.is_valid():
+            group = form.save(commit=False)
+            group.created_by = request.user
+            group.save()
+            # the create one is of course the owner
+            Membership.objects.create(user=request.user, group=group, balance=0)
+            return redirect("group_detail", group_id=group.id)
+    else:
+        form = GroupForm()
+    return render(request, "core/group_create.html", {"form": form})
+
+
+@login_required
+def distribute_balance(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
+
+    if request.user != group.created_by:
+        messages.error(request, "Only the group owner can distribute balance.")
+        return redirect("group_detail", group_id=group.id)
+
+    if request.method == "POST":
+        amount = request.POST.get("amount")
+        try:
+            amount = Decimal(amount)
+        except InvalidOperation:
+            messages.error(request, "Invalid amount.")
+            return redirect("group_detail", group_id=group.id)
+
+        memberships = Membership.objects.filter(group=group)
+        for membership in memberships:
+            membership.balance += amount
+            membership.save()
+
+        messages.success(request, f"Distributed {amount}$ to all group members.")
+        return redirect("group_detail", group_id=group.id)
+
+    return render(request, "core/distribute_balance.html", {"group": group})

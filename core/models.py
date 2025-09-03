@@ -174,6 +174,18 @@ class Membership(models.Model):
 
     def __str__(self):
         return f"{self.user.username} in {self.group.name} ({self.balance}$)"
+    
+    def portfolio_value(self):
+        total = self.balance
+        purchases = self.groupassetpurchase_set.all()
+        for p in purchases:
+            try:
+                current_asset = CurrentAsset.objects.get(symbol=p.asset.symbol)
+                total += p.quantity * current_asset.current_price
+            except CurrentAsset.DoesNotExist:
+                total += p.quantity * p.price_at_purchase
+        return total
+    
 
 # transactions in a group
 class GroupTransaction(models.Model):
