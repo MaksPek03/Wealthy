@@ -126,7 +126,7 @@ const assetScreen = () => {
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
 
-            <Header title={`${asset.name} WALLET`} />
+            <Header title={`${asset.name} ASSET`} />
 
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <View className={`w-max ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}>
