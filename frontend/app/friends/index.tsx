@@ -99,8 +99,7 @@ const friends = () => {
                                 <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>{item.username}</Text>
                                 <TouchableOpacity className={`w-25 ${isDark ? "bg-buttons-dark" : "bg-buttons"} py-2.5 px-2.5`}
                                                   onPress={() => handleRemove(item.id)}>
-                                        Remove Friend
-                                    </Text>
+                                        <Text>Remove Friend</Text>
                                 </TouchableOpacity>
                             </View>
                         )}
