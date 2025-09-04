@@ -351,6 +351,30 @@ def api_remove_friend(request, user_id):
 
     return JsonResponse({"message": "Friend removed successfully"})
 
+def api_users_list(request):
+    users = None
+    query = request.GET.get('q')
+    if query:
+        users = User.objects.filter(username__icontains=query).exclude(id=request.user.id)
+
+    users_data = [
+            {
+                "id": user.id,
+                "username": user.username,
+            }
+            for user in users
+        ]
+
+    return JsonResponse(users_data, safe=False)
+
+def api_send_friend_request(request, user_id)
+    receiver = get_object_or_404(User, id=user_id)
+    existing_request = FriendRequest.objects.filter(sender=request.user, receiver=receiver, is_active = True)
+    if not existing_request.exists() and request.user != receiver:
+        FriendRequest.objects.create(sender=request.user, receiver=receiver)
+
+    return JsonResponse({"message": "Request sent successfully"})
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
