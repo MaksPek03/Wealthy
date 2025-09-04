@@ -2,7 +2,6 @@ import {
     ActivityIndicator,
     FlatList,
     Text,
-    TextInput,
     TouchableOpacity,
     View
 } from 'react-native';
@@ -29,16 +28,10 @@ const wallets = () => {
         fetchWallets();
     }, []);
 
-    useEffect(() => {
-        console.log('WALLETS STATE UPDATED:', wallets);
-    }, [wallets]);
-
-
     const fetchWallets = async () => {
         setLoading(true);
         try {
             const userId = await AsyncStorage.getItem('user_id');
-            console.log('USER ID:', userId);
 
             const response = await fetch(`https://wealthy-0mga.onrender.com/api/accounts/profile/wallets/${userId}`);
             const data: Wallet[] = await response.json();
@@ -69,6 +62,7 @@ const wallets = () => {
                         }
                         renderItem={({item}) => (
                             <TouchableOpacity
+                                onPress={() => router.push(`/wallets/${item.id}`)}
                             >
                                 <View className={`flex-row py-2 border-b-2 border-gray-300 px-4`}>
                                     <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>{item.name}</Text>

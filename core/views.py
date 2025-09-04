@@ -20,10 +20,12 @@ from .forms import PriceAlertForm, GroupForm
 from .models import PriceAlert
 from django.db.models import Sum, F, FloatField
 from .models import SharedWallet
+
 from .models import Group, Membership, GroupTransaction, JoinRequest, GroupAssetPurchase
 from decimal import Decimal, InvalidOperation
 from .forms import BuyAssetForm
 from decimal import Decimal
+
 
 # it returns the main page, it does not require log in
 def home(request):
@@ -326,6 +328,12 @@ def api_remove_wallet_asset(request, wallet_id, asset_id):
     transactions.delete()
 
     return JsonResponse({"message": "Asset removed successfully"})
+
+def api_fiends_list(request):
+    friend_list = FriendList.objects.get_or_create(user=request.user)[0]
+    friends = friend_list.friends.all()
+
+    return JsonResponse(list(friends))
 
 def register(request):
     form = UserCreationForm(request.POST or None)

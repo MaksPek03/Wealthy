@@ -3,6 +3,7 @@ from .models import Wallet, WalletAsset
 from .models import PriceAlert, UserGoal, Group
 from .models import CurrentAsset
 
+
 # it only get the name, and creates new empty wallet, connected to a specific user
 class WalletForm(forms.ModelForm):
     class Meta:
@@ -60,3 +61,4 @@ class BuyAssetForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['asset'].label_from_instance = lambda obj: f"{obj.name} ({obj.symbol}) - {obj.current_price}$"
+
