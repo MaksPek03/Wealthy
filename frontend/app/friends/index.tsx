@@ -63,7 +63,7 @@ const friends = () => {
                 ):(
                     <FlatList
                         data={filteredFriends.length > 0 || search ? filteredFriends : friends}
-                        keyExtractor={(item) => item.username}
+                        keyExtractor={(item) => item.id.toString()}
                         ListEmptyComponent={
                             <Text className={`text-xl text-center ${isDark ? "text-text-dark" : "text-text"}`}>
                                 You don't have any friends!
