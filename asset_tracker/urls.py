@@ -34,6 +34,7 @@ urlpatterns = [
     path('api/asset/<str:symbol>/history/<str:day>/', views.api_asset_history_filter, name='api_history_price_filter'),
     path('trends/', views.trends, name='trends'),
     path('friends/', views.friends_list, name='friends_list'),
+    path('api/friends/', views.api_friends_list, name='api_friends_list'),
     path('friends/send-request/<int:user_id>/', views.send_friend_request, name='send_friend_request'),
     path('friends/accept-request/<int:request_id>/', views.accept_friend_request, name='accept_friend_request'),
     path('friends/decline-request/<int:request_id>/', views.decline_friend_request, name='decline_friend_request'),
