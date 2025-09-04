@@ -1,0 +1,14 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Buy asset in {{ group.name }}{% endblock %}
+
+{% block content %}
+<h2>Buy asset in {{ group.name }}</h2>
+<p>Your balance: {{ membership.balance }} $</p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Buy</button>
+</form>
+{% endblock %}
