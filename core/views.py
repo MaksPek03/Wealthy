@@ -343,6 +343,14 @@ def api_friends_list(request):
 
     return JsonResponse(friends_data, safe=False)
 
+def api_remove_friend(request, user_id):
+    user_to_remove = get_object_or_404(User, id=user_id)
+    friend_list = FriendList.objects.get(user=request.user)
+    if friend_list.is_mutual_friend(user_to_remove):
+        friend_list.unfriend(user_to_remove)
+
+    return JsonResponse({"message": "Friend removed successfully"})
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
