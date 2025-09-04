@@ -1,0 +1,85 @@
+{% extends 'core/base.html' %}
+{% block title %}Group: {{ group.name }}{% endblock %}
+
+{% block content %}
+<h1>{{ group.name }}</h1>
+<p>{{ group.description }}</p>
+
+{% if request.user != group.created_by %}
+  <a href="{% url 'request_to_join' group.id %}">please to join</a>
+{% endif %}
+
+{% if request.user == group.created_by %}
+  <h2>Requests</h2>
+  <ul>
+    {% for req in group.join_requests.all %}
+      {% if not req.is_approved %}
+        <li>
+          {{ req.user.username }}
+          <a href="{% url 'approve_request' group.id req.id %}">accept</a>
+          <a href="{% url 'reject_request' group.id req.id %}">reject</a>
+        </li>
+      {% endif %}
+    {% empty %}
+      <li>no pending requests</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<h2>Ranking</h2>
+<table>
+  <tr>
+    <th>User</th>
+    <th>Balance left</th>
+    <th>Total portfolio value</th>
+  </tr>
+  {% for member in members %}
+  <tr>
+    <td>{{ member.user.username }}</td>
+    <td>{{ member.balance }}</td>
+    <td>{{ member.portfolio_value }}</td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="3">no members</td>
+  </tr>
+  {% endfor %}
+</table>
+
+
+
+{% if request.user == group.created_by %}
+  <a href="{% url 'distribute_balance' group.id %}"> Distribute balance</a>
+{% endif %}
+
+
+{% if membership %}
+  <a href="{% url 'buy_asset_in_group' group.id %}">Buy assets</a>
+{% endif %}
+
+<h2>Group Asset Purchases</h2>
+{% with total_purchases=0 %}
+  <ul>
+    {% for membership in group.membership_set.all %}
+      {% for p in membership.groupassetpurchase_set.all %}
+        {% if forloop.first and forloop.parentloop.first %}
+          {% with total_purchases=1 %}{% endwith %}
+        {% endif %}
+        <li>
+          {{ p.membership.user.username }} bought {{ p.quantity }}
+          {{ p.asset.symbol }} at {{ p.price_at_purchase }}$
+          ({{ p.created_at }})
+        </li>
+      {% endfor %}
+    {% endfor %}
+  </ul>
+
+  {% if total_purchases == 0 %}
+    <p>No purchases yet</p>
+  {% endif %}
+{% endwith %}
+
+
+
+
+{% endblock %}

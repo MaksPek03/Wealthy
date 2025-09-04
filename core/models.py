@@ -151,3 +151,75 @@ class SharedWallet(models.Model):
     
     class Meta:
         unique_together = ('wallet', 'shared_with')
+
+# a group that user can join
+class Group(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+    
+# membership in a group    
+class Membership(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)  
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'group')
+
+    def __str__(self):
+        return f"{self.user.username} in {self.group.name} ({self.balance}$)"
+    
+    def portfolio_value(self):
+        total = self.balance
+        purchases = self.groupassetpurchase_set.all()
+        for p in purchases:
+            try:
+                current_asset = CurrentAsset.objects.get(symbol=p.asset.symbol)
+                total += p.quantity * current_asset.current_price
+            except CurrentAsset.DoesNotExist:
+                total += p.quantity * p.price_at_purchase
+        return total
+    
+
+# transactions in a group
+class GroupTransaction(models.Model):
+    membership = models.ForeignKey(Membership, on_delete=models.CASCADE)
+    description = models.CharField(blank=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def apply(self):
+        self.membership.balance += self.amount
+        self.membership.save()
+
+# user can try to join the group, by this model
+class JoinRequest(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="join_requests")
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_approved = models.BooleanField(default=False)
+
+    # to not send the same join approve
+    class Meta:
+        unique_together = ('user', 'group')
+
+
+class GroupAssetPurchase(models.Model):
+    membership = models.ForeignKey(Membership, on_delete=models.CASCADE) 
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)  
+    quantity = models.DecimalField(max_digits=12, decimal_places=2) 
+    price_at_purchase = models.DecimalField(max_digits=12, decimal_places=2)  
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def total_cost(self):
+        return self.quantity * self.price_at_purchase
+
+    def __str__(self):
+        return f"{self.membership.user.username} bought {self.quantity} {self.asset.symbol} in {self.membership.group.name}"
+

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from core.models import FriendList, FriendRequest, Asset, UserGoal, PriceAlert,HistoricAsset, CurrentAsset, Wallet, WalletAsset
+from core.models import FriendList, FriendRequest, Asset, UserGoal, PriceAlert,HistoricAsset, CurrentAsset, Wallet, WalletAsset, Group
 
 # filter - how we can filter among the fields
 # display - what is showed on a page
@@ -34,4 +34,5 @@ admin.site.register(HistoricAsset)
 admin.site.register(CurrentAsset)
 admin.site.register(Wallet)
 admin.site.register(WalletAsset)
+admin.site.register(Group)
 
