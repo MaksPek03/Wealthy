@@ -4,7 +4,7 @@ from .models import Wallet, CurrentAsset, WalletAsset, Asset, HistoricAsset
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import WalletForm, WalletAssetForm
+from .forms import WalletForm, WalletAssetForm, UserGoalForm
 import json
 import traceback
 from django.contrib.auth import authenticate, login
@@ -20,9 +20,15 @@ from .forms import PriceAlertForm
 from .models import PriceAlert
 from django.db.models import Sum, F, FloatField
 from .models import SharedWallet
+
+# it returns the main page, it does not require log in
 def home(request):
     return render(request, 'core/home.html')
 
+# it parses the request.body and dowload the username and the passweord, 
+# then using authenticate function it verifies it in the database
+# if everything is fine it will make the session with user id
+# if password is wrong it will return the 405 error, or 500 if there will be some server error
 @csrf_exempt
 def api_login(request):
     if request.method == "POST":
@@ -45,6 +51,9 @@ def api_login(request):
     else:
         return JsonResponse({"message": "Method not allowed"}, status=405)
 
+
+# it parses whether the username and password are given, then it will filter to check whether the username is already taken
+# if everything is alright it will create an user, here we also have exception with 500 and 405 errors
 @csrf_exempt
 def api_register(request):
     if request.method == "POST":
@@ -70,20 +79,28 @@ def api_register(request):
     else:
         return JsonResponse({"message": "Method not allowed"}, status=405)
 
+# it get all values from currentAsset, so the newest prices, and return it as a list of dictonaries, where we
+# have name, symbol and price
 def api_price(request):
     prices = CurrentAsset.objects.all().values('name', 'symbol', 'current_price')
     return JsonResponse(list(prices), safe = False)
 
+# it checks the price for a specific asset (symbol), and returns all the properties for a given asset
 def api_asset_price(request, symbol):
     asset = CurrentAsset.objects.filter(symbol__iexact=symbol).values('name', 'symbol', 'current_price').first()
     return JsonResponse({'name': asset['name'],
                                      'symbol': asset['symbol'],
                                      'current_price': asset['current_price']}, safe = False)
 
+# for a specific asset, this function will be looking for all prices saved in the HistoricAsset
+# it returns the list with all prices, and date recorded for a specific asset
 def api_asset_history(request, symbol):
     history = HistoricAsset.objects.filter(symbol__iexact=symbol).order_by('-date_recorded').values('price', 'date_recorded')
     return JsonResponse(list(history), safe = False)
 
+
+# it filters the historic prices starting from a specific day
+# and return all prices from such period
 def api_asset_history_filter(request, symbol, day):
     if day != "max":
         day_int = int(day)
@@ -96,13 +113,17 @@ def api_asset_history_filter(request, symbol, day):
         history = HistoricAsset.objects.filter(symbol__iexact=symbol).order_by('-date_recorded').values('price', 'date_recorded')
     return JsonResponse(list(history), safe = False)
 
+# for a specific symbol it return the name of an asset
 def api_asset_name(request, symbol):
     asset = Asset.objects.filter(symbol__iexact=symbol).first()
     return JsonResponse({'name': asset.name})
 
+# for a specifi user_id it return the wallets that are connected with such user
 def api_wallets(request, user_id):
     wallets = Wallet.objects.filter(user=user_id).values('id', 'name')
     return JsonResponse(list(wallets), safe=False)
+
+# it creates the wallet, with a specific name for a given user
 
 @csrf_exempt
 def api_add_wallet(request):
@@ -131,6 +152,12 @@ def api_add_wallet(request):
     else:
         return JsonResponse({'error': 'POST method required'}, status=405)
 
+# first of all, accordind to the wallet id, we get all assets
+# then it aggregates all cost, so according to the quantity and the purchase price, we have a sum of purchases
+# it creates a dictionary of all current prices 
+# for every position it counts the actual value and then add to the sum of the wallet
+# it also counts the differnece between the purchase and actual value of the wallet, in the cash and also percentages
+# it return the JSON file with all data
 def api_wallet_detail(request, wallet_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     wallet_assets = WalletAsset.objects.filter(wallet=wallet).select_related('asset')
@@ -179,10 +206,12 @@ def api_wallet_detail(request, wallet_id):
 
     return JsonResponse(data, safe=False)
 
+# it search for a specifi wallet, that has a given id and basically delete it
 def api_remove_wallet(request, wallet_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     wallet.delete()
     return JsonResponse({"message": "Wallet removed successfully"})
+
 
 def api_list_of_assets(request):
     assets = Asset.objects.all().values('id', 'name')
@@ -312,11 +341,15 @@ def register(request):
     return render(request, 'registration/register.html', {'form': form})
 
 
+# main page, that is shown afeter the log in
 @login_required
 def profile(request):
     return render(request, 'core/profile.html')
 
 
+# it get the currency, by the default it is a usd, then it will get all actual prices
+# then it will look for every currency rate, from the current prices (the newest prices)
+# for every asset it add the new field (coneverted_prices) whtich means the price in a given currency
 @login_required
 def price(request):
     currency = request.GET.get('currency', 'usd').lower()
@@ -340,11 +373,13 @@ def price(request):
     })
 
 
+# it returns the list of all assets
 @login_required
 def asset_list(request):
     assets = Asset.objects.all()
     return render(request, 'core/asset_list.html', {'assets': assets})
 
+# for specific symbol, it will return the asset with the whole history of the prices
 @login_required
 def asset_history(request, symbol):
     asset = get_object_or_404(Asset, symbol__iexact=symbol)
@@ -354,16 +389,21 @@ def asset_history(request, symbol):
         'history': history
     })
 
+# now it is only a template, there will be a trends for type of assets
+# and also the most increasing/decreasing assets in a list
 @login_required
 def trends(request):
     return render(request,'core/trends.html')
 
+# it returns all wallets for a specific user
+# and also it will create a new empty form to add new wallets
 @login_required
 def wallets(request):
     wallets = Wallet.objects.filter(user=request.user)
     form = WalletForm()
     return render(request, 'core/wallet_list.html', {'wallets':wallets, 'form': form})
 
+# function that adds the wallet to the database, after the user fulfill the form in the app
 @login_required
 def add_wallet(request):
     if request.method == 'POST':
@@ -377,6 +417,9 @@ def add_wallet(request):
         form = WalletForm()
     return render(request, 'core/add_wallet.html', {'form':form, 'wallets': Wallet.objects.filter(user=request.user)})
 
+# given function returns assets connected to the wallet, check the price of purchase of every of them
+# then checks the actual value of the all assets, to counts the differnce in price, both in currency and percentages
+# there exist a possible option to check the prices in a different currency
 @login_required
 def wallet_detail(request, wallet_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
@@ -431,6 +474,9 @@ def wallet_detail(request, wallet_id):
     })
 
 
+# for a given asset in a wallet the user can do the same as above
+# so for specific purchase, we also see the difference in actual value and purchase price
+# there is also an option to change the currency
 @login_required
 def wallet_asset_detail(request, wallet_id, asset_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
@@ -479,12 +525,12 @@ def wallet_asset_detail(request, wallet_id, asset_id):
         'currencies': currencies,
     })
 
-
+# it shows all the assets in a wallet, basically it should not named 'add'
 @login_required
 def add_wallet_asset(request, wallet_id):
     assets = Asset.objects.all()
     return render(request, 'core/add_wallet_asset.html', {'wallet_id': wallet_id, 'assets': assets})
-
+# here the user can add the asset, to the wallet, after fulfill the form
 @login_required
 def add_wallet_asset_details(request, wallet_id, asset_id):
     wallet = get_object_or_404(Wallet, id=wallet_id)
@@ -508,12 +554,14 @@ def add_wallet_asset_details(request, wallet_id, asset_id):
 
     })
 
+# according to the id of a wallet, it is deleted
 @login_required
 def remove_wallet(request, wallet_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     wallet.delete()
     return redirect('wallet_list')
 
+# from a given, we deleted a specific asset, with its own 'transactions'
 @login_required
 def remove_wallet_asset(request, wallet_id, asset_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
@@ -530,6 +578,7 @@ def remove_wallet_asset(request, wallet_id, asset_id):
 
 from django.views.decorators.http import require_POST
 
+# user delete only one of the transaction, not whole the asset, one asset can have many transactions
 @login_required
 def delete_wallet_transaction(request, wallet_id, asset_id, transaction_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
@@ -542,6 +591,7 @@ def delete_wallet_transaction(request, wallet_id, asset_id, transaction_id):
     return redirect('wallet_asset_detail', wallet_id=wallet.id, asset_id=asset.id)
 
 
+# it creates the invitaion of a friend request, and send to the specific person
 @login_required
 def send_friend_request(request, user_id):
     receiver = get_object_or_404(User, id=user_id)
@@ -552,19 +602,21 @@ def send_friend_request(request, user_id):
 
 
 
-
+# accept of a invitation
 @login_required
 def accept_friend_request(request, request_id):
     friend_request = get_object_or_404(FriendRequest, id=request_id, receiver = request.user)
     friend_request.accept()
     return redirect('friends_list')
 
+# decline of a invitation
 @login_required
 def decline_friend_request(request, request_id):
     friend_request = get_object_or_404(FriendRequest, id=request_id, receiver = request.user)
     friend_request.decline()
     return redirect('friends_list')
 
+# removinf a friend, by one of the user
 @login_required
 def remove_friend(request, user_id):
     user_to_remove = get_object_or_404(User, id=user_id)
@@ -573,6 +625,8 @@ def remove_friend(request, user_id):
         friend_list.unfriend(user_to_remove)
     return redirect('friends_list')
 
+# the function return the list of friends, but also the list of the invitations
+# also user can search for a friend
 @login_required
 def friends_list(request):
     friend_list = FriendList.objects.get_or_create(user=request.user)[0]
@@ -591,18 +645,13 @@ def friends_list(request):
     })
 
 
-class UserGoalForm(forms.ModelForm):
-    class Meta:
-        model = UserGoal
-        fields = ['name', 'description', 'target_amount', 'current_amount', 'deadline']
-
-
+# for a specific user that sends the request, it will returns all the goals that are setted
 @login_required
 def user_goals(request):
     goals = UserGoal.objects.filter(user=request.user)
     return render(request, 'core/user_goals.html', {'goals': goals})
 
-
+# after fulfill the form, the goal is added to the user
 @login_required
 def add_user_goal(request):
     if request.method == 'POST':
@@ -616,7 +665,7 @@ def add_user_goal(request):
         form = UserGoalForm()
     return render(request, 'core/add_user_goal.html', {'form': form})
 
-
+# delete the user goal
 @login_required
 def delete_user_goal(request, goal_id):
     goal = get_object_or_404(UserGoal, id=goal_id, user=request.user)
@@ -625,7 +674,7 @@ def delete_user_goal(request, goal_id):
 
 
 
-
+# after fullfill the form about the price alerts the price allert is added to the database
 @login_required
 def add_price_alert(request, asset_id):
     asset = get_object_or_404(Asset, id=asset_id)
@@ -645,6 +694,8 @@ def add_price_alert(request, asset_id):
         'asset': asset
     })
 
+# the idea is to show the all alerts that are connected with the user, but also showing how is far
+# to get such price by the asset
 @login_required
 def my_alerts(request):
     user_alerts = PriceAlert.objects.filter(user=request.user).select_related('asset')
@@ -672,6 +723,8 @@ def my_alerts(request):
         'alerts_with_diff': alerts_with_diff
     })
 
+# function to share the wallet, by the id to the other user, from the user friend list
+
 @login_required
 def share_wallet(request, wallet_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user = request.user)
@@ -688,7 +741,7 @@ def share_wallet(request, wallet_id):
         'wallet': wallet,
         'friends': friends
     })
-
+# the list of all shared wallets to the user by the friends 
 @login_required
 def shared_wallets(request):
     shared_wall = SharedWallet.objects.filter(shared_with=request.user).select_related('wallet')
@@ -698,6 +751,9 @@ def shared_wallets(request):
         'shared_wallets': wallets
     })
 
+# once someone shared the wallet to the user
+# the user can obtain the details of such wallets including the assets and purchase prices that are in it
+# the function show also the current price of those purchases
 @login_required
 def shared_wallet_detail(request, wallet_id):
     shared = get_object_or_404(SharedWallet, wallet__id=wallet_id, shared_with=request.user)
