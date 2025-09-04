@@ -151,7 +151,7 @@ const assetScreen = () => {
                         renderItem={({item}) => (
                             <View className={`flex-row py-2 border-b-2 border-gray-300 px-4`}>
                                 <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>
-                                    Quantity: {item.quantity} bought for: {item.quantity}$ on: {item.purchaseDate}
+                                    Quantity: {item.quantity} bought for: {item.purchasePrice}$ on: {item.purchaseDate}
                                 </Text>
                                 <TouchableOpacity
                                     className={`py-3 px-2.5 m-3 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
