@@ -31,7 +31,7 @@ from decimal import Decimal
 def home(request):
     return render(request, 'core/home.html')
 
-# it parses the request.body and dowload the username and the passweord, 
+# it parses the request.body and dowload the username and the passweord,
 # then using authenticate function it verifies it in the database
 # if everything is fine it will make the session with user id
 # if password is wrong it will return the 405 error, or 500 if there will be some server error
@@ -160,7 +160,7 @@ def api_add_wallet(request):
 
 # first of all, accordind to the wallet id, we get all assets
 # then it aggregates all cost, so according to the quantity and the purchase price, we have a sum of purchases
-# it creates a dictionary of all current prices 
+# it creates a dictionary of all current prices
 # for every position it counts the actual value and then add to the sum of the wallet
 # it also counts the differnece between the purchase and actual value of the wallet, in the cash and also percentages
 # it return the JSON file with all data
@@ -330,10 +330,18 @@ def api_remove_wallet_asset(request, wallet_id, asset_id):
     return JsonResponse({"message": "Asset removed successfully"})
 
 def api_friends_list(request):
-    friend_list = FriendList.objects.get_or_create(user=request.user)[0]
+    friend_list, _ = FriendList.objects.get_or_create(user=request.user)
     friends = friend_list.friends.all()
 
-    return JsonResponse(list(friends))
+    friends_data = [
+        {
+            "id": friend.id,
+            "username": friend.username,
+        }
+        for friend in friends
+    ]
+
+    return JsonResponse(friends_data, safe=False)
 
 def register(request):
     form = UserCreationForm(request.POST or None)
@@ -747,7 +755,7 @@ def share_wallet(request, wallet_id):
         'wallet': wallet,
         'friends': friends
     })
-# the list of all shared wallets to the user by the friends 
+# the list of all shared wallets to the user by the friends
 @login_required
 def shared_wallets(request):
     shared_wall = SharedWallet.objects.filter(shared_with=request.user).select_related('wallet')
@@ -781,7 +789,7 @@ def shared_wallet_detail(request, wallet_id):
         'total_value': total_value
     })
 
-# list all groups 
+# list all groups
 @login_required
 def group_list(request):
     groups = Group.objects.all()
@@ -830,7 +838,7 @@ def approve_request(request, group_id, request_id):
 
     join_request.is_approved = True
     join_request.save()
-    
+
     Membership.objects.get_or_create(user=join_request.user, group=group)
 
     return redirect("group_detail", group_id=group.id)
