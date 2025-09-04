@@ -36,6 +36,13 @@ const MainMenu = () => {
                 >
                     <Text className={`text-3xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>CHECK TRENDS</Text>
                 </TouchableOpacity>
+
+                <TouchableOpacity
+                    onPress={() => router.push('/friends')}
+                    className={`px-10 py-4 min-h-14 min-w-72 mt-14 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
+                >
+                    <Text className={`text-3xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>FRIENDS</Text>
+                </TouchableOpacity>
             </View>
 
             <Footer backButton={false}/>
