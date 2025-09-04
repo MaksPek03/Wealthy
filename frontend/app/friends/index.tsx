@@ -56,7 +56,7 @@ const friends = () => {
                             const response = await fetch(`https://wealthy-0mga.onrender.com/api/friends/remove-friend/${friendId}/`);
                         } catch (err) {
                             console.error('Error removing friend:', err);
-                        }finally {
+                        } finally {
                             fetchFriends();
                         }
                     }
