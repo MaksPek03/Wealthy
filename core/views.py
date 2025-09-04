@@ -329,7 +329,7 @@ def api_remove_wallet_asset(request, wallet_id, asset_id):
 
     return JsonResponse({"message": "Asset removed successfully"})
 
-def api_fiends_list(request):
+def api_friends_list(request):
     friend_list = FriendList.objects.get_or_create(user=request.user)[0]
     friends = friend_list.friends.all()
 
