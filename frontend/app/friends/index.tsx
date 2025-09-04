@@ -66,7 +66,7 @@ const friends = () => {
                     style: "cancel",
                 }
             ]
-        )
+        );
 
     }
 
