@@ -13,11 +13,6 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-interface Wallet {
-    id: string;
-    name: string;
-}
-
 const addWallet = () => {
     const { isDark, toggleTheme } = useTheme();
     const router = useRouter()
@@ -60,7 +55,7 @@ const addWallet = () => {
 
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
-            <Header title={"WALLETS"} />
+            <Header title={"ADD WALLET"} />
 
             <View className={`flex-[5] items-center ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <TextInput
