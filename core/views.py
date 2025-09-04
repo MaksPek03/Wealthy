@@ -367,7 +367,7 @@ def api_users_list(request):
 
     return JsonResponse(users_data, safe=False)
 
-def api_send_friend_request(request, user_id)
+def api_send_friend_request(request, user_id):
     receiver = get_object_or_404(User, id=user_id)
     existing_request = FriendRequest.objects.filter(sender=request.user, receiver=receiver, is_active = True)
     if not existing_request.exists() and request.user != receiver:
