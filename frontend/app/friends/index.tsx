@@ -3,7 +3,7 @@ import Footer from "@/app/components/Footer";
 import React, {useEffect, useState} from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
 import Header from "@/app/components/Header";
-import {ActivityIndicator, FlatList, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {ActivityIndicator, Alert, FlatList, Text, TextInput, TouchableOpacity, View} from "react-native";
 
 interface User {
     id: number;
@@ -34,7 +34,7 @@ const friends = () => {
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     const handleSearch = (text: string) => {
         setSearch(text);
@@ -44,6 +44,31 @@ const friends = () => {
         setFilteredFriends(filtered);
     };
 
+    const handleRemove = async (friendId: number) => {
+        Alert.alert(
+            "Confirmation",
+            "Are you sure you want to remove this friend?",
+            [
+                {
+                    text: "Yes",
+                    onPress: async () => {
+                        try {
+                            const response = await fetch(`https://wealthy-0mga.onrender.com/api/friends/remove-friend/${friendId}/`);
+                        } catch (err) {
+                            console.error('Error removing friend:', err);
+                        }finally {
+                            fetchFriends();
+                        }
+                    }
+                },
+                {
+                    text: "No",
+                    style: "cancel",
+                }
+            ]
+        )
+
+    }
 
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
@@ -71,7 +96,13 @@ const friends = () => {
                         }
                         renderItem={({item}) => (
                             <View className={`flex-row py-2 border-b-2 border-gray-300 px-4`}>
-                                    <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>{item.username}</Text>
+                                <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>{item.username}</Text>
+                                <TouchableOpacity className={`w-25 ${isDark ? "bg-buttons-dark" : "bg-buttons"} py-2.5 px-2.5`}
+                                                  onPress={() => handleRemove(item.id)}>
+                                    <Text>
+                                        remove friend
+                                    </Text>
+                                </TouchableOpacity>
                             </View>
                         )}
                     />
