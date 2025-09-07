@@ -24,6 +24,10 @@ from .models import Group, Membership, GroupTransaction, JoinRequest, GroupAsset
 from decimal import Decimal, InvalidOperation
 from .forms import BuyAssetForm
 from decimal import Decimal
+from django.db.models import Max, Min, Avg
+from django.utils.timezone import now
+from django.utils import timezone
+from datetime import timedelta
 
 # it returns the main page, it does not require log in
 def home(request):
@@ -815,3 +819,77 @@ def distribute_balance(request, group_id):
         return redirect("group_detail", group_id=group.id)
 
     return render(request, "core/distribute_balance.html", {"group": group})
+@login_required
+def trends(request):
+    user = request.user
+    wallets = Wallet.objects.filter(user=user)
+    wallet_assets = WalletAsset.objects.filter(wallet__in=wallets).select_related("asset")
+
+    asset_prices = {a.symbol: a.current_price for a in CurrentAsset.objects.all()}
+    total_value = sum(
+        wa.quantity * asset_prices.get(wa.asset.symbol, wa.purchase_price)
+        for wa in wallet_assets
+    )
+
+    now = timezone.now()
+    timeframes = {
+        "day": now - timedelta(days=1),
+        "month": now - timedelta(days=30),
+        "year": now - timedelta(days=365),
+    }
+
+    trends_data = {}
+    for label, threshold in timeframes.items():
+        history = HistoricAsset.objects.filter(date_recorded__gte=threshold).order_by("symbol", "date_recorded")
+
+        changes = {}
+        for symbol in set(h.symbol for h in history):
+            records = list(history.filter(symbol=symbol).order_by("date_recorded"))
+            if len(records) >= 2:
+                first_price = records[0].price
+                last_price = records[-1].price
+                change_pct = ((last_price - first_price) / first_price * 100) if first_price > 0 else Decimal('0')
+                changes[symbol] = change_pct
+
+        if changes:
+            best_symbol = max(changes, key=changes.get)
+            worst_symbol = min(changes, key=changes.get)
+            trends_data[label] = {
+                "best": {"symbol": best_symbol, "change": round(changes[best_symbol], 2)},
+                "worst": {"symbol": worst_symbol, "change": round(changes[worst_symbol], 2)},
+            }
+        else:
+            trends_data[label] = {"best": None, "worst": None}
+
+    type_trends = {}
+    for asset_type in Asset.objects.values_list("type", flat=True).distinct():
+        type_assets = Asset.objects.filter(type=asset_type)
+        type_trends[asset_type] = {
+            "current_value": sum(asset_prices.get(a.symbol, Decimal('0')) for a in type_assets)
+        }
+
+        for label, threshold in timeframes.items():
+            history = HistoricAsset.objects.filter(type=asset_type, date_recorded__gte=threshold)
+
+            if not history.exists():
+                type_trends[asset_type][label] = None
+                continue
+
+            changes = []
+            for symbol in history.values_list('symbol', flat=True).distinct():
+                records = history.filter(symbol=symbol).order_by('date_recorded')
+                if records.count() < 2:
+                    continue
+                first_price = records.first().price
+                last_price = records.last().price
+                change_pct = ((last_price - first_price) / first_price * 100) if first_price > 0 else Decimal('0')
+                changes.append(change_pct)
+
+            type_trends[asset_type][label] = round(sum(changes)/len(changes), 2) if changes else None
+
+
+    return render(request, "core/trends.html", {
+        "total_value": total_value,
+        "trends_data": trends_data,
+        "type_trends": type_trends,
+    })
