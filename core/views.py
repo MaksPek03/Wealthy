@@ -328,7 +328,11 @@ def wallet_detail(request, wallet_id):
             total_value += wa.quantity * asset_prices[symbol]
 
     total_difference = float(total_value) - float(total_purchase_value)
-    differnce_in_percentage = (total_difference/float(total_purchase_value))*100
+    if total_purchase_value > 0:
+        differnce_in_percentage = (total_difference / float(total_purchase_value)) * 100
+    else:
+        differnce_in_percentage = 0
+
 
 
     currency = request.GET.get('currency', 'usd').lower()  
