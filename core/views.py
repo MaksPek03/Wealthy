@@ -849,17 +849,16 @@ def trends(request):
                 first_price = records[0].price
                 last_price = records[-1].price
                 change_pct = ((last_price - first_price) / first_price * 100) if first_price > 0 else Decimal('0')
-                changes[symbol] = change_pct
+                changes[symbol] = round(change_pct, 2)
 
         if changes:
-            best_symbol = max(changes, key=changes.get)
-            worst_symbol = min(changes, key=changes.get)
+            sorted_changes = sorted(changes.items(), key=lambda x: x[1], reverse=True)
             trends_data[label] = {
-                "best": {"symbol": best_symbol, "change": round(changes[best_symbol], 2)},
-                "worst": {"symbol": worst_symbol, "change": round(changes[worst_symbol], 2)},
+                "best": [{"symbol": s, "change": c} for s, c in sorted_changes[:5]],
+                "worst": [{"symbol": s, "change": c} for s, c in sorted_changes[-5:][::-1]],  
             }
         else:
-            trends_data[label] = {"best": None, "worst": None}
+            trends_data[label] = {"best": [], "worst": []}
 
     type_trends = {}
     for asset_type in Asset.objects.values_list("type", flat=True).distinct():
@@ -886,7 +885,6 @@ def trends(request):
                 changes.append(change_pct)
 
             type_trends[asset_type][label] = round(sum(changes)/len(changes), 2) if changes else None
-
 
     return render(request, "core/trends.html", {
         "total_value": total_value,

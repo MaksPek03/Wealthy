@@ -1,15 +1,24 @@
 <h2>Trends</h2>
-<p>whole value {{ total_value }}$</p>
+<p>Whole value: {{ total_value }}$</p>
 
-<h3>best / words assets</h3>
+<h3>Best / Worst assets</h3>
 {% for period, data in trends_data.items %}
   <h4>{{ period|title }}</h4>
   {% if data.best %}
-    assets: {{ data.best.symbol }} ({{ data.best.change }}%)
-    <br>
-    worst: {{ data.worst.symbol }} ({{ data.worst.change }}%)
+    <p><b>Best:</b></p>
+    <ul>
+      {% for item in data.best %}
+        <li>{{ item.symbol }}: {{ item.change }}%</li>
+      {% endfor %}
+    </ul>
+    <p><b>Worst:</b></p>
+    <ul>
+      {% for item in data.worst %}
+        <li>{{ item.symbol }}: {{ item.change }}%</li>
+      {% endfor %}
+    </ul>
   {% else %}
-    no data
+    <p>No data</p>
   {% endif %}
 {% endfor %}
 
@@ -23,7 +32,7 @@
     <br>
     month: {% if stats.month != None %} {{ stats.month }}% {% else %} no data {% endif %}
     <br>
-    rok: {% if stats.year != None %} {{ stats.year }}% {% else %} no data {% endif %}
+    year: {% if stats.year != None %} {{ stats.year }}% {% else %} no data {% endif %}
   </li>
 {% endfor %}
 </ul>
