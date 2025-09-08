@@ -20,6 +20,7 @@ from .forms import PriceAlertForm, GroupForm
 from .models import PriceAlert
 from django.db.models import Sum, F, FloatField
 from .models import SharedWallet
+
 from .models import Group, Membership, GroupTransaction, JoinRequest, GroupAssetPurchase
 from decimal import Decimal, InvalidOperation
 from .forms import BuyAssetForm
@@ -29,11 +30,12 @@ from django.utils.timezone import now
 from django.utils import timezone
 from datetime import timedelta
 
+
 # it returns the main page, it does not require log in
 def home(request):
     return render(request, 'core/home.html')
 
-# it parses the request.body and dowload the username and the passweord, 
+# it parses the request.body and dowload the username and the passweord,
 # then using authenticate function it verifies it in the database
 # if everything is fine it will make the session with user id
 # if password is wrong it will return the 405 error, or 500 if there will be some server error
@@ -162,7 +164,7 @@ def api_add_wallet(request):
 
 # first of all, accordind to the wallet id, we get all assets
 # then it aggregates all cost, so according to the quantity and the purchase price, we have a sum of purchases
-# it creates a dictionary of all current prices 
+# it creates a dictionary of all current prices
 # for every position it counts the actual value and then add to the sum of the wallet
 # it also counts the differnece between the purchase and actual value of the wallet, in the cash and also percentages
 # it return the JSON file with all data
@@ -220,7 +222,163 @@ def api_remove_wallet(request, wallet_id):
     wallet.delete()
     return JsonResponse({"message": "Wallet removed successfully"})
 
-# classic register of a user
+
+def api_list_of_assets(request):
+    assets = Asset.objects.all().values('id', 'name')
+    return JsonResponse(list(assets), safe=False)
+
+@csrf_exempt
+def api_add_wallet_asset_details(request, wallet_id, asset_id):
+
+    wallet = get_object_or_404(Wallet, id=wallet_id)
+    asset = get_object_or_404(Asset, id=asset_id)
+
+    if request.method != "POST":
+        return JsonResponse({'error': 'POST method required'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        quantity = data.get('quantity')
+        purchase_price = data.get('purchase_price')
+        purchase_date = data.get('purchase_date')
+
+        wallet_asset = WalletAsset.objects.create(
+            wallet=wallet,
+            asset=asset,
+            quantity=quantity,
+            purchase_price=purchase_price,
+            purchase_date=purchase_date
+        )
+
+        return JsonResponse({
+            'id': wallet_asset.id,
+            'wallet_id': wallet.id,
+            'asset_id': asset.id,
+            'quantity': wallet_asset.quantity,
+            'purchase_price': wallet_asset.purchase_price,
+            'purchase_date': str(wallet_asset.purchase_date)
+        }, status=201)
+
+    except json.JSONDecodeError as e:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+def api_wallet_asset_detail(request, wallet_id, asset_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    asset = get_object_or_404(Asset, id=asset_id)
+    transactions = WalletAsset.objects.filter(wallet=wallet, asset=asset)
+
+    asset_total_purchase_value = transactions.aggregate(
+        total=Sum(F('purchase_price') * F('quantity'), output_field=FloatField())
+    )['total'] or 0
+
+    try:
+        current_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
+    except CurrentAsset.DoesNotExist:
+        current_price = 0
+
+    total_value_transactions = sum(
+        transaction.quantity * current_price for transaction in transactions
+    )
+
+    total_difference = float(total_value_transactions) - float(asset_total_purchase_value)
+    total_difference_percentage = (
+        (float(total_difference) / float(asset_total_purchase_value)) * 100
+        if asset_total_purchase_value != 0 else 0
+    )
+
+    return JsonResponse({
+        'wallet': {
+            'id': wallet.id,
+            'name': wallet.name,
+        },
+        'asset': {
+            'id': asset.id,
+            'name': asset.name,
+            'symbol': asset.symbol,
+        },
+        'transactions': [
+            {
+                'id': t.id,
+                'quantity': float(t.quantity),
+                'purchase_price': float(t.purchase_price),
+                'purchase_date': str(t.purchase_date)
+            }
+            for t in transactions
+        ],
+        'asset_total_purchase_value': float(asset_total_purchase_value),
+        'total_value_transactions': float(total_value_transactions),
+        'total_difference': float(total_difference),
+        'total_difference_percentage': float(total_difference_percentage),
+        'current_price': float(current_price),
+    }, status=200)
+
+
+def api_delete_wallet_transaction(request, wallet_id, asset_id, transaction_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    asset = get_object_or_404(Asset, id=asset_id)
+    transaction = get_object_or_404(WalletAsset, id=transaction_id, wallet=wallet, asset=asset)
+
+    transaction.delete()
+
+    return JsonResponse({"message": "Transaction removed successfully"})
+
+def api_remove_wallet_asset(request, wallet_id, asset_id):
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    asset = get_object_or_404(Asset, id=asset_id)
+    transactions = WalletAsset.objects.filter(wallet=wallet, asset=asset)
+
+    transactions.delete()
+
+    return JsonResponse({"message": "Asset removed successfully"})
+
+def api_friends_list(request):
+    friend_list, _ = FriendList.objects.get_or_create(user=request.user)
+    friends = friend_list.friends.all()
+
+    friends_data = [
+        {
+            "id": friend.id,
+            "username": friend.username,
+        }
+        for friend in friends
+    ]
+
+    return JsonResponse(friends_data, safe=False)
+
+def api_remove_friend(request, user_id):
+    user_to_remove = get_object_or_404(User, id=user_id)
+    friend_list = FriendList.objects.get(user=request.user)
+    if friend_list.is_mutual_friend(user_to_remove):
+        friend_list.unfriend(user_to_remove)
+
+    return JsonResponse({"message": "Friend removed successfully"})
+
+def api_users_list(request):
+    users = None
+    query = request.GET.get('q')
+    if query:
+        users = User.objects.filter(username__icontains=query).exclude(id=request.user.id)
+
+    users_data = [
+            {
+                "id": user.id,
+                "username": user.username,
+            }
+            for user in users
+        ]
+
+    return JsonResponse(users_data, safe=False)
+
+def api_send_friend_request(request, user_id):
+    receiver = get_object_or_404(User, id=user_id)
+    existing_request = FriendRequest.objects.filter(sender=request.user, receiver=receiver, is_active = True)
+    if not existing_request.exists() and request.user != receiver:
+        FriendRequest.objects.create(sender=request.user, receiver=receiver)
+
+    return JsonResponse({"message": "Request sent successfully"})
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
@@ -339,16 +497,16 @@ def wallet_detail(request, wallet_id):
 
 
 
-    currency = request.GET.get('currency', 'usd').lower()  
+    currency = request.GET.get('currency', 'usd').lower()
     prices = CurrentAsset.objects.all()
     try:
         currency_asset = CurrentAsset.objects.get(symbol=currency)
-        currency_rate = currency_asset.current_price  
+        currency_rate = currency_asset.current_price
     except CurrentAsset.DoesNotExist:
-        currency_rate = 1  
+        currency_rate = 1
     for asset in prices:
         asset.converted_price = round(asset.current_price / currency_rate, 2)
-    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']  
+    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']
 
     converted_total_value = total_value / currency_rate
     converted_total_purchase_value = float(total_purchase_value) / float(currency_rate)
@@ -602,7 +760,7 @@ def my_alerts(request):
             current_asset = CurrentAsset.objects.get(symbol=alert.asset.symbol)
             current_price = current_asset.current_price
         except CurrentAsset.DoesNotExist:
-            current_price = None 
+            current_price = None
 
         if current_price is not None:
             difference = round(alert.target_price - current_price, 2)
@@ -637,7 +795,7 @@ def share_wallet(request, wallet_id):
         'wallet': wallet,
         'friends': friends
     })
-# the list of all shared wallets to the user by the friends 
+# the list of all shared wallets to the user by the friends
 @login_required
 def shared_wallets(request):
     shared_wall = SharedWallet.objects.filter(shared_with=request.user).select_related('wallet')
@@ -671,7 +829,7 @@ def shared_wallet_detail(request, wallet_id):
         'total_value': total_value
     })
 
-# list all groups 
+# list all groups
 @login_required
 def group_list(request):
     groups = Group.objects.all()
@@ -720,7 +878,7 @@ def approve_request(request, group_id, request_id):
 
     join_request.is_approved = True
     join_request.save()
-    
+
     Membership.objects.get_or_create(user=join_request.user, group=group)
 
     return redirect("group_detail", group_id=group.id)
