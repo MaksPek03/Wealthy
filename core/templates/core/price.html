@@ -1,28 +1,30 @@
+{% extends 'core/base.html' %}
 {% block content %}
-  <p>actual prices</p>
-
-  <form method="get" action="">
-    <label for="currency">Choose currency:</label>
-    <select name="currency" id="currency" onchange="this.form.submit()">
-      {% for c in currencies %}
-        <option value="{{ c }}" {% if c == currency %}selected{% endif %}>{{ c|upper }}</option>
-      {% endfor %}
-    </select>
-  </form>
-
+  <h2 class="main_h2">Actual prices:</h2>
+  <div class="form-container">
+    <form method="get" action="">
+      <label for="currency">Choose currency:</label>
+      <select name="currency" id="currency" onchange="this.form.submit()">
+        {% for c in currencies %}
+          <option value="{{ c }}" {% if c == currency %}selected{% endif %}>{{ c|upper }}</option>
+        {% endfor %}
+      </select>
+    </form>
+  </div>
   {% if prices %}
-    <ul>
+    <ul class="wallet-assets">
       {% for price in prices %}
         <li>
-          name: {{ price.name }}<br>
-          <!-- symbol: {{ price.symbol }}<br> -->
-          current price: {{ price.converted_price }} {{ currency|upper }}
+          <span>{{ price.name }}</span><br>
+          <span>Current price: <b>{{ price.converted_price }} {{ currency|upper }}</b><br></span>
+          <p></p>
         </li>
       {% endfor %}
     </ul>
   {% else %}
-    <p>no prices</p>
+    <h2 class="main_h2">No prices</h2>
   {% endif %}
-
-  <p><a href="{% url 'profile' %}">come back</a></p>
+  <p class="form-link">
+    <a href="{% url 'profile' %}">Come back</a>
+  </p>
 {% endblock %}
