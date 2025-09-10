@@ -1,17 +1,17 @@
-
-
+{% extends 'core/base.html' %}
 {% block content %}
-  <h2>wallets shared to You</h2>
-
+  <h2 class="main_h2">wallets shared to You</h2>
   {% if shared_wallets %}
-    <ul>
+    <ul class="wallet-assets">
       {% for wallet in shared_wallets %}
-        <li><a href="{% url 'shared_wallet_detail' wallet.id %}">{{ wallet.name }}</a></li>
+        <li>
+          <a href="{% url 'shared_wallet_detail' wallet.id %}">{{ wallet.name }}</a>
+        </li>
       {% endfor %}
     </ul>
   {% else %}
-    <p>You have no shared wallets</p>
+     <h2 class="main_h2">No wallets are shared to You</h2>
   {% endif %}
 
-  <p><a href="{% url 'wallet_list' %}">Your wallets</a></p>
+  <p class="form-link"><a href="{% url 'wallet_list' %}">Your wallets</a></p>
 {% endblock %}
