@@ -1,5 +1,38 @@
-{% block content %}
-  <h2></h2>
-  <p>trends</p>
-  <p><a href = "{% url 'profile' %}">come back</a> </p>
-{% endblock %}
+<h2>Trends</h2>
+<p>Whole value: {{ total_value }}$</p>
+
+<h3>Best / Worst assets</h3>
+{% for period, data in trends_data.items %}
+  <h4>{{ period|title }}</h4>
+  {% if data.best %}
+    <p><b>Best:</b></p>
+    <ul>
+      {% for item in data.best %}
+        <li>{{ item.symbol }}: {{ item.change }}%</li>
+      {% endfor %}
+    </ul>
+    <p><b>Worst:</b></p>
+    <ul>
+      {% for item in data.worst %}
+        <li>{{ item.symbol }}: {{ item.change }}%</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No data</p>
+  {% endif %}
+{% endfor %}
+
+<h3>Trends according to type</h3>
+<ul>
+{% for type, stats in type_trends.items %}
+  <li>
+    <b>{{ type }}</b> – actual value: {{ stats.current_value }}$
+    <br>
+    day: {% if stats.day != None %} {{ stats.day }}% {% else %} no data {% endif %}
+    <br>
+    month: {% if stats.month != None %} {{ stats.month }}% {% else %} no data {% endif %}
+    <br>
+    year: {% if stats.year != None %} {{ stats.year }}% {% else %} no data {% endif %}
+  </li>
+{% endfor %}
+</ul>
