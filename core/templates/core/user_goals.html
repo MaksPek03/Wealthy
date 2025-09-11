@@ -1,16 +1,31 @@
-<h1>my aims</h1>
-<a href="{% url 'add_user_goal' %}">add new goal</a>
-<ul>
-    {% for goal in goals %}
+{% extends 'core/base.html' %}
+{% block content %}
+  <h2 class="main_h2">My goals</h2>
+
+  <p class="form-link">
+    <a href="{% url 'add_user_goal' %}">Add new goal</a>
+  </p>
+
+  {% if goals %}
+    <ul class="wallet-assets">
+      {% for goal in goals %}
         <li>
-            <strong>{{ goal.name }}</strong> – {{ goal.current_amount }} / {{ goal.target_amount }} ({{ goal.progress_percentage|floatformat:0 }}%)
-            {% if goal.deadline %}<br>Deadline: {{ goal.deadline }}{% endif %}
-            <form method="post" action="{% url 'delete_user_goal' goal.id %}" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit">remove</button>
-            </form>
+          <strong>{{ goal.name }}</strong> – {{ goal.current_amount }} / {{ goal.target_amount }}
+          ({{ goal.progress_percentage|floatformat:0 }}%)
+          {% if goal.deadline %}<br>Deadline: {{ goal.deadline }}{% endif %}
+
+          <form method="post" action="{% url 'delete_user_goal' goal.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn">Remove</button>
+          </form>
         </li>
-    {% empty %}
-        <li>you have no goals</li>
-    {% endfor %}
-</ul>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p style="text-align: center;">You have no goals</p>
+  {% endif %}
+
+  <p class="form-link">
+    <a href="{% url 'profile' %}">back to profile</a>
+  </p>
+{% endblock %}

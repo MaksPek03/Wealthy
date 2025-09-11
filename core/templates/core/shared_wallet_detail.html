@@ -1,13 +1,15 @@
+{% extends 'core/base.html' %}
 {% block content %}
-  <h2>wallet: {{ wallet.name }} (shared to You)</h2>
+  <h2 class="main_h2">Wallet: {{ wallet.name }} (shared with you)</h2>
 
   {% if wallet_assets %}
-    <ul>
+    <ul class="wallet-assets">
       {% for wa in wallet_assets %}
         <li>
-          {{ wa.asset.name }} ({{ wa.asset.symbol }}) quantity: {{ wa.quantity }}<br>
-          purchase price: {{ wa.purchase_price }} $<br>
-          actual price: {{ wa.current_price }} $
+          {{ wa.asset.name }} ({{ wa.asset.symbol }})<br>
+          Quantity: {{ wa.quantity }}<br>
+          Purchase price: {{ wa.purchase_price }} $<br>
+          Current price: {{ wa.current_price }} $
         </li>
       {% endfor %}
     </ul>
@@ -15,7 +17,9 @@
     <p>This wallet has no assets</p>
   {% endif %}
 
-  <p>Whole value of a wallet: {{ total_value|floatformat:2 }}</p>
+  <p><b>Total value:</b> {{ total_value|floatformat:2 }} $</p>
 
-  <p><a href="{% url 'shared_wallets' %}">Come back to wallets</a></p>
+  <p class="form-link">
+    <a href="{% url 'shared_wallets' %}">Back to wallets</a>
+  </p>
 {% endblock %}

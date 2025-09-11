@@ -1,38 +1,50 @@
-<h2>Trends</h2>
-<p>Whole value: {{ total_value }}$</p>
+{% extends 'core/base.html' %}
+{% block content %}
+  <h2 class="main_h2">Trends</h2>
 
-<h3>Best / Worst assets</h3>
-{% for period, data in trends_data.items %}
-  <h4>{{ period|title }}</h4>
-  {% if data.best %}
-    <p><b>Best:</b></p>
-    <ul>
-      {% for item in data.best %}
-        <li>{{ item.symbol }}: {{ item.change }}%</li>
-      {% endfor %}
-    </ul>
-    <p><b>Worst:</b></p>
-    <ul>
-      {% for item in data.worst %}
-        <li>{{ item.symbol }}: {{ item.change }}%</li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No data</p>
-  {% endif %}
-{% endfor %}
+  <!-- <div class="wallet-summary">
+    <p><b>Whole value:</b> {{ total_value }}$</p>
+  </div> -->
+  <h3 class="main_h2" style="font-size: 30px;">Best / worst assets</h3>
+  {% for period, data in trends_data.items %}
+    <div class="wallet-summary">
+      <h4 style="font-size: 25px;">{{ period|title }}</h4>
+      {% if data.best %}
+        <p><b>Best:</b></p>
+        <ul class="wallet-assets">
+          {% for item in data.best %}
+            <li>{{ item.symbol }}: {{ item.change }}%</li>
+          {% endfor %}
+        </ul>
+        <p><b>Worst:</b></p>
+        <ul class="wallet-assets">
+          {% for item in data.worst %}
+            <li>{{ item.symbol }}: {{ item.change }}%</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No data</p>
+      {% endif %}
+    </div>
+  {% endfor %}
+  <h3 class="main_h2" style="font-size: 30px;">Trends according to type:</h3>
+  <ul class="wallet-assets">
+    {% for type, stats in type_trends.items %}
+      <li>
+        <b>{{ type }}</b> – actual value: {{ stats.current_value }}$
+        <br>
+        day: {% if stats.day != None %} {{ stats.day }}% {% else %} no data in last day {% endif %}
+        <br>
+        month: {% if stats.month != None %} {{ stats.month }}% {% else %} no data in last month {% endif %}
+        <br>
+        year: {% if stats.year != None %} {{ stats.year }}% {% else %} no data in last year {% endif %}
+        <br>
+        <p></p>
+      </li>
+    {% endfor %}
+  </ul>
 
-<h3>Trends according to type</h3>
-<ul>
-{% for type, stats in type_trends.items %}
-  <li>
-    <b>{{ type }}</b> – actual value: {{ stats.current_value }}$
-    <br>
-    day: {% if stats.day != None %} {{ stats.day }}% {% else %} no data {% endif %}
-    <br>
-    month: {% if stats.month != None %} {{ stats.month }}% {% else %} no data {% endif %}
-    <br>
-    year: {% if stats.year != None %} {{ stats.year }}% {% else %} no data {% endif %}
-  </li>
-{% endfor %}
-</ul>
+  <p class="form-link">
+    <a href="{% url 'profile' %}">Come back</a>
+  </p>
+{% endblock %}

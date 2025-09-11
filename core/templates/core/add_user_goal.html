@@ -1,7 +1,14 @@
-<h1>new goal</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">save</button>
-</form>
-<a href="{% url 'user_goals' %}">come back</a>
+{% extends 'core/base.html' %}
+{% block content %}
+<h2 class="main_h2">new goal</h2>
+    <div class="form-container">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">save</button>
+        </form>
+    </div>
+    <p class="form-link">
+<a href="{% url 'user_goals' %}">Back to profile</a>
+</p>
+{% endblock %}
