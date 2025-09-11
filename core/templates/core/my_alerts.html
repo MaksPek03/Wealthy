@@ -1,35 +1,43 @@
-<h2>Your alert prices: </h2>
+{% extends 'core/base.html' %}
+{% block content %}
+  <h2 class="main_h2">Your alerts</h2>
 
-<table>
+  <table class="wallet-assets" style="width:100%; text-align:left;">
     <thead>
-        <tr>
-            <th>Asset</th>
-            <th>Alert price</th>
-            <th>Actual price</th>
-            <th>difference</th>
-        </tr>
+      <tr>
+        <th>Asset</th>
+        <th>Alert price</th>
+        <th>Current price</th>
+        <th>Difference</th>
+      </tr>
     </thead>
     <tbody>
-        {% for item in alerts_with_diff %}
+      {% for item in alerts_with_diff %}
         <tr>
-            <td>{{ item.alert.asset.name }} ({{ item.alert.asset.symbol }})</td>
-            <td>{{ item.alert.target_price }}</td>
-            <td>
-                {% if item.current_price %}
-                    {{ item.current_price }}
-                {% else %}
-                    Brak danych
-                {% endif %}
-            </td>
-            <td>{{ item.difference }} {{ item.direction }}</td>
+          <td>{{ item.alert.asset.name }} ({{ item.alert.asset.symbol }})</td>
+          <td>{{ item.alert.target_price }}</td>
+          <td>
+            {% if item.current_price %}
+              {{ item.current_price }}
+            {% else %}
+              No data
+            {% endif %}
+          </td>
+          <td>{{ item.difference }} {{ item.direction }}</td>
         </tr>
-        {% empty %}
+      {% empty %}
         <tr>
-            <td colspan="4">you have no alerts</td>
+          <td colspan="4">You have no alerts</td>
         </tr>
-        {% endfor %}
-        <a href="{% url 'asset_list' %}">add new alert</a>
-        
+      {% endfor %}
     </tbody>
-</table>
-<a href="{% url 'profile' %}">back to profile</a>
+  </table>
+
+  <p class="form-link">
+    <a href="{% url 'asset_list' %}">Add new alert</a>
+  </p>
+
+  <p class="form-link">
+    <a href="{% url 'profile' %}">Back to profle</a>
+  </p>
+{% endblock %}
