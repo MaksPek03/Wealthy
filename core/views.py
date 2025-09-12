@@ -358,14 +358,14 @@ def api_friend_requests_list(request):
     return JsonResponse(requests_data, safe=False)
 
 def api_accept_friend_request(request, request_id):
-    friend_request = get_object_or_404(FriendRequest, id=request_id, receiver = request.user)
+    friend_request = get_object_or_404(FriendRequest, id=request_id, receiver=request.user)
     friend_request.accept()
 
     return JsonResponse({"message": "Request accepted successfully"})
 
 
 def api_decline_friend_request(request, request_id):
-    friend_request = get_object_or_404(FriendRequest, id=request_id, receiver = request.user)
+    friend_request = get_object_or_404(FriendRequest, id=request_id, receiver=request.user)
     friend_request.decline()
 
     return JsonResponse({"message": "Request declined successfully"})
