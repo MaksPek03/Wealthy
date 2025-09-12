@@ -356,10 +356,7 @@ def api_remove_friend(request, user_id):
     return JsonResponse({"message": "Friend removed successfully"})
 
 def api_users_list(request):
-    users = None
-    query = request.GET.get('q')
-    if query:
-        users = User.objects.filter(username__icontains=query).exclude(id=request.user.id)
+    users = User.objects.exclude(id=request.user.id)
 
     users_data = [
             {
