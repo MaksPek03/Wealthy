@@ -343,6 +343,33 @@ def api_friends_list(request):
 
     return JsonResponse(friends_data, safe=False)
 
+def api_friend_requests_list(request):
+    friend_requests = FriendRequest.objects.filter(receiver=request.user, is_active=True)
+
+    requests_data = [
+        {
+            "id": fr.id,
+            "sender_id": fr.sender.id,
+            "sender_username": fr.sender.username,
+        }
+        for fr in friend_requests
+    ]
+
+    return JsonResponse(requests_data, safe=False)
+
+def api_accept_friend_request(request, request_id):
+    friend_request = get_object_or_404(FriendRequest, id=request_id, receiver = request.user)
+    friend_request.accept()
+
+    return JsonResponse({"message": "Request accepted successfully"})
+
+
+def api_decline_friend_request(request, request_id):
+    friend_request = get_object_or_404(FriendRequest, id=request_id, receiver = request.user)
+    friend_request.decline()
+
+    return JsonResponse({"message": "Request declined successfully"})
+
 def api_remove_friend(request, user_id):
     user_to_remove = get_object_or_404(User, id=user_id)
     friend_list = FriendList.objects.get(user=request.user)
