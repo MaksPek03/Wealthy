@@ -4,6 +4,7 @@ import React, {useEffect, useState} from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
 import Header from "@/app/components/Header";
 import {ActivityIndicator, Alert, FlatList, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {router} from "expo-router";
 
 interface User {
     id: number;
@@ -67,8 +68,7 @@ const friends = () => {
                 }
             ]
         );
-
-    }
+    };
 
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
@@ -106,6 +106,20 @@ const friends = () => {
                     />
                 )
                 }
+
+                <TouchableOpacity
+                    onPress={() => router.push(`/friends/requests`)}
+                    className={`px-8 py-4 min-h-14 min-w-72 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
+                >
+                    <Text className={`text-3xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>YOUR FRIEND REQUESTS</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    onPress={() => router.push(`/friends/addFriend`)}
+                    className={`px-8 py-4 min-h-14 min-w-72 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
+                >
+                    <Text className={`text-3xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>ADD NEW FRIEND</Text>
+                </TouchableOpacity>
 
             </View>
 
