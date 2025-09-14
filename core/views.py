@@ -25,6 +25,10 @@ from .models import Group, Membership, GroupTransaction, JoinRequest, GroupAsset
 from decimal import Decimal, InvalidOperation
 from .forms import BuyAssetForm
 from decimal import Decimal
+from django.db.models import Max, Min, Avg
+from django.utils.timezone import now
+from django.utils import timezone
+from datetime import timedelta
 
 
 # it returns the main page, it does not require log in
@@ -358,14 +362,14 @@ def api_friend_requests_list(request):
     return JsonResponse(requests_data, safe=False)
 
 def api_accept_friend_request(request, request_id):
-    friend_request = get_object_or_404(FriendRequest, id=request_id, receiver = request.user)
+    friend_request = get_object_or_404(FriendRequest, id=request_id, receiver=request.user)
     friend_request.accept()
 
     return JsonResponse({"message": "Request accepted successfully"})
 
 
 def api_decline_friend_request(request, request_id):
-    friend_request = get_object_or_404(FriendRequest, id=request_id, receiver = request.user)
+    friend_request = get_object_or_404(FriendRequest, id=request_id, receiver=request.user)
     friend_request.decline()
 
     return JsonResponse({"message": "Request declined successfully"})
@@ -510,7 +514,11 @@ def wallet_detail(request, wallet_id):
             total_value += wa.quantity * asset_prices[symbol]
 
     total_difference = float(total_value) - float(total_purchase_value)
-    differnce_in_percentage = (total_difference/float(total_purchase_value))*100
+    if total_purchase_value > 0:
+        differnce_in_percentage = (total_difference / float(total_purchase_value)) * 100
+    else:
+        differnce_in_percentage = 0
+
 
 
     currency = request.GET.get('currency', 'usd').lower()
@@ -597,7 +605,7 @@ def wallet_asset_detail(request, wallet_id, asset_id):
 
 # it shows all the assets in a wallet, basically it should not named 'add'
 @login_required
-def add_wallet_asset(request, wallet_id):
+def wallet_assets(request, wallet_id):
     assets = Asset.objects.all()
     return render(request, 'core/add_wallet_asset.html', {'wallet_id': wallet_id, 'assets': assets})
 # here the user can add the asset, to the wallet, after fulfill the form
@@ -993,3 +1001,75 @@ def distribute_balance(request, group_id):
         return redirect("group_detail", group_id=group.id)
 
     return render(request, "core/distribute_balance.html", {"group": group})
+@login_required
+def trends(request):
+    user = request.user
+    wallets = Wallet.objects.filter(user=user)
+    wallet_assets = WalletAsset.objects.filter(wallet__in=wallets).select_related("asset")
+
+    asset_prices = {a.symbol: a.current_price for a in CurrentAsset.objects.all()}
+    total_value = sum(
+        wa.quantity * asset_prices.get(wa.asset.symbol, wa.purchase_price)
+        for wa in wallet_assets
+    )
+
+    now = timezone.now()
+    timeframes = {
+        "day": now - timedelta(days=1),
+        "month": now - timedelta(days=30),
+        "year": now - timedelta(days=365),
+    }
+
+    trends_data = {}
+    for label, threshold in timeframes.items():
+        history = HistoricAsset.objects.filter(date_recorded__gte=threshold).order_by("symbol", "date_recorded")
+
+        changes = {}
+        for symbol in set(h.symbol for h in history):
+            records = list(history.filter(symbol=symbol).order_by("date_recorded"))
+            if len(records) >= 2:
+                first_price = records[0].price
+                last_price = records[-1].price
+                change_pct = ((last_price - first_price) / first_price * 100) if first_price > 0 else Decimal('0')
+                changes[symbol] = round(change_pct, 2)
+
+        if changes:
+            sorted_changes = sorted(changes.items(), key=lambda x: x[1], reverse=True)
+            trends_data[label] = {
+                "best": [{"symbol": s, "change": c} for s, c in sorted_changes[:5]],
+                "worst": [{"symbol": s, "change": c} for s, c in sorted_changes[-5:][::-1]],  
+            }
+        else:
+            trends_data[label] = {"best": [], "worst": []}
+
+    type_trends = {}
+    for asset_type in Asset.objects.values_list("type", flat=True).distinct():
+        type_assets = Asset.objects.filter(type=asset_type)
+        type_trends[asset_type] = {
+            "current_value": sum(asset_prices.get(a.symbol, Decimal('0')) for a in type_assets)
+        }
+
+        for label, threshold in timeframes.items():
+            history = HistoricAsset.objects.filter(type=asset_type, date_recorded__gte=threshold)
+
+            if not history.exists():
+                type_trends[asset_type][label] = None
+                continue
+
+            changes = []
+            for symbol in history.values_list('symbol', flat=True).distinct():
+                records = history.filter(symbol=symbol).order_by('date_recorded')
+                if records.count() < 2:
+                    continue
+                first_price = records.first().price
+                last_price = records.last().price
+                change_pct = ((last_price - first_price) / first_price * 100) if first_price > 0 else Decimal('0')
+                changes.append(change_pct)
+
+            type_trends[asset_type][label] = round(sum(changes)/len(changes), 2) if changes else None
+
+    return render(request, "core/trends.html", {
+        "total_value": total_value,
+        "trends_data": trends_data,
+        "type_trends": type_trends,
+    })
