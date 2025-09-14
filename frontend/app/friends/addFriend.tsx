@@ -88,7 +88,7 @@ const addFriend = () => {
                         keyExtractor={(item) => item.id.toString()}
                         ListEmptyComponent={
                             <Text className={`text-xl text-center ${isDark ? "text-text-dark" : "text-text"}`}>
-                                You don't have any friends!
+                                No users found.
                             </Text>
                         }
                         renderItem={({item}) => (
