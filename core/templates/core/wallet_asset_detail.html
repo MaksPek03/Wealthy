@@ -10,7 +10,7 @@
     </select>
 </form>
 
-<p>Total purchase price for this asset: {{ asset_total_purchase_value|floatformat:2 }} {{ currency|upper }}</p>
+<p>Total purchase price for this asset: {{ asset_total_purchase_value|floatformat:3 }} {{ currency|upper }}</p>
 <p>Total actual value of assets: {{ total_value_transactions|floatformat:2 }} {{ currency|upper }}</p>
 <p>balance: {{ total_difference|floatformat:2 }} {{ currency|upper }},
    in percentage: {{ total_difference_percentage|floatformat:2 }}%</p>

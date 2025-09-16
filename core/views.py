@@ -29,6 +29,9 @@ from django.db.models import Max, Min, Avg
 from django.utils.timezone import now
 from django.utils import timezone
 from datetime import timedelta
+from django.views.decorators.http import require_POST
+from django.db.models import DecimalField, F, Sum
+
 
 
 # it returns the main page, it does not require log in
@@ -463,11 +466,6 @@ def asset_history(request, symbol):
         'history': history
     })
 
-# now it is only a template, there will be a trends for type of assets
-# and also the most increasing/decreasing assets in a list
-@login_required
-def trends(request):
-    return render(request,'core/trends.html')
 
 # it returns all wallets for a specific user
 # and also it will create a new empty form to add new wallets
@@ -499,7 +497,7 @@ def wallet_detail(request, wallet_id):
     wallet_assets = WalletAsset.objects.filter(wallet=wallet).select_related('asset')
 
     total_purchase_value = wallet_assets.aggregate(
-        total=Sum(F('purchase_price') * F('quantity'), output_field=FloatField())
+    total=Sum(F('purchase_price') * F('quantity'), output_field=DecimalField())
     )['total'] or 0
 
     asset_prices = {
@@ -561,8 +559,9 @@ def wallet_asset_detail(request, wallet_id, asset_id):
     transactions = WalletAsset.objects.filter(wallet=wallet, asset=asset)
 
     asset_total_purchase_value = transactions.aggregate(
-        total=Sum(F('purchase_price') * F('quantity'), output_field=FloatField())
+        total=Sum(F('purchase_price') * F('quantity'), output_field=DecimalField())
     )['total'] or 0
+
 
     try:
         base_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
@@ -653,7 +652,6 @@ def remove_wallet_asset(request, wallet_id, asset_id):
 
     return redirect('wallet_detail', wallet_id=wallet_id)
 
-from django.views.decorators.http import require_POST
 
 # user delete only one of the transaction, not whole the asset, one asset can have many transactions
 @login_required
@@ -666,6 +664,27 @@ def delete_wallet_transaction(request, wallet_id, asset_id, transaction_id):
     messages.success(request, "transaction deleted successfully")
 
     return redirect('wallet_asset_detail', wallet_id=wallet.id, asset_id=asset.id)
+
+
+# the function return the list of friends, but also the list of the invitations
+# also user can search for a friend
+@login_required
+def friends_list(request):
+    friend_list = FriendList.objects.get_or_create(user=request.user)[0]
+    friends = friend_list.friends.all()
+    friend_requests = FriendRequest.objects.filter(receiver=request.user, is_active=True)
+
+    users = None
+    query = request.GET.get('q')
+    if query:
+        users = User.objects.filter(username__icontains=query).exclude(id=request.user.id)
+
+    return render(request, 'core/friends_list.html', {
+        'friends': friends,
+        'friend_requests': friend_requests,
+        'users': users,
+    })
+
 
 
 # it creates the invitaion of a friend request, and send to the specific person
@@ -702,24 +721,6 @@ def remove_friend(request, user_id):
         friend_list.unfriend(user_to_remove)
     return redirect('friends_list')
 
-# the function return the list of friends, but also the list of the invitations
-# also user can search for a friend
-@login_required
-def friends_list(request):
-    friend_list = FriendList.objects.get_or_create(user=request.user)[0]
-    friends = friend_list.friends.all()
-    friend_requests = FriendRequest.objects.filter(receiver=request.user, is_active=True)
-
-    users = None
-    query = request.GET.get('q')
-    if query:
-        users = User.objects.filter(username__icontains=query).exclude(id=request.user.id)
-
-    return render(request, 'core/friends_list.html', {
-        'friends': friends,
-        'friend_requests': friend_requests,
-        'users': users,
-    })
 
 
 # for a specific user that sends the request, it will returns all the goals that are setted
@@ -801,23 +802,26 @@ def my_alerts(request):
     })
 
 # function to share the wallet, by the id to the other user, from the user friend list
-
 @login_required
 def share_wallet(request, wallet_id):
-    wallet = get_object_or_404(Wallet, id=wallet_id, user = request.user)
-    friends = FriendList.objects.get(user=request.user).friends.all()
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    
+    friend_list, created = FriendList.objects.get_or_create(user=request.user)
+    friends = friend_list.friends.all()
 
     if request.method == "POST":
         friend_id = request.POST.get('friend_id')
         friend_user = get_object_or_404(User, id=friend_id)
 
         SharedWallet.objects.get_or_create(wallet=wallet, shared_with=friend_user)
-        messages.success(request, f'you shared a wallet to user: {friend_user.username}')
+        messages.success(request, f'You shared the wallet with user: {friend_user.username}')
         return redirect('wallet_detail', wallet_id=wallet.id)
-    return render(request, 'core/share_wallet.html',{
+
+    return render(request, 'core/share_wallet.html', {
         'wallet': wallet,
         'friends': friends
     })
+
 # the list of all shared wallets to the user by the friends
 @login_required
 def shared_wallets(request):
