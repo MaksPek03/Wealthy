@@ -489,7 +489,6 @@ def add_wallet(request):
             return redirect('wallet_list')
     else:
         form = WalletForm()
-    return render(request, 'core/add_wallet.html', {'form':form, 'wallets': Wallet.objects.filter(user=request.user)})
 
 # given function returns assets connected to the wallet, check the price of purchase of every of them
 # then checks the actual value of the all assets, to counts the differnce in price, both in currency and percentages
