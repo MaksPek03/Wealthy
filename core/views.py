@@ -430,7 +430,11 @@ def profile(request):
 @login_required
 def price(request):
     currency = request.GET.get('currency', 'usd').lower()
+    asset_type = request.GET.get('type', None)  
     prices = CurrentAsset.objects.all()
+
+    if asset_type:
+        prices = prices.filter(type=asset_type)
 
     try:
         currency_asset = CurrentAsset.objects.get(symbol=currency)
@@ -438,8 +442,10 @@ def price(request):
     except CurrentAsset.DoesNotExist:
         currency_rate = 1
 
-    for asset in prices:
-        asset.converted_price = round(asset.current_price / currency_rate, 2)
+    for price_obj in prices:
+        price_obj.converted_price = round(price_obj.current_price / currency_rate, 2)
+
+    asset_types = CurrentAsset.objects.values_list('type', flat=True).distinct()
 
     currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']
 
@@ -447,6 +453,8 @@ def price(request):
         'prices': prices,
         'currency': currency,
         'currencies': currencies,
+        'asset_types': asset_types,
+        'selected_type': asset_type,
     })
 
 
