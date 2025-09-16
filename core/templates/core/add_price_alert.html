@@ -1,9 +1,16 @@
+{% extends 'core/base.html' %}
 {% block content %}
-  <h2>add price alert for {{ asset.name }} ({{ asset.symbol }})</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">add alert</button>
-  </form>
+  <h2 class="main_h2">Add price alert for {{ asset.name }} ({{ asset.symbol }})</h2>
+
+  <div class="form-container">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Add alert</button>
+        </form>
+    </div>
+  <p class="form-link">
   <a href="{% url 'asset_list' %}">back to assets</a>
+  </p>
 {% endblock %}
+

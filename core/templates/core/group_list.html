@@ -1,21 +1,28 @@
 {% extends 'core/base.html' %}
-
 {% block title %}Groups{% endblock %}
 
 {% block content %}
-<h1>list of groups</h1>
-<ul>
-    {% for group in groups %}
-    <li>
-        <a href="{% url 'group_detail' group.id %}">
-            {{ group.name }}
-        </a>
-    </li>
-    {% empty %}
-    <li>there are no groups</li>
-    {% endfor %}
-</ul>
-<h1>list of groups</h1>
-<a href="{% url 'group_create' %}">Create a new group</a>
-<ul>
+  <h2 class="main_h2">Groups</h2>
+
+  {% if groups %}
+    <ul class="wallet-assets">
+      {% for group in groups %}
+        <li>
+          <a href="{% url 'group_detail' group.id %}">
+        {{ group.name }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <h2 class="main_h2">There are no groups</h2>
+  {% endif %}
+
+  <p class="form-link">
+    <a href="{% url 'group_create' %}">Create a new group</a>
+  </p>
+
+  <p class="form-link">
+    <a href="{% url 'profile' %}">Back to profile</a>
+  </p>
 {% endblock %}

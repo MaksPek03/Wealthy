@@ -1,49 +1,64 @@
+{% extends 'core/base.html' %}
 {% block content %}
-<h2>friends list</h2>
+  <h2 class="main_h2">Friends List</h2>
 
-<h3>your friends:</h3>
-<ul>
-  {% for friend in friends %}
-    <li>
-      {{ friend.username }} 
-      <a href="{% url 'remove_friend' friend.id %}">Remove</a>
-    </li>
-  {% empty %}
-    <li>You have no friends</li>
-  {% endfor %}
-</ul>
-
-<h3>friend requests:</h3>
-<ul>
-  {% for request in friend_requests %}
-    <li>
-      {{ request.sender.username }}
-      <a href="{% url 'accept_friend_request' request.id %}">Accept</a>
-      <a href="{% url 'decline_friend_request' request.id %}">Decline</a>
-    </li>
-  {% empty %}
-    <li>No new friend requests</li>
-  {% endfor %}
-</ul>
-
-<h3>send friend request</h3>
-<form method="get" action="">
-  <input type="text" name="q" placeholder="Username...">
-  <input type="submit" value="Search">
-</form>
-
-{% if users %}
-  <ul>
-    {% for u in users %}
-      {% if u != request.user %}
-        <li>
-          {{ u.username }}
-          <a href="{% url 'send_friend_request' u.id %}">Send request</a>
+  <h3 class="main_h2" style="font-size: 30px;">Your friends</h3>
+  {% if friends %}
+    <ul class="wallet-assets">
+      {% for friend in friends %}
+        <li style="font-size: 30px;">
+          {{ friend.username }}
+          <p class="form-link">
+            <a href="{% url 'remove_friend' friend.id %}">Remove</a>
+          </p>
         </li>
-      {% endif %}
-    {% endfor %}
-  </ul>
-{% endif %}
+      {% endfor %}
+    </ul>
+  {% else %}
+    <h2 class="main_h2">You have no friends</h2>
+  {% endif %}
 
-<a href="{% url 'profile' %}">back to profile</a>
+  <h3 class="main_h2" style="font-size: 30px;">Friend requests</h3>
+  {% if friend_requests %}
+    <ul class="wallet-assets">
+      {% for request in friend_requests %}
+        <li>
+          {{ request.sender.username }}
+          <p class="form-link">
+            <a href="{% url 'accept_friend_request' request.id %}">Accept</a> |
+            <a href="{% url 'decline_friend_request' request.id %}">Decline</a>
+          </p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="form-link">No new friend requests</p>
+  {% endif %}
+
+  <h3 class="main_h2" style="font-size: 30px;">Send Friend Request</h3>
+  <div class="form-container">
+    <form method="get" action="">
+      <input type="text" name="q" placeholder="Username...">
+      <button type="submit" class="btn">Search</button>
+    </form>
+  </div>
+
+  {% if users %}
+    <ul class="wallet-assets">
+      {% for u in users %}
+        {% if u != request.user %}
+          <li>
+            {{ u.username }}
+            <p class="form-link">
+              <a href="{% url 'send_friend_request' u.id %}">Send request</a>
+            </p>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <p class="form-link">
+    <a href="{% url 'profile' %}">Back to profile</a>
+  </p>
 {% endblock %}
