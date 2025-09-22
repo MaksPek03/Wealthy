@@ -18,7 +18,6 @@ from .models import FriendRequest, FriendList, UserGoal
 from django import forms
 from .forms import PriceAlertForm, GroupForm
 from .models import PriceAlert
-from django.db.models import Sum, F, FloatField
 from .models import SharedWallet
 
 from .models import Group, Membership, GroupTransaction, JoinRequest, GroupAssetPurchase
@@ -31,6 +30,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.http import require_POST
 from django.db.models import DecimalField, F, Sum
+from django.db.models import Sum, F, DecimalField, ExpressionWrapper, FloatField
 
 
 
@@ -499,115 +499,133 @@ def add_wallet(request):
 # given function returns assets connected to the wallet, check the price of purchase of every of them
 # then checks the actual value of the all assets, to counts the differnce in price, both in currency and percentages
 # there exist a possible option to check the prices in a different currency
+
 @login_required
 def wallet_detail(request, wallet_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     wallet_assets = WalletAsset.objects.filter(wallet=wallet).select_related('asset')
 
-    total_purchase_value = wallet_assets.aggregate(
-    total=Sum(F('purchase_price') * F('quantity'), output_field=DecimalField())
-    )['total'] or 0
+    asset_summaries_dict = {}
 
-    asset_prices = {
-        asset.symbol: asset.current_price for asset in CurrentAsset.objects.all()
-    }
-
-    total_value = 0
     for wa in wallet_assets:
-        symbol = wa.asset.symbol
-        if symbol in asset_prices:
-            total_value += wa.quantity * asset_prices[symbol]
+        asset_id = wa.asset.id
+        if asset_id not in asset_summaries_dict:
+            asset_summaries_dict[asset_id] = {
+                'asset': wa.asset,
+                'symbol': wa.asset.symbol,
+                'total_quantity': wa.quantity,
+                'total_purchase': wa.purchase_price,
+                'current_unit_price': Decimal('0'),
+                'current_total': Decimal('0'),
+            }
+        else:
+            asset_summaries_dict[asset_id]['total_quantity'] += wa.quantity
+            asset_summaries_dict[asset_id]['total_purchase'] += wa.purchase_price
 
-    total_difference = float(total_value) - float(total_purchase_value)
-    if total_purchase_value > 0:
-        differnce_in_percentage = (total_difference / float(total_purchase_value)) * 100
-    else:
-        differnce_in_percentage = 0
+    asset_prices = {a.symbol: Decimal(a.current_price) for a in CurrentAsset.objects.all()}
 
+    total_value = Decimal('0')
+    for summary in asset_summaries_dict.values():
+        current_price = asset_prices.get(summary['symbol'], Decimal('0'))
+        summary['current_unit_price'] = current_price
+        summary['current_total'] = summary['total_quantity'] * current_price
+        total_value += summary['current_total']
 
+    total_purchase_value = sum(s['total_purchase'] for s in asset_summaries_dict.values())
+    total_difference = total_value - total_purchase_value
+    difference_in_percentage = (total_difference / total_purchase_value * Decimal('100')) if total_purchase_value > 0 else Decimal('0')
 
+    # Waluta
     currency = request.GET.get('currency', 'usd').lower()
-    prices = CurrentAsset.objects.all()
-    try:
-        currency_asset = CurrentAsset.objects.get(symbol=currency)
-        currency_rate = currency_asset.current_price
-    except CurrentAsset.DoesNotExist:
-        currency_rate = 1
-    for asset in prices:
-        asset.converted_price = round(asset.current_price / currency_rate, 2)
     currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']
+    try:
+        currency_rate = Decimal(CurrentAsset.objects.get(symbol=currency).current_price)
+    except CurrentAsset.DoesNotExist:
+        currency_rate = Decimal('1')
 
     converted_total_value = total_value / currency_rate
-    converted_total_purchase_value = float(total_purchase_value) / float(currency_rate)
-    converted_total_difference = float(converted_total_value) - float(converted_total_purchase_value)
+    converted_total_purchase_value = total_purchase_value / currency_rate
+    converted_total_difference = converted_total_value - converted_total_purchase_value
     converted_difference_in_percentage = (
-        (converted_total_difference / converted_total_purchase_value) * 100 if total_purchase_value else 0
+        (converted_total_difference / converted_total_purchase_value * Decimal('100'))
+        if converted_total_purchase_value > 0 else Decimal('0')
     )
+
+    asset_summaries = list(asset_summaries_dict.values())
 
     return render(request, 'core/wallet_detail.html', {
         'wallet': wallet,
         'wallet_assets': wallet_assets,
+        'asset_summaries': asset_summaries,
         'total_purchase': converted_total_purchase_value,
         'total_value': converted_total_value,
         'total_difference': converted_total_difference,
         'difference_in_percentage': converted_difference_in_percentage,
-        'prices': prices,
         'currency': currency,
         'currencies': currencies,
     })
 
 
-# for a given asset in a wallet the user can do the same as above
-# so for specific purchase, we also see the difference in actual value and purchase price
-# there is also an option to change the currency
+
 @login_required
 def wallet_asset_detail(request, wallet_id, asset_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     asset = get_object_or_404(Asset, id=asset_id)
-    transactions = WalletAsset.objects.filter(wallet=wallet, asset=asset)
 
-    asset_total_purchase_value = transactions.aggregate(
-        total=Sum(F('purchase_price') * F('quantity'), output_field=DecimalField())
-    )['total'] or 0
+    transactions_qs = WalletAsset.objects.filter(wallet=wallet, asset=asset)
 
+    asset_total_purchase_value = transactions_qs.aggregate(
+        total=Sum('purchase_price', output_field=DecimalField(max_digits=30, decimal_places=12))
+    )['total'] or Decimal('0')
+
+    total_quantity = transactions_qs.aggregate(
+        total_qty=Sum('quantity', output_field=DecimalField(max_digits=30, decimal_places=12))
+    )['total_qty'] or Decimal('0')
 
     try:
-        base_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
+        base_price = Decimal(CurrentAsset.objects.get(symbol=asset.symbol).current_price)
     except CurrentAsset.DoesNotExist:
-        base_price = 0
+        base_price = Decimal('0')
 
     currency = request.GET.get('currency', 'usd').lower()
     currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']
-
     try:
-        currency_asset = CurrentAsset.objects.get(symbol=currency)
-        currency_rate = currency_asset.current_price
+        currency_rate = Decimal(CurrentAsset.objects.get(symbol=currency).current_price)
     except CurrentAsset.DoesNotExist:
-        currency_rate = 1
+        currency_rate = Decimal('1')
 
-    converted_price = round(base_price / currency_rate, 2)
+    converted_unit_price = (base_price / currency_rate) if currency_rate != 0 else Decimal('0')
 
-    total_value_transactions = sum(tx.quantity * converted_price for tx in transactions)
-    converted_total_purchase = float(asset_total_purchase_value) / float(currency_rate)
+    total_current_value = (converted_unit_price * total_quantity)
+    converted_total_purchase = (asset_total_purchase_value / currency_rate) if currency_rate != 0 else Decimal('0')
 
-    total_difference = float(total_value_transactions) - float(converted_total_purchase)
-    total_difference_percentage = (
-        (total_difference / converted_total_purchase) * 100 if converted_total_purchase else 0
-    )
+    total_difference = total_current_value - converted_total_purchase
+    total_difference_percentage = (total_difference / converted_total_purchase * Decimal('100')) if converted_total_purchase > 0 else Decimal('0')
 
+    transactions = []
+    for tx in transactions_qs:
+        transactions.append({
+            'id': tx.id,
+            'quantity': tx.quantity,
+            'purchase_price': tx.purchase_price,  
+            'purchase_date': tx.purchase_date,
+            'current_value': Decimal(tx.quantity) * converted_unit_price,
+        })
 
     return render(request, 'core/wallet_asset_detail.html', {
         'wallet': wallet,
         'asset': asset,
         'transactions': transactions,
-        'converted_price': converted_price,
+        'converted_unit_price': converted_unit_price,
         'asset_total_purchase_value': converted_total_purchase,
-        'total_value_transactions': total_value_transactions,
+        'total_current_value': total_current_value,
         'total_difference': total_difference,
         'total_difference_percentage': total_difference_percentage,
         'currency': currency,
         'currencies': currencies,
+        'total_quantity': total_quantity,
     })
+
 
 # it shows all the assets in a wallet, basically it should not named 'add'
 @login_required
