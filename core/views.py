@@ -19,6 +19,7 @@ from django import forms
 from .forms import PriceAlertForm, GroupForm
 from .models import PriceAlert
 from .models import SharedWallet
+from .models import AssetTrend
 
 from .models import Group, Membership, GroupTransaction, JoinRequest, GroupAssetPurchase
 from decimal import Decimal, InvalidOperation
@@ -1030,75 +1031,55 @@ def distribute_balance(request, group_id):
         return redirect("group_detail", group_id=group.id)
 
     return render(request, "core/distribute_balance.html", {"group": group})
+
 @login_required
 def trends(request):
     user = request.user
     wallets = Wallet.objects.filter(user=user)
-    wallet_assets = WalletAsset.objects.filter(wallet__in=wallets).select_related("asset")
+    wallet_assets = WalletAsset.objects.filter(wallet__in=wallets).select_related('asset')
 
+    # Total portfolio value
     asset_prices = {a.symbol: a.current_price for a in CurrentAsset.objects.all()}
     total_value = sum(
         wa.quantity * asset_prices.get(wa.asset.symbol, wa.purchase_price)
         for wa in wallet_assets
     )
 
-    now = timezone.now()
-    timeframes = {
-        "day": now - timedelta(days=1),
-        "month": now - timedelta(days=30),
-        "year": now - timedelta(days=365),
-    }
+    # Timeframes
+    timeframes = ['day', 'week', 'month', 'year']
 
+    # Top/Bottom assets
     trends_data = {}
-    for label, threshold in timeframes.items():
-        history = HistoricAsset.objects.filter(date_recorded__gte=threshold).order_by("symbol", "date_recorded")
+    for tf in timeframes:
+        records = AssetTrend.objects.filter(timeframe=tf)
+        sorted_records = sorted(records, key=lambda x: x.change_pct, reverse=True)
+        best = sorted_records[:5]
+        worst = sorted_records[-5:][::-1]
+        max_len = max(len(best), len(worst))
+        paired = []
+        for i in range(max_len):
+            paired.append({
+                'best': best[i] if i < len(best) else None,
+                'worst': worst[i] if i < len(worst) else None
+            })
+        trends_data[tf] = paired
 
-        changes = {}
-        for symbol in set(h.symbol for h in history):
-            records = list(history.filter(symbol=symbol).order_by("date_recorded"))
-            if len(records) >= 2:
-                first_price = records[0].price
-                last_price = records[-1].price
-                change_pct = ((last_price - first_price) / first_price * 100) if first_price > 0 else Decimal('0')
-                changes[symbol] = round(change_pct, 2)
-
-        if changes:
-            sorted_changes = sorted(changes.items(), key=lambda x: x[1], reverse=True)
-            trends_data[label] = {
-                "best": [{"symbol": s, "change": c} for s, c in sorted_changes[:5]],
-                "worst": [{"symbol": s, "change": c} for s, c in sorted_changes[-5:][::-1]],  
-            }
-        else:
-            trends_data[label] = {"best": [], "worst": []}
-
+    # Average change by asset type — **bierzemy wszystkie aktywa, nie tylko portfel**
     type_trends = {}
-    for asset_type in Asset.objects.values_list("type", flat=True).distinct():
-        type_assets = Asset.objects.filter(type=asset_type)
-        type_trends[asset_type] = {
-            "current_value": sum(asset_prices.get(a.symbol, Decimal('0')) for a in type_assets)
-        }
-
-        for label, threshold in timeframes.items():
-            history = HistoricAsset.objects.filter(type=asset_type, date_recorded__gte=threshold)
-
-            if not history.exists():
-                type_trends[asset_type][label] = None
-                continue
-
-            changes = []
-            for symbol in history.values_list('symbol', flat=True).distinct():
-                records = history.filter(symbol=symbol).order_by('date_recorded')
-                if records.count() < 2:
-                    continue
-                first_price = records.first().price
-                last_price = records.last().price
-                change_pct = ((last_price - first_price) / first_price * 100) if first_price > 0 else Decimal('0')
-                changes.append(change_pct)
-
-            type_trends[asset_type][label] = round(sum(changes)/len(changes), 2) if changes else None
+    asset_types = Asset.objects.values_list('type', flat=True).distinct()
+    for atype in asset_types:
+        type_trends[atype] = {}
+        symbols_of_type = Asset.objects.filter(type=atype).values_list('symbol', flat=True)
+        for tf in timeframes:
+            records = AssetTrend.objects.filter(
+                timeframe=tf,
+                symbol__in=symbols_of_type
+            )
+            type_trends[atype][tf] = round(sum(r.change_pct for r in records)/len(records), 2) if records else None
 
     return render(request, "core/trends.html", {
         "total_value": total_value,
         "trends_data": trends_data,
         "type_trends": type_trends,
+        "timeframes": timeframes,
     })

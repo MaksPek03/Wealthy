@@ -222,4 +222,18 @@ class GroupAssetPurchase(models.Model):
 
     def __str__(self):
         return f"{self.membership.user.username} bought {self.quantity} {self.asset.symbol} in {self.membership.group.name}"
+    
+class AssetTrend(models.Model):
+    symbol = models.CharField(max_length=10)
+    timeframe = models.CharField(max_length=10)  
+    change_pct = models.DecimalField(max_digits=10, decimal_places=2)
+    recorded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("symbol", "timeframe")
+
+    def __str__(self):
+        return f"{self.symbol} ({self.timeframe}): {self.change_pct}%"
+
+
 

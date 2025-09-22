@@ -19,11 +19,16 @@ class WalletAssetForm(forms.ModelForm):
         widgets = {
             'purchase_date': forms.DateInput(attrs={'type':'date'}),
         }
+        labels = {
+            'purchase_price': 'How many you paid in USD',
+        }
+
     def clean_purchase_date(self):
         date = self.cleaned_data.get('purchase_date')
         if date > timezone.now().date():
             raise forms.ValidationError("You cannot add asset from the future")
         return date
+
 
 # for a speficic asset, user set the price target and whether the alert should be above or below
 # target price has a bootstrap with the numeric field with the 0.01 step, and the above/below is a checkbox

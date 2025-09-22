@@ -1,47 +1,55 @@
 {% extends 'core/base.html' %}
+{% load custom_tags %}
+
 {% block content %}
-  <h2 class="main_h2">Trends</h2>
-
-  <h3 class="main_h2" style="font-size: 30px;">Best / worst assets</h3>
-  {% for period, data in trends_data.items %}
-    <div class="wallet-summary">
-      <h4 style="font-size: 25px;">{{ period|title }}</h4>
-      {% if data.best %}
-        <p><b>Best:</b></p>
-        <ul class="wallet-assets">
-          {% for item in data.best %}
-            <li>{{ item.symbol }}: {{ item.change }}%</li>
+<table align="center">
+  <tr>
+    <td>      
+      <h3>Top/Worts assets by time frame</h3>
+      {% for tf, paired_list in trends_data.items %}
+        <table align="center" class="trends-table">
+          <tr>
+            <th colspan="4">{{ tf|capfirst }}</th>
+          </tr>
+          <tr>
+            <th>Best</th><th>change %</th><th>Worst</th><th>change %</th>
+          </tr>
+          {% for pair in paired_list %}
+          <tr>
+            <td>{% if pair.best %}{{ pair.best.symbol }}{% endif %}</td>
+            <td>{% if pair.best %}{{ pair.best.change_pct|floatformat:2 }}{% endif %}</td>
+            <td>{% if pair.worst %}{{ pair.worst.symbol }}{% endif %}</td>
+            <td>{% if pair.worst %}{{ pair.worst.change_pct|floatformat:2 }}{% endif %}</td>
+          </tr>
           {% endfor %}
-        </ul>
-        <p><b>Worst:</b></p>
-        <ul class="wallet-assets">
-          {% for item in data.worst %}
-            <li>{{ item.symbol }}: {{ item.change }}%</li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p>No data</p>
-      {% endif %}
-    </div>
-  {% endfor %}
-  <h3 class="main_h2" style="font-size: 30px;">Trends according to type:</h3>
-  <ul class="wallet-assets">
-    {% for type, stats in type_trends.items %}
-      <li>
-        <b>{{ type }}</b> – actual value: {{ stats.current_value }}$
+        </table>
         <br>
-        day: {% if stats.day != None %} {{ stats.day }}% {% else %} no data in last day {% endif %}
-        <br>
-        month: {% if stats.month != None %} {{ stats.month }}% {% else %} no data in last month {% endif %}
-        <br>
-        year: {% if stats.year != None %} {{ stats.year }}% {% else %} no data in last year {% endif %}
-        <br>
-        <p></p>
-      </li>
-    {% endfor %}
-  </ul>
+      {% endfor %}
 
-  <p class="form-link">
-    <a href="{% url 'profile' %}">Come back</a>
-  </p>
+      <h3>Average change by asset type</h3>
+      <table align="center" class="trends-table">
+        <tr>
+          <th>Asset type</th>
+          {% for tf in timeframes %}<th>{{ tf|capfirst }}</th>{% endfor %}
+        </tr>
+        {% for atype, values in type_trends.items %}
+        <tr>
+          <td>{{ atype }}</td>
+          {% for tf in timeframes %}
+            <td>
+              {% with val=values|get:tf %}
+                {% if val %}
+                  {{ val|floatformat:2 }}%
+                {% else %}
+                  -
+                {% endif %}
+              {% endwith %}
+            </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </table>
+    </td>
+  </tr>
+</table>
 {% endblock %}
