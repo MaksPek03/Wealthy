@@ -1,50 +1,55 @@
 {% extends 'core/base.html' %}
 {% block content %}
-<h2>{{ asset.name }} transactions in {{ wallet.name }}</h2>
+<h2 class="main_h2">{{ asset.name }} transactions in {{ wallet.name }}</h2>
 
-<form method="get" action="">
-    <label for="currency">Choose currency:</label>
-    <select name="currency" id="currency" onchange="this.form.submit()">
-      {% for c in currencies %}
-        <option value="{{ c }}" {% if c == currency %}selected{% endif %}>{{ c|upper }}</option>
-      {% endfor %}
-    </select>
-</form>
+<div class="wallet-summary">
+  <form method="get" action="" class="form-container">
+      <label for="currency">Choose currency:</label>
+      <select name="currency" id="currency" onchange="this.form.submit()">
+        {% for c in currencies %}
+          <option value="{{ c }}" {% if c == currency %}selected{% endif %}>{{ c|upper }}</option>
+        {% endfor %}
+      </select>
+  </form>
 
-<p>Total purchase cost for this asset: <strong>{{ asset_total_purchase_value|floatformat:2 }} {{ currency|upper }}</strong></p>
-<p>Total current value of this asset: <strong>{{ total_current_value|floatformat:2 }} {{ currency|upper }}</strong></p>
-<p>Balance: <strong>{{ total_difference|floatformat:2 }} {{ currency|upper }}</strong>,
-   in percentage: <strong>{{ total_difference_percentage|floatformat:2 }}%</strong></p>
+  <p>Total purchase cost for this asset: <strong>{{ asset_total_purchase_value|floatformat:2 }} {{ currency|upper }}</strong></p>
+  <p>Total current value of this asset: <strong>{{ total_current_value|floatformat:2 }} {{ currency|upper }}</strong></p>
+  <p>Balance: <strong>{{ total_difference|floatformat:2 }} {{ currency|upper }}</strong> 
+     ({{ total_difference_percentage|floatformat:2 }}%)</p>
+</div>
+
+<h3 class="main_h2">Transactions</h3>
 
 {% if transactions %}
-    <h3>Transactions:</h3>
-    <ul>
-        {% for tx in transactions %}
-            <li>
-                Quantity: {{ tx.quantity|floatformat:5 }}
-                | Paid (total): {{ tx.purchase_price|floatformat:2 }} {{ currency|upper }}
-                | Date: {{ tx.purchase_date }}
-                | Current value: {{ tx.current_value|floatformat:2 }} {{ currency|upper }}
-
-                <form method="post"
-                      action="{% url 'delete_wallet_transaction' wallet.id asset.id tx.id %}"
-                      onsubmit="return confirm('Delete this transaction?');">
-                    {% csrf_token %}
-                    <button type="submit">Delete transaction</button>
-                </form>
-            </li>
-        {% endfor %}
+    <ul class="wallet-assets">
+    {% for tx in transactions %}
+        <li>
+            <a>
+                Quantity: {{ tx.quantity|floatformat:5 }}<br>
+                Paid (total): {{ tx.purchase_price|floatformat:2 }} {{ currency|upper }}<br>
+                Date: {{ tx.purchase_date }}<br>
+                Current value: {{ tx.current_value|floatformat:2 }} {{ currency|upper }}
+            </a>
+            <form method="post" action="{% url 'delete_wallet_transaction' wallet.id asset.id tx.id %}"
+                  onsubmit="return confirm('Delete this transaction?');">
+                {% csrf_token %}
+                <button class="btn" type="submit">Delete transaction</button>
+                <p></p>
+            </form>
+        </li>
+    {% endfor %}
     </ul>
 {% else %}
-    <p>No transactions for this asset in this wallet.</p>
+    <p style="text-align:center;">No transactions for this asset in this wallet</p>
 {% endif %}
-
 
 <form method="post" action="{% url 'remove_wallet_asset' wallet.id asset.id %}"
       onsubmit="return confirm('Are you sure to remove this asset and all its transactions?');">
     {% csrf_token %}
-    <button type="submit">Remove asset</button>
+    <button class="btn">Remove asset</button>
 </form>
 
-<p><a href="{% url 'wallet_detail' wallet.id %}">Back to wallet</a></p>
+<div class="wallet-links">
+    <a href="{% url 'wallet_detail' wallet.id %}">Back to wallet</a>
+</div>
 {% endblock %}
