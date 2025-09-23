@@ -200,9 +200,11 @@
 }
 
 
-.nav-link {
-    color: red !important;
+.form-check-inline {
+    margin-right: 15px;
+    color: white;
 }
+
 
 
 
