@@ -18,13 +18,15 @@
         <h2 class="main_h2">You have no wallets yet.</h2 class="main_h2">
     {% endif %}
     
-    <h2 class="main_h2">Add New Wallet</h2>
-    <div class="form-container">
+<h2 class="main_h2">Add New Wallet</h2>
+<div class="form-container-wallet">
     <form action="{% url 'add_wallet' %}" method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn">Add Wallet</button>
     </form>
 </div>
-    <p class="form-link"><a href="{% url 'profile' %}">Back to profile</a></p>
+  <p class="form-link-comeback">
+    <a href="{% url 'profile' %}">Back to profile</a>
+  </p>
 {% endblock %}

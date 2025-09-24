@@ -8,7 +8,7 @@
       {% for friend in friends %}
         <li style="font-size: 30px;">
           {{ friend.username }}
-          <p class="form-link">
+          <p class="form-link-comeback">
             <a href="{% url 'remove_friend' friend.id %}">Remove</a>
           </p>
         </li>
@@ -24,7 +24,7 @@
       {% for request in friend_requests %}
         <li>
           {{ request.sender.username }}
-          <p class="form-link">
+          <p class="form-link-comeback">
             <a href="{% url 'accept_friend_request' request.id %}">Accept</a> |
             <a href="{% url 'decline_friend_request' request.id %}">Decline</a>
           </p>
@@ -32,7 +32,7 @@
       {% endfor %}
     </ul>
   {% else %}
-    <p class="form-link">No new friend requests</p>
+    <p class="form-link-comeback">No new friend requests</p>
   {% endif %}
 
   <h3 class="main_h2" style="font-size: 30px;">Send Friend Request</h3>
@@ -49,7 +49,7 @@
         {% if u != request.user %}
           <li>
             {{ u.username }}
-            <p class="form-link">
+            <p class="form-link-comeback">
               <a href="{% url 'send_friend_request' u.id %}">Send request</a>
               <br><br>
             </p>
@@ -59,7 +59,7 @@
     </ul>
   {% endif %}
 
-  <p class="form-link">
+  <p class="form-link-comeback">
     <a href="{% url 'profile' %}">Back to profile</a>
   </p>
 {% endblock %}

@@ -5,7 +5,7 @@
 <table align="center">
   <tr>
     <td>      
-      <h3>Top/Worts assets by time frame</h3>
+      <h2 class="main_h2">Top/Worst assets by time frame</h2>
       {% for tf, paired_list in trends_data.items %}
         <table align="center" class="trends-table">
           <tr>
@@ -26,7 +26,7 @@
         <br>
       {% endfor %}
 
-      <h3>Average change by asset type</h3>
+      <h2 class="main_h2">Average change by asset type</h2>
       <table align="center" class="trends-table">
         <tr>
           <th>Asset type</th>
@@ -52,4 +52,7 @@
     </td>
   </tr>
 </table>
+    <p class="form-link-comeback">
+    <a href="{% url 'profile' %}">Back to profile</a>
+  </p>
 {% endblock %}

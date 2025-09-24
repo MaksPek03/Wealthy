@@ -250,3 +250,21 @@ body.dark-mode .trends-table td {
 body.dark-mode .trends-table tr:nth-child(even) {
     background-color: #1a1a1a;
 }
+
+
+.form-container-wallet {
+    max-width: 400px;       
+    margin: 20px auto;      
+    display: flex;
+    flex-direction: column;
+    gap: 10px;             
+}
+.form-link-comeback {
+    text-align: center;  
+    margin-top: 20px;    
+}
+
+.form-link-comeback a {
+    text-decoration: none;
+    color: #333;
+}

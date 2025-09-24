@@ -6,7 +6,7 @@
   <p style="text-align: center;">{{ group.description }}</p>
 
   {% if request.user != group.created_by %}
-    <p class="form-link">
+    <p class="form-link-comeback">
       <a href="{% url 'request_to_join' group.id %}">Request to join</a>
     </p>
   {% endif %}
@@ -19,7 +19,7 @@
           {% if not req.is_approved %}
             <li>
               {{ req.user.username }}
-              <p class="form-link">
+              <p class="form-link-comeback">
                 <a href="{% url 'approve_request' group.id req.id %}">Accept</a> |
                 <a href="{% url 'reject_request' group.id req.id %}">Reject</a>
               </p>
@@ -53,13 +53,13 @@
   </table>
 
   {% if request.user == group.created_by %}
-    <p class="form-link">
+    <p class="form-link-comeback">
       <a href="{% url 'distribute_balance' group.id %}">Distribute balance</a>
     </p>
   {% endif %}
 
   {% if membership %}
-    <p class="form-link">
+    <p class="form-link-comeback">
       <a href="{% url 'buy_asset_in_group' group.id %}">Buy assets</a>
     </p>
   {% endif %}
@@ -82,7 +82,7 @@
     {% endwith %}
   </ul>
 
-  <p class="form-link">
+  <p class="form-link-comeback">
     <a href="{% url 'group_list' %}">Back to groups</a>
   </p>
 {% endblock %}
