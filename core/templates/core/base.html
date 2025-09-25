@@ -3,13 +3,16 @@
 <html lang="pl">
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %} Wealthy {%endblock%}</title>
-        <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+        <title>{% block title %}Wealthy{% endblock %}</title>
+        <link rel="stylesheet" href="{% static 'core/css/style3.css' %}">
     </head>
     <body>
-        <nav class="navbar">
 
-        </nav>
+        <p class="form-link">
+            <a href="{% url 'profile' %}">Main page</a>
+        </p>
+
+
         <div class="content">
             {% block content %}{% endblock %}
         </div>

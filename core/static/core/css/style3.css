@@ -1,0 +1,270 @@
+
+body {
+    background-color: #ffffff;
+    color: #333;
+    font-family: Arial, sans-serif;
+}
+
+.main_menu {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    margin-top: 100px;
+}
+
+.main_menu li a {
+    text-decoration: none;
+    background: #f0f0f0;
+    color: #333;
+    border-radius: 5px;
+    padding: 15px 30px;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.main_menu li a:hover {
+    background-color: #e0e0e0;
+}
+.main_h2 {
+    text-align: center;
+    font-size: 40px;
+    color: #333;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-top: 50px;
+}
+
+.form-container {
+    max-width: 450px;
+    margin: auto;
+    padding: 30px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.form-container input {
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.btn {
+    background-color: #f0f0f0;
+    color: #333;
+    border-radius: 5px;
+    font-size: 20px;
+    padding: 15px;
+    width: 100%;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+}
+
+.btn:hover {
+    background-color: #e0e0e0;
+}
+
+.form-link a {
+    text-decoration: none;
+    color: #333;
+}
+
+.form-link a:hover {
+    color: #555;
+}
+
+.form-check-inline {
+    margin-right: 15px;
+    color: #333;
+}
+
+.profile {
+    list-style: none;
+    margin: 50px auto;
+}
+
+.profile li {
+    margin-bottom: 15px;
+}
+
+.profile li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 25px;
+    width: 100%;
+    text-align: center;
+    padding: auto;
+    border-radius: 10px;
+}
+
+.profile li a:hover {
+    color: #555;
+}
+
+/* WALLETS */
+.wallets {
+    max-width: 400px;
+    margin: 50px auto;
+}
+
+.wallets li {
+    list-style: none;
+    margin-bottom: 15px;
+}
+
+.wallets li a {
+    display: block;
+    text-decoration: none;
+    color: #333;
+    font-size: 40px;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.wallets li a:hover {
+    color: #555;
+}
+
+.wallet-summary {
+    max-width: 500px;
+    margin: 30px auto;
+    color: #333;
+    text-align: center;
+}
+
+.wallet-links a {
+    margin: 20px auto;
+    display: block;
+    width: 50%;
+    text-decoration: none;
+    color: #333;
+    text-align: center;
+    font-weight: bold;
+    font-size: 30px;
+}
+
+.wallet-links a:hover {
+    color: #555;
+}
+
+.wallet-assets {
+    list-style: none;
+    margin: 20px auto;
+    max-width: 500px;
+}
+
+.wallet-assets li {
+    text-align: center;
+}
+
+.wallet-assets li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 25px;
+    display: inline-block;
+}
+
+.wallet-assets li a:hover {
+    color: #555;
+}
+
+/* TRENDS */
+.trends-container {
+    text-align: center;
+    margin: 40px auto;
+}
+
+.trends-table {
+    margin: 20px auto;
+    border-collapse: collapse;
+    color: #333;
+    width: auto;
+    max-width: 700px;
+    text-align: center;
+    border: 1px solid #ccc;
+    background-color: #ffffff;
+}
+
+.trends-table th {
+    background-color: #e0e0e0;
+    padding: 12px 20px;
+    border: 1px solid #ccc;
+}
+
+.trends-table td {
+    border: 1px solid #ccc;
+    padding: 10px 15px;
+}
+
+.trends-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.trends-container h4 {
+    text-align: center;
+    color: #333;
+}
+
+
+
+body.dark-mode {
+    background-color: #121212;
+    color: #f0f0f0;
+}
+
+body.dark-mode .main_menu li a,
+body.dark-mode .btn,
+body.dark-mode .form-container {
+    background-color: #1f1f1f;
+    color: #f0f0f0;
+    border: 1px solid #333;
+}
+
+body.dark-mode .main_menu li a:hover,
+body.dark-mode .btn:hover {
+    background-color: #333;
+}
+
+body.dark-mode .form-link a,
+body.dark-mode .profile li a,
+body.dark-mode .wallets li a,
+body.dark-mode .wallet-links a,
+body.dark-mode .wallet-assets li a,
+body.dark-mode .trends-container h4,
+body.dark-mode .trends-table {
+    color: #f0f0f0;
+}
+
+body.dark-mode .trends-table th {
+    background-color: #1f1f1f;
+    border: 1px solid #333;
+}
+
+body.dark-mode .trends-table td {
+    border: 1px solid #333;
+}
+
+body.dark-mode .trends-table tr:nth-child(even) {
+    background-color: #1a1a1a;
+}
+
+
+.form-container-wallet {
+    max-width: 400px;       
+    margin: 20px auto;      
+    display: flex;
+    flex-direction: column;
+    gap: 10px;             
+}
+.form-link-comeback {
+    text-align: center;  
+    margin-top: 20px;    
+}
+
+.form-link-comeback a {
+    text-decoration: none;
+    color: #333;
+}

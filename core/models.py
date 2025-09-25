@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User 
 from django.conf import settings
 from django.utils import timezone
+from decimal import Decimal
 
 # basic model of an asset (name, type, symbol and the price)
 class Asset(models.Model):
@@ -38,7 +39,7 @@ class Wallet(models.Model):
 class WalletAsset(models.Model):
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
     asset = models.ForeignKey(Asset, on_delete= models.CASCADE)
-    quantity = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.DecimalField(max_digits=10, decimal_places=5)
     purchase_price = models.DecimalField(max_digits=10, decimal_places=2)
     purchase_date = models.DateField()
     def __str__(self):
@@ -122,13 +123,24 @@ class UserGoal(models.Model):
     deadline = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def update_current_amount(self):
+        total = Decimal(0)
+        for wallet in self.user.wallet_set.all():
+            for wa in wallet.walletasset_set.all():
+                try:
+                    current_asset = CurrentAsset.objects.get(symbol=wa.asset.symbol)
+                    total += wa.quantity * current_asset.current_price
+                except CurrentAsset.DoesNotExist:
+                    total += wa.quantity * wa.purchase_price
+        self.current_amount = total
+        self.save()
+
     def progress_percentage(self):
+        self.update_current_amount()  
         if self.target_amount > 0:
             return min(100, (self.current_amount / self.target_amount) * 100)
         return 0
 
-    def __str__(self):
-        return f"{self.name} ({self.user.username})"
     
  # price alerts will be informing user, when the specific asset will obtain the price
  # it can be below or above some price   
@@ -222,4 +234,18 @@ class GroupAssetPurchase(models.Model):
 
     def __str__(self):
         return f"{self.membership.user.username} bought {self.quantity} {self.asset.symbol} in {self.membership.group.name}"
+    
+class AssetTrend(models.Model):
+    symbol = models.CharField(max_length=10)
+    timeframe = models.CharField(max_length=10)  
+    change_pct = models.DecimalField(max_digits=10, decimal_places=2)
+    recorded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("symbol", "timeframe")
+
+    def __str__(self):
+        return f"{self.symbol} ({self.timeframe}): {self.change_pct}%"
+
+
 

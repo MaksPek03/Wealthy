@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 {% block content %}
-<h2 class="main_h2">new goal</h2>
+<h2 class="main_h2">new goal about your total value of wallets</h2>
     <div class="form-container">
         <form method="post">
             {% csrf_token %}
@@ -8,7 +8,7 @@
             <button type="submit" class="btn">save</button>
         </form>
     </div>
-    <p class="form-link">
+    <p class="form-link-comeback">
 <a href="{% url 'user_goals' %}">Back to profile</a>
 </p>
 {% endblock %}

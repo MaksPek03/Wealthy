@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from core.models import Asset, CurrentAsset
-from datetime import datetime  # at the top
+from datetime import datetime  
 import requests
 from datetime import date
 
@@ -113,7 +113,7 @@ class Command(BaseCommand):
             response = session.get(self.FINNHUB_URL, params=params, timeout=5)
             response.raise_for_status()
             data = response.json()
-            return data.get('c')  # 'c' = current price
+            return data.get('c')  
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"Failed to fetch Finnhub price for {asset.symbol}: {e}"))
             return None

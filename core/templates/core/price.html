@@ -1,30 +1,38 @@
 {% extends 'core/base.html' %}
 {% block content %}
-  <h2 class="main_h2">Actual prices:</h2>
-  <div class="form-container">
-    <form method="get" action="">
-      <label for="currency">Choose currency:</label>
-      <select name="currency" id="currency" onchange="this.form.submit()">
-        {% for c in currencies %}
-          <option value="{{ c }}" {% if c == currency %}selected{% endif %}>{{ c|upper }}</option>
-        {% endfor %}
-      </select>
-    </form>
-  </div>
-  {% if prices %}
-    <ul class="wallet-assets">
-      {% for price in prices %}
-        <li>
-          <span>{{ price.name }}</span><br>
-          <span>Current price: <b>{{ price.converted_price }} {{ currency|upper }}</b><br></span>
-          <p></p>
-        </li>
+<h2 class="main_h2">Actual prices:</h2>
+<div class="form-container">
+  <form method="get" action="">
+    <label for="type">Filter by type:</label>
+    <select name="type" id="type" onchange="this.form.submit()">
+      <option value="">All</option>
+      {% for t in asset_types %}
+        <option value="{{ t }}" {% if t == selected_type %}selected{% endif %}>{{ t }}</option>
       {% endfor %}
-    </ul>
-  {% else %}
-    <h2 class="main_h2">No prices</h2>
-  {% endif %}
-  <p class="form-link">
-    <a href="{% url 'profile' %}">Come back</a>
-  </p>
+    </select>
+    <label for="currency">Choose currency:</label>
+    <select name="currency" id="currency" onchange="this.form.submit()">
+      {% for c in currencies %}
+        <option value="{{ c }}" {% if c == currency %}selected{% endif %}>{{ c|upper }}</option>
+      {% endfor %}
+    </select>
+  </form>
+</div>
+{% if prices %}
+  <ul class="wallet-assets">
+  {% for price in prices %}
+    <li>
+      <span>{{ price.name }} ({{ price.symbol }})</span><br>
+      <span>Type: {{ price.type }}</span><br>
+      <span>Current price: <b>{{ price.converted_price }} {{ currency|upper }}</b></span>
+      <p></p>
+    </li>
+  {% endfor %}
+</ul>
+{% else %}
+  <h2 class="main_h2">No prices found</h2>
+{% endif %}
+<p class="form-link-comeback">
+  <a href="{% url 'profile' %}">Come back</a>
+</p>
 {% endblock %}

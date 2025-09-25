@@ -18,8 +18,8 @@ from .models import FriendRequest, FriendList, UserGoal
 from django import forms
 from .forms import PriceAlertForm, GroupForm
 from .models import PriceAlert
-from django.db.models import Sum, F, FloatField
 from .models import SharedWallet
+from .models import AssetTrend
 
 from .models import Group, Membership, GroupTransaction, JoinRequest, GroupAssetPurchase
 from decimal import Decimal, InvalidOperation
@@ -29,6 +29,10 @@ from django.db.models import Max, Min, Avg
 from django.utils.timezone import now
 from django.utils import timezone
 from datetime import timedelta
+from django.views.decorators.http import require_POST
+from django.db.models import DecimalField, F, Sum
+from django.db.models import Sum, F, DecimalField, ExpressionWrapper, FloatField
+
 
 
 # it returns the main page, it does not require log in
@@ -427,7 +431,11 @@ def profile(request):
 @login_required
 def price(request):
     currency = request.GET.get('currency', 'usd').lower()
+    asset_type = request.GET.get('type', None)  
     prices = CurrentAsset.objects.all()
+
+    if asset_type:
+        prices = prices.filter(type=asset_type)
 
     try:
         currency_asset = CurrentAsset.objects.get(symbol=currency)
@@ -435,8 +443,10 @@ def price(request):
     except CurrentAsset.DoesNotExist:
         currency_rate = 1
 
-    for asset in prices:
-        asset.converted_price = round(asset.current_price / currency_rate, 2)
+    for price_obj in prices:
+        price_obj.converted_price = round(price_obj.current_price / currency_rate, 2)
+
+    asset_types = CurrentAsset.objects.values_list('type', flat=True).distinct()
 
     currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']
 
@@ -444,6 +454,8 @@ def price(request):
         'prices': prices,
         'currency': currency,
         'currencies': currencies,
+        'asset_types': asset_types,
+        'selected_type': asset_type,
     })
 
 
@@ -463,11 +475,6 @@ def asset_history(request, symbol):
         'history': history
     })
 
-# now it is only a template, there will be a trends for type of assets
-# and also the most increasing/decreasing assets in a list
-@login_required
-def trends(request):
-    return render(request,'core/trends.html')
 
 # it returns all wallets for a specific user
 # and also it will create a new empty form to add new wallets
@@ -489,119 +496,137 @@ def add_wallet(request):
             return redirect('wallet_list')
     else:
         form = WalletForm()
-    return render(request, 'core/add_wallet.html', {'form':form, 'wallets': Wallet.objects.filter(user=request.user)})
 
 # given function returns assets connected to the wallet, check the price of purchase of every of them
 # then checks the actual value of the all assets, to counts the differnce in price, both in currency and percentages
 # there exist a possible option to check the prices in a different currency
+
 @login_required
 def wallet_detail(request, wallet_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     wallet_assets = WalletAsset.objects.filter(wallet=wallet).select_related('asset')
 
-    total_purchase_value = wallet_assets.aggregate(
-        total=Sum(F('purchase_price') * F('quantity'), output_field=FloatField())
-    )['total'] or 0
+    asset_summaries_dict = {}
 
-    asset_prices = {
-        asset.symbol: asset.current_price for asset in CurrentAsset.objects.all()
-    }
-
-    total_value = 0
     for wa in wallet_assets:
-        symbol = wa.asset.symbol
-        if symbol in asset_prices:
-            total_value += wa.quantity * asset_prices[symbol]
+        asset_id = wa.asset.id
+        if asset_id not in asset_summaries_dict:
+            asset_summaries_dict[asset_id] = {
+                'asset': wa.asset,
+                'symbol': wa.asset.symbol,
+                'total_quantity': wa.quantity,
+                'total_purchase': wa.purchase_price,
+                'current_unit_price': Decimal('0'),
+                'current_total': Decimal('0'),
+            }
+        else:
+            asset_summaries_dict[asset_id]['total_quantity'] += wa.quantity
+            asset_summaries_dict[asset_id]['total_purchase'] += wa.purchase_price
 
-    total_difference = float(total_value) - float(total_purchase_value)
-    if total_purchase_value > 0:
-        differnce_in_percentage = (total_difference / float(total_purchase_value)) * 100
-    else:
-        differnce_in_percentage = 0
+    asset_prices = {a.symbol: Decimal(a.current_price) for a in CurrentAsset.objects.all()}
 
+    total_value = Decimal('0')
+    for summary in asset_summaries_dict.values():
+        current_price = asset_prices.get(summary['symbol'], Decimal('0'))
+        summary['current_unit_price'] = current_price
+        summary['current_total'] = summary['total_quantity'] * current_price
+        total_value += summary['current_total']
 
+    total_purchase_value = sum(s['total_purchase'] for s in asset_summaries_dict.values())
+    total_difference = total_value - total_purchase_value
+    difference_in_percentage = (total_difference / total_purchase_value * Decimal('100')) if total_purchase_value > 0 else Decimal('0')
 
+    # Waluta
     currency = request.GET.get('currency', 'usd').lower()
-    prices = CurrentAsset.objects.all()
-    try:
-        currency_asset = CurrentAsset.objects.get(symbol=currency)
-        currency_rate = currency_asset.current_price
-    except CurrentAsset.DoesNotExist:
-        currency_rate = 1
-    for asset in prices:
-        asset.converted_price = round(asset.current_price / currency_rate, 2)
     currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']
+    try:
+        currency_rate = Decimal(CurrentAsset.objects.get(symbol=currency).current_price)
+    except CurrentAsset.DoesNotExist:
+        currency_rate = Decimal('1')
 
     converted_total_value = total_value / currency_rate
-    converted_total_purchase_value = float(total_purchase_value) / float(currency_rate)
-    converted_total_difference = float(converted_total_value) - float(converted_total_purchase_value)
+    converted_total_purchase_value = total_purchase_value / currency_rate
+    converted_total_difference = converted_total_value - converted_total_purchase_value
     converted_difference_in_percentage = (
-        (converted_total_difference / converted_total_purchase_value) * 100 if total_purchase_value else 0
+        (converted_total_difference / converted_total_purchase_value * Decimal('100'))
+        if converted_total_purchase_value > 0 else Decimal('0')
     )
+
+    asset_summaries = list(asset_summaries_dict.values())
 
     return render(request, 'core/wallet_detail.html', {
         'wallet': wallet,
         'wallet_assets': wallet_assets,
+        'asset_summaries': asset_summaries,
         'total_purchase': converted_total_purchase_value,
         'total_value': converted_total_value,
         'total_difference': converted_total_difference,
         'difference_in_percentage': converted_difference_in_percentage,
-        'prices': prices,
         'currency': currency,
         'currencies': currencies,
     })
 
 
-# for a given asset in a wallet the user can do the same as above
-# so for specific purchase, we also see the difference in actual value and purchase price
-# there is also an option to change the currency
+
 @login_required
 def wallet_asset_detail(request, wallet_id, asset_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     asset = get_object_or_404(Asset, id=asset_id)
-    transactions = WalletAsset.objects.filter(wallet=wallet, asset=asset)
 
-    asset_total_purchase_value = transactions.aggregate(
-        total=Sum(F('purchase_price') * F('quantity'), output_field=FloatField())
-    )['total'] or 0
+    transactions_qs = WalletAsset.objects.filter(wallet=wallet, asset=asset)
+
+    asset_total_purchase_value = transactions_qs.aggregate(
+        total=Sum('purchase_price', output_field=DecimalField(max_digits=30, decimal_places=12))
+    )['total'] or Decimal('0')
+
+    total_quantity = transactions_qs.aggregate(
+        total_qty=Sum('quantity', output_field=DecimalField(max_digits=30, decimal_places=12))
+    )['total_qty'] or Decimal('0')
 
     try:
-        base_price = CurrentAsset.objects.get(symbol=asset.symbol).current_price
+        base_price = Decimal(CurrentAsset.objects.get(symbol=asset.symbol).current_price)
     except CurrentAsset.DoesNotExist:
-        base_price = 0
+        base_price = Decimal('0')
 
     currency = request.GET.get('currency', 'usd').lower()
     currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']
-
     try:
-        currency_asset = CurrentAsset.objects.get(symbol=currency)
-        currency_rate = currency_asset.current_price
+        currency_rate = Decimal(CurrentAsset.objects.get(symbol=currency).current_price)
     except CurrentAsset.DoesNotExist:
-        currency_rate = 1
+        currency_rate = Decimal('1')
 
-    converted_price = round(base_price / currency_rate, 2)
+    converted_unit_price = (base_price / currency_rate) if currency_rate != 0 else Decimal('0')
 
-    total_value_transactions = sum(tx.quantity * converted_price for tx in transactions)
-    converted_total_purchase = float(asset_total_purchase_value) / float(currency_rate)
+    total_current_value = (converted_unit_price * total_quantity)
+    converted_total_purchase = (asset_total_purchase_value / currency_rate) if currency_rate != 0 else Decimal('0')
 
-    total_difference = float(total_value_transactions) - float(converted_total_purchase)
-    total_difference_percentage = (
-        (total_difference / converted_total_purchase) * 100 if converted_total_purchase else 0
-    )
+    total_difference = total_current_value - converted_total_purchase
+    total_difference_percentage = (total_difference / converted_total_purchase * Decimal('100')) if converted_total_purchase > 0 else Decimal('0')
 
+    transactions = []
+    for tx in transactions_qs:
+        transactions.append({
+            'id': tx.id,
+            'quantity': tx.quantity,
+            'purchase_price': tx.purchase_price,  
+            'purchase_date': tx.purchase_date,
+            'current_value': Decimal(tx.quantity) * converted_unit_price,
+        })
 
     return render(request, 'core/wallet_asset_detail.html', {
         'wallet': wallet,
         'asset': asset,
         'transactions': transactions,
-        'converted_price': converted_price,
+        'converted_unit_price': converted_unit_price,
         'asset_total_purchase_value': converted_total_purchase,
-        'total_value_transactions': total_value_transactions,
+        'total_current_value': total_current_value,
         'total_difference': total_difference,
         'total_difference_percentage': total_difference_percentage,
         'currency': currency,
         'currencies': currencies,
+        'total_quantity': total_quantity,
     })
+
 
 # it shows all the assets in a wallet, basically it should not named 'add'
 @login_required
@@ -654,7 +679,6 @@ def remove_wallet_asset(request, wallet_id, asset_id):
 
     return redirect('wallet_detail', wallet_id=wallet_id)
 
-from django.views.decorators.http import require_POST
 
 # user delete only one of the transaction, not whole the asset, one asset can have many transactions
 @login_required
@@ -667,6 +691,27 @@ def delete_wallet_transaction(request, wallet_id, asset_id, transaction_id):
     messages.success(request, "transaction deleted successfully")
 
     return redirect('wallet_asset_detail', wallet_id=wallet.id, asset_id=asset.id)
+
+
+# the function return the list of friends, but also the list of the invitations
+# also user can search for a friend
+@login_required
+def friends_list(request):
+    friend_list = FriendList.objects.get_or_create(user=request.user)[0]
+    friends = friend_list.friends.all()
+    friend_requests = FriendRequest.objects.filter(receiver=request.user, is_active=True)
+
+    users = None
+    query = request.GET.get('q')
+    if query:
+        users = User.objects.filter(username__icontains=query).exclude(id=request.user.id)
+
+    return render(request, 'core/friends_list.html', {
+        'friends': friends,
+        'friend_requests': friend_requests,
+        'users': users,
+    })
+
 
 
 # it creates the invitaion of a friend request, and send to the specific person
@@ -703,24 +748,6 @@ def remove_friend(request, user_id):
         friend_list.unfriend(user_to_remove)
     return redirect('friends_list')
 
-# the function return the list of friends, but also the list of the invitations
-# also user can search for a friend
-@login_required
-def friends_list(request):
-    friend_list = FriendList.objects.get_or_create(user=request.user)[0]
-    friends = friend_list.friends.all()
-    friend_requests = FriendRequest.objects.filter(receiver=request.user, is_active=True)
-
-    users = None
-    query = request.GET.get('q')
-    if query:
-        users = User.objects.filter(username__icontains=query).exclude(id=request.user.id)
-
-    return render(request, 'core/friends_list.html', {
-        'friends': friends,
-        'friend_requests': friend_requests,
-        'users': users,
-    })
 
 
 # for a specific user that sends the request, it will returns all the goals that are setted
@@ -802,23 +829,26 @@ def my_alerts(request):
     })
 
 # function to share the wallet, by the id to the other user, from the user friend list
-
 @login_required
 def share_wallet(request, wallet_id):
-    wallet = get_object_or_404(Wallet, id=wallet_id, user = request.user)
-    friends = FriendList.objects.get(user=request.user).friends.all()
+    wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    
+    friend_list, created = FriendList.objects.get_or_create(user=request.user)
+    friends = friend_list.friends.all()
 
     if request.method == "POST":
         friend_id = request.POST.get('friend_id')
         friend_user = get_object_or_404(User, id=friend_id)
 
         SharedWallet.objects.get_or_create(wallet=wallet, shared_with=friend_user)
-        messages.success(request, f'you shared a wallet to user: {friend_user.username}')
+        messages.success(request, f'You shared the wallet with user: {friend_user.username}')
         return redirect('wallet_detail', wallet_id=wallet.id)
-    return render(request, 'core/share_wallet.html',{
+
+    return render(request, 'core/share_wallet.html', {
         'wallet': wallet,
         'friends': friends
     })
+
 # the list of all shared wallets to the user by the friends
 @login_required
 def shared_wallets(request):
@@ -1001,75 +1031,55 @@ def distribute_balance(request, group_id):
         return redirect("group_detail", group_id=group.id)
 
     return render(request, "core/distribute_balance.html", {"group": group})
+
 @login_required
 def trends(request):
     user = request.user
     wallets = Wallet.objects.filter(user=user)
-    wallet_assets = WalletAsset.objects.filter(wallet__in=wallets).select_related("asset")
+    wallet_assets = WalletAsset.objects.filter(wallet__in=wallets).select_related('asset')
 
+    # Total portfolio value
     asset_prices = {a.symbol: a.current_price for a in CurrentAsset.objects.all()}
     total_value = sum(
         wa.quantity * asset_prices.get(wa.asset.symbol, wa.purchase_price)
         for wa in wallet_assets
     )
 
-    now = timezone.now()
-    timeframes = {
-        "day": now - timedelta(days=1),
-        "month": now - timedelta(days=30),
-        "year": now - timedelta(days=365),
-    }
+    # Timeframes
+    timeframes = ['day', 'week', 'month', 'year']
 
+    # Top/Bottom assets
     trends_data = {}
-    for label, threshold in timeframes.items():
-        history = HistoricAsset.objects.filter(date_recorded__gte=threshold).order_by("symbol", "date_recorded")
+    for tf in timeframes:
+        records = AssetTrend.objects.filter(timeframe=tf)
+        sorted_records = sorted(records, key=lambda x: x.change_pct, reverse=True)
+        best = sorted_records[:5]
+        worst = sorted_records[-5:][::-1]
+        max_len = max(len(best), len(worst))
+        paired = []
+        for i in range(max_len):
+            paired.append({
+                'best': best[i] if i < len(best) else None,
+                'worst': worst[i] if i < len(worst) else None
+            })
+        trends_data[tf] = paired
 
-        changes = {}
-        for symbol in set(h.symbol for h in history):
-            records = list(history.filter(symbol=symbol).order_by("date_recorded"))
-            if len(records) >= 2:
-                first_price = records[0].price
-                last_price = records[-1].price
-                change_pct = ((last_price - first_price) / first_price * 100) if first_price > 0 else Decimal('0')
-                changes[symbol] = round(change_pct, 2)
-
-        if changes:
-            sorted_changes = sorted(changes.items(), key=lambda x: x[1], reverse=True)
-            trends_data[label] = {
-                "best": [{"symbol": s, "change": c} for s, c in sorted_changes[:5]],
-                "worst": [{"symbol": s, "change": c} for s, c in sorted_changes[-5:][::-1]],  
-            }
-        else:
-            trends_data[label] = {"best": [], "worst": []}
-
+    # Average change by asset type — **bierzemy wszystkie aktywa, nie tylko portfel**
     type_trends = {}
-    for asset_type in Asset.objects.values_list("type", flat=True).distinct():
-        type_assets = Asset.objects.filter(type=asset_type)
-        type_trends[asset_type] = {
-            "current_value": sum(asset_prices.get(a.symbol, Decimal('0')) for a in type_assets)
-        }
-
-        for label, threshold in timeframes.items():
-            history = HistoricAsset.objects.filter(type=asset_type, date_recorded__gte=threshold)
-
-            if not history.exists():
-                type_trends[asset_type][label] = None
-                continue
-
-            changes = []
-            for symbol in history.values_list('symbol', flat=True).distinct():
-                records = history.filter(symbol=symbol).order_by('date_recorded')
-                if records.count() < 2:
-                    continue
-                first_price = records.first().price
-                last_price = records.last().price
-                change_pct = ((last_price - first_price) / first_price * 100) if first_price > 0 else Decimal('0')
-                changes.append(change_pct)
-
-            type_trends[asset_type][label] = round(sum(changes)/len(changes), 2) if changes else None
+    asset_types = Asset.objects.values_list('type', flat=True).distinct()
+    for atype in asset_types:
+        type_trends[atype] = {}
+        symbols_of_type = Asset.objects.filter(type=atype).values_list('symbol', flat=True)
+        for tf in timeframes:
+            records = AssetTrend.objects.filter(
+                timeframe=tf,
+                symbol__in=symbols_of_type
+            )
+            type_trends[atype][tf] = round(sum(r.change_pct for r in records)/len(records), 2) if records else None
 
     return render(request, "core/trends.html", {
         "total_value": total_value,
         "trends_data": trends_data,
         "type_trends": type_trends,
+        "timeframes": timeframes,
     })

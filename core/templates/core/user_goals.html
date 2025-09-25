@@ -2,7 +2,7 @@
 {% block content %}
   <h2 class="main_h2">My goals</h2>
 
-  <p class="form-link">
+  <p class="form-link-comeback">
     <a href="{% url 'add_user_goal' %}">Add new goal</a>
   </p>
 
@@ -25,7 +25,7 @@
     <p style="text-align: center;">You have no goals</p>
   {% endif %}
 
-  <p class="form-link">
-    <a href="{% url 'profile' %}">back to profile</a>
+  <p class="form-link-comeback">
+    <a href="{% url 'profile' %}">Back to profile</a>
   </p>
 {% endblock %}

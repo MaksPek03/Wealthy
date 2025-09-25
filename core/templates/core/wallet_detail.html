@@ -2,47 +2,40 @@
 {% block content %}
   <h2 class="main_h2">Wallet: {{ wallet.name }}</h2>
 
-
   <div class="wallet-summary">
-  <form method="get" action="">
-    <label for="currency">Choose currency:</label>
-    <select name="currency" id="currency" onchange="this.form.submit()">
-      {% for c in currencies %}
-        <option value="{{ c }}" {% if c == currency %}selected{% endif %}>{{ c|upper }}</option>
-      {% endfor %}
-    </select>
-  </form>
+    <form method="get" action="">
+      <label for="currency">Choose currency:</label>
+      <select name="currency" id="currency" onchange="this.form.submit()">
+        {% for c in currencies %}
+          <option value="{{ c }}" {% if c == currency %}selected{% endif %}>{{ c|upper }}</option>
+        {% endfor %}
+      </select>
+    </form>
 
-  <p>total purchase price of all assets in this wallet: <bold>{{ total_purchase|floatformat:2 }} {{ currency|upper }}</bold></p>
-  <p>total actual price of all assets in this wallet:<bold> {{ total_value|floatformat:2 }} {{ currency|upper }}</bold></p>
-  <p>balance: <bold>{{ total_difference|floatformat:2 }} {{ currency|upper }} 
-     ({{ difference_in_percentage|floatformat:2 }}%)</bold></p>
+    <p>Total purchase (sum of transaction costs): <strong>{{ total_purchase|floatformat:2 }} {{ currency|upper }}</strong></p>
+    <p>Total current value of all assets: <strong>{{ total_value|floatformat:2 }} {{ currency|upper }}</strong></p>
+    <p>Balance: <strong>{{ total_difference|floatformat:2 }} {{ currency|upper }}</strong>
+       ({{ difference_in_percentage|floatformat:2 }}%)</p>
   </div>
 
-
-  {% if wallet_assets %}
+  <h2 class="main_h2">Assets in this wallet:</h2>
+  {% if asset_summaries %}
     <ul class="wallet-assets">
-      {% for wa in wallet_assets %}
-        {% ifchanged wa.asset.id %}
-          <li>
-            <a href="{% url 'wallet_asset_detail' wallet.id wa.asset.id %}">
-              {{ wa.asset.name }} ({{ wa.asset.symbol }})
-            </a>
-          </li>
-        {% endifchanged %}
+      {% for s in asset_summaries %}
+        <li>
+          <a href="{% url 'wallet_asset_detail' wallet.id s.asset.id %}">{{ s.asset.name }}</a>
+        </li>
       {% endfor %}
     </ul>
   {% else %}
-    <p>This wallet has no assets yet</p>
+  <div class="wallet-summary">
+    <p>This wallet has no assets yet.</p>
+  </div>
   {% endif %}
 
-  
-<div class="wallet-links">
+  <div class="wallet-links">
     <a href="{% url 'add_wallet_asset' wallet.id %}">Add an asset</a>
     <a href="{% url 'share_wallet' wallet.id %}">Share a wallet</a>
     <a href="{% url 'wallet_list' %}">Back to wallet list</a>
-</div>
-
-
-
+  </div>
 {% endblock %}

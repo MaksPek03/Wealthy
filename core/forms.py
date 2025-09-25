@@ -2,6 +2,7 @@ from django import forms
 from .models import Wallet, WalletAsset
 from .models import PriceAlert, UserGoal, Group
 from .models import CurrentAsset
+from django.utils import timezone
 
 
 # it only get the name, and creates new empty wallet, connected to a specific user
@@ -18,25 +19,56 @@ class WalletAssetForm(forms.ModelForm):
         widgets = {
             'purchase_date': forms.DateInput(attrs={'type':'date'}),
         }
+        labels = {
+            'purchase_price': 'How many you paid in USD',
+        }
+
+    def clean_purchase_date(self):
+        date = self.cleaned_data.get('purchase_date')
+        if date > timezone.now().date():
+            raise forms.ValidationError("You cannot add asset from the future")
+        return date
+
 
 # for a speficic asset, user set the price target and whether the alert should be above or below
 # target price has a bootstrap with the numeric field with the 0.01 step, and the above/below is a checkbox
 class PriceAlertForm(forms.ModelForm):
+    above = forms.ChoiceField(
+        choices=[('True', 'Above'), ('False', 'Below')],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-inline'}),
+        label='Above or below',
+    )
+
+
+
+
     class Meta:
         model = PriceAlert
         fields = ['target_price', 'above']
         widgets = {
             'target_price': forms.NumberInput(attrs={'step': '0.01', 'class': 'form-control'}),
-            'above': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-
         }
+
+    def clean_above(self):
+        return self.cleaned_data['above'] == 'True'
 
 
 # form to set the aims for the user, with a few fields to fulfill
 class UserGoalForm(forms.ModelForm):
     class Meta:
         model = UserGoal
-        fields = ['name', 'description', 'target_amount', 'current_amount', 'deadline']
+        fields = ['name', 'description', 'target_amount', 'deadline']
+
+        widgets = {
+                'deadline': forms.DateInput(attrs={'type':'date'}),
+            }
+
+    def clean_deadline(self):
+        deadline = self.cleaned_data.get('deadline')
+        if deadline and deadline < timezone.now().date():
+            raise forms.ValidationError("Deadline cannot be in the past")
+        return deadline
+
 
 
 class GroupForm(forms.ModelForm):
