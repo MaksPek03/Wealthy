@@ -70,11 +70,26 @@ class UserGoalForm(forms.ModelForm):
         return deadline
 
 
-
 class GroupForm(forms.ModelForm):
     class Meta:
         model = Group
-        fields = ["name", "description"]
+        fields = ["name", "description", "purchase_days", "summary_days", "start_time"]
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "description": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+            "purchase_days": forms.NumberInput(attrs={"class": "form-control", "min": 1}),
+            "summary_days": forms.NumberInput(attrs={"class": "form-control", "min": 1}),
+            "start_time": forms.DateTimeInput(
+                attrs={"class": "form-control", "type": "datetime-local"},
+                format="%Y-%m-%dT%H:%M"
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.start_time:
+            self.initial['start_time'] = self.instance.start_time.strftime("%Y-%m-%dT%H:%M")
+
 
 
 class BuyAssetForm(forms.Form):
