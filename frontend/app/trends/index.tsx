@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {ActivityIndicator, FlatList, SafeAreaView, ScrollView, Text, TextInput, View} from "react-native";
+import {ActivityIndicator, SafeAreaView, ScrollView, Text, View} from "react-native";
 import Header from "@/app/components/Header";
 import {useTheme} from "@/app/context/ThemeContext";
 import Footer from "@/app/components/Footer";
