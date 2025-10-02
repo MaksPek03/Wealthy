@@ -12,7 +12,7 @@ interface Price {
     current_price: number;
 }
 
-const checkTrends = () => {
+const history = () => {
     const { isDark, toggleTheme } = useTheme();
     const router = useRouter();
     const [prices, setPrices] = useState<Price[]>([]);
@@ -63,7 +63,7 @@ const checkTrends = () => {
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
 
-            <Header title={"CHECK TRENDS"}/>
+            <Header title={"CHECK HISTORY"}/>
 
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <TextInput
@@ -83,7 +83,7 @@ const checkTrends = () => {
                         stickyHeaderIndices={[0]}
                         renderItem={({item}) => (
                             <TouchableOpacity
-                                onPress={() => router.push(`/checktrends/trends/${item.symbol}`)}
+                                onPress={() => router.replace(`/history/${item.symbol}`)}
                             >
                                 <View className={`flex-row py-2 border-b-2 border-gray-300 px-4`}>
                                     <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>{item.name}</Text>
@@ -96,10 +96,10 @@ const checkTrends = () => {
                 }
             </View>
 
-            <Footer />
+            <Footer path={`/menu`}/>
 
         </SafeAreaView>
     );
 }
 
-export default checkTrends;
+export default history;

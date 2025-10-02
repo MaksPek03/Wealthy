@@ -108,14 +108,14 @@ const friends = () => {
                 }
 
                 <TouchableOpacity
-                    onPress={() => router.push(`/friends/requests`)}
+                    onPress={() => router.replace(`/friends/requests`)}
                     className={`px-8 py-4 min-h-14 min-w-72 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
                 >
                     <Text className={`text-3xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>YOUR FRIEND REQUESTS</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={() => router.push(`/friends/addFriend`)}
+                    onPress={() => router.replace(`/friends/addFriend`)}
                     className={`px-8 py-4 min-h-14 min-w-72 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
                 >
                     <Text className={`text-3xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>ADD NEW FRIEND</Text>
@@ -123,7 +123,7 @@ const friends = () => {
 
             </View>
 
-            <Footer/>
+            <Footer path={`/menu`}/>
 
         </SafeAreaView>
     );

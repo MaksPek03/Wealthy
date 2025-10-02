@@ -4,7 +4,7 @@ import React from 'react';
 const index = () => {
 
     return (
-        <Redirect href={"/welcome_pages/welcome"} />
+        <Redirect href={"/start"} />
     );
 }
 

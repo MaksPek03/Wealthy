@@ -123,7 +123,7 @@ const requests = () => {
 
             </View>
 
-            <Footer />
+            <Footer path = {`/friends`}/>
 
         </SafeAreaView>
     )

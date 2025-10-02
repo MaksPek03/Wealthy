@@ -44,7 +44,7 @@ const addWallet = () => {
             }
 
             Alert.alert("New wallet added successfully.");
-            router.push('/wallets/wallets');
+            router.replace('/wallets');
         } catch (error) {
             Alert.alert("Error", "Could not connect to the server.");
             console.error("Adding wallet:", error);
@@ -78,7 +78,7 @@ const addWallet = () => {
                 </TouchableOpacity>
             </View>
 
-            <Footer />
+            <Footer path={`/wallets`}/>
 
         </SafeAreaView>
     );

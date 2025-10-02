@@ -80,7 +80,7 @@ const WalletScreen = () => {
                         } catch (err) {
                             console.error('Error removing wallet:', err);
                         }finally {
-                            router.replace('/wallets/wallets');
+                            router.replace('/wallets');
                         }
                     }
                 },
@@ -107,7 +107,7 @@ const WalletScreen = () => {
 
                 <View className={`flex-row justify-around py-5`}>
                     <TouchableOpacity className={`w-25 ${isDark ? "bg-buttons-dark" : "bg-buttons"} py-2.5 px-2.5`}
-                                      onPress={() => router.push(`/wallets/${walletId}/addAsset`)}>
+                                      onPress={() => router.replace(`/wallets/${walletId}/addAsset`)}>
                         <Text>
                             add asset
                         </Text>
@@ -130,7 +130,7 @@ const WalletScreen = () => {
                             contentContainerStyle={{ alignItems: 'center' }}
                             renderItem={({ item }) => (
                                 <TouchableOpacity
-                                    onPress={() => router.push(`/wallets/${walletId}/assets/${item.id}`)}
+                                    onPress={() => router.replace(`/wallets/${walletId}/assets/${item.id}`)}
                                     className={`w-60 py-3 px-2.5 m-3 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
                                 >
                                     <Text className={`text-center text-3xl ${isDark ? "text-text-dark" : "text-text"}`}>
@@ -145,7 +145,7 @@ const WalletScreen = () => {
 
             </View>
 
-            <Footer />
+            <Footer path={`/wallets`}/>
 
         </SafeAreaView>
     );
