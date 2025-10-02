@@ -33,6 +33,7 @@ urlpatterns = [
     path('api/asset/<str:symbol>/history/', views.api_asset_history, name='api_history_price'),
     path('api/asset/<str:symbol>/history/<str:day>/', views.api_asset_history_filter, name='api_history_price_filter'),
     path('trends/', views.trends, name='trends'),
+    path('api_trends/', views.api_trends, name='api_trends'),
     path('friends/', views.friends_list, name='friends_list'),
     path('api/friends/', views.api_friends_list, name='api_friends_list'),
     path('api/users/', views.api_users_list, name='api_users_list'),
