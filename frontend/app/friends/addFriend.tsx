@@ -106,7 +106,7 @@ const addFriend = () => {
 
             </View>
 
-            <Footer />
+            <Footer path = {`/friends`}/>
 
         </SafeAreaView>
     )

@@ -17,7 +17,6 @@ interface Price {
 const AssetScreen = () => {
     const { symbol } = useLocalSearchParams();
     const { isDark, toggleTheme } = useTheme();
-    const router = useRouter();
     const [prices, setPrices] = useState<Price[]>([]);
     const [name, setName] = useState<string>('');
     const [price, setPrice] = useState<string>('');
@@ -80,7 +79,7 @@ const AssetScreen = () => {
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
 
-            <Header title={`${name} TRENDS`} />
+            <Header title={`${name} HISTORY`} />
 
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
 
@@ -98,7 +97,7 @@ const AssetScreen = () => {
 
             </View>
 
-            <Footer />
+            <Footer path={`/history`}/>
 
         </SafeAreaView>
     );

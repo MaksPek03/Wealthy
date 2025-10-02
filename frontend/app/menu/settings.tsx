@@ -40,7 +40,7 @@ const Settings= ()=> {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={() => router.push('/welcome_pages/welcome')}
+                    onPress={() => router.push('/start')}
                     className={`px-8 py-4 min-h-14 min-w-96 mt-14 rounded-3xl bg-red-500`}
                 >
                     <Text className={`text-3xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>

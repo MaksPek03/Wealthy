@@ -86,7 +86,7 @@ const addAsset = () => {
             }
 
             Alert.alert("Success", "Asset added to wallet!");
-            router.push(`/wallets/${walletId}`);
+            router.replace(`/wallets/${walletId}`);
 
         } catch (err) {
             console.error(err);
@@ -204,7 +204,7 @@ const addAsset = () => {
                 </TouchableOpacity>
             </View>
 
-            <Footer />
+            <Footer path={`/wallets/${walletId}`}/>
 
         </SafeAreaView>
     );

@@ -62,7 +62,7 @@ const wallets = () => {
                         }
                         renderItem={({item}) => (
                             <TouchableOpacity
-                                onPress={() => router.push(`/wallets/${item.id}`)}
+                                onPress={() => router.replace(`/wallets/${item.id}`)}
                             >
                                 <View className={`flex-row py-2 border-b-2 border-gray-300 px-4`}>
                                     <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>{item.name}</Text>
@@ -73,14 +73,14 @@ const wallets = () => {
                 )
                 }
                 <TouchableOpacity
-                    onPress={() => router.push(`/wallets/addWallet`)}
+                    onPress={() => router.replace(`/wallets/addWallet`)}
                     className={`px-8 py-4 min-h-14 min-w-72 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
                 >
                     <Text className={`text-3xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>ADD WALLET</Text>
                 </TouchableOpacity>
             </View>
 
-            <Footer />
+            <Footer path={`/menu`}/>
 
         </SafeAreaView>
     );

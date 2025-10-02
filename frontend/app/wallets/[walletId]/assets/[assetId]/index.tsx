@@ -175,7 +175,7 @@ const assetScreen = () => {
                 </TouchableOpacity>
             </View>
 
-            <Footer />
+            <Footer path={`/wallets/${walletId}`}/>
 
         </SafeAreaView>
     )

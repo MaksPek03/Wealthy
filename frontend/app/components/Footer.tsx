@@ -5,9 +5,10 @@ import {useRouter} from "expo-router";
 
 interface Props {
     backButton?: boolean;
+    path?: string;
 }
 
-const Footer = ({ backButton = true}: Props) => {
+const Footer = ({ backButton = true, path = ``}: Props) => {
     const { isDark, toggleTheme } = useTheme();
     const router = useRouter();
 
@@ -15,7 +16,7 @@ const Footer = ({ backButton = true}: Props) => {
         <View className={`flex-[1] justify-center items-center ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
             {backButton && (
                 <TouchableOpacity
-                    onPress={() => router.back()}
+                    onPress={() =>  path === `` ? router.back() : router.replace(path)}
                     className={`px-8 py-4 rounded-3xl min-h-10 min-w-40 mb-8 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
                 >
                     <Text className={`text-1xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>GO BACK</Text>

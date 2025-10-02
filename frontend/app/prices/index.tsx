@@ -123,7 +123,7 @@ const checkPrices = () => {
                 }
             </View>
 
-            <Footer />
+            <Footer path={`/menu`}/>
 
         </SafeAreaView>
     );

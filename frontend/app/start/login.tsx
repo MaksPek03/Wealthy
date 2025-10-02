@@ -37,7 +37,7 @@ const Login = () => {
 
             await AsyncStorage.setItem('user_id', String(data.user_id));
 
-            router.replace('/menu/mainMenu');
+            router.replace('/menu');
         } catch (error) {
             Alert.alert("Error", "Could not connect to the server.");
             console.error("Login error:", error);
@@ -86,7 +86,7 @@ const Login = () => {
 
 
             <TouchableOpacity
-                onPress={() => router.push('/welcome_pages/welcome')}
+                onPress={() => router.replace('/start')}
                 className={`px-8 py-4 rounded-3xl min-h-10 min-w-40 mb-16 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
             >
                 <Text className={`text-1xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>GO BACK</Text>

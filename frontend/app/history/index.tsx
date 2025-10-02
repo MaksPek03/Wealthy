@@ -83,7 +83,7 @@ const checkTrends = () => {
                         stickyHeaderIndices={[0]}
                         renderItem={({item}) => (
                             <TouchableOpacity
-                                onPress={() => router.push(`/checktrends/trends/${item.symbol}`)}
+                                onPress={() => router.replace(`/history/${item.symbol}`)}
                             >
                                 <View className={`flex-row py-2 border-b-2 border-gray-300 px-4`}>
                                     <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>{item.name}</Text>
@@ -96,7 +96,7 @@ const checkTrends = () => {
                 }
             </View>
 
-            <Footer />
+            <Footer path={`/menu`}/>
 
         </SafeAreaView>
     );
