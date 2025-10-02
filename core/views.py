@@ -407,6 +407,67 @@ def api_send_friend_request(request, user_id):
 
     return JsonResponse({"message": "Request sent successfully"})
 
+def api_trends(request, user_id):
+    wallets = Wallet.objects.filter(user=user_id)
+    wallet_assets = WalletAsset.objects.filter(wallet__in=wallets).select_related('asset')
+
+    # Total portfolio value
+    asset_prices = {a.symbol: a.current_price for a in CurrentAsset.objects.all()}
+    total_value = sum(
+        wa.quantity * asset_prices.get(wa.asset.symbol, wa.purchase_price)
+        for wa in wallet_assets
+    )
+
+    # Timeframes
+    timeframes = ['day', 'week', 'month', 'year']
+
+    # Top/Bottom assets
+    trends_data = {}
+    for tf in timeframes:
+        records = AssetTrend.objects.filter(timeframe=tf)
+        sorted_records = sorted(records, key=lambda x: x.change_pct, reverse=True)
+        best = sorted_records[:5]
+        worst = sorted_records[-5:][::-1]
+
+        max_len = max(len(best), len(worst))
+        paired = []
+        for i in range(max_len):
+            paired.append({
+                'best': {
+                    'symbol': best[i].symbol,
+                    'change_pct': best[i].change_pct,
+                } if i < len(best) else None,
+                'worst': {
+                    'symbol': worst[i].symbol,
+                    'change_pct': worst[i].change_pct,
+                } if i < len(worst) else None,
+            })
+        trends_data[tf] = paired
+
+    # Average change by asset type
+    type_trends = {}
+    asset_types = Asset.objects.values_list('type', flat=True).distinct()
+    for atype in asset_types:
+        type_trends[atype] = {}
+        symbols_of_type = Asset.objects.filter(type=atype).values_list('symbol', flat=True)
+        for tf in timeframes:
+            records = AssetTrend.objects.filter(
+                timeframe=tf,
+                symbol__in=symbols_of_type
+            )
+            if records:
+                avg_change = sum(r.change_pct for r in records) / len(records)
+                type_trends[atype][tf] = round(avg_change, 2)
+            else:
+                type_trends[atype][tf] = None
+
+    return JsonResponse({
+        "total_value": total_value,
+        "trends_data": trends_data,
+        "type_trends": type_trends,
+        "timeframes": timeframes,
+    }, safe=False)
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
@@ -431,7 +492,7 @@ def profile(request):
 @login_required
 def price(request):
     currency = request.GET.get('currency', 'usd').lower()
-    asset_type = request.GET.get('type', None)  
+    asset_type = request.GET.get('type', None)
     prices = CurrentAsset.objects.all()
 
     if asset_type:
@@ -608,7 +669,7 @@ def wallet_asset_detail(request, wallet_id, asset_id):
         transactions.append({
             'id': tx.id,
             'quantity': tx.quantity,
-            'purchase_price': tx.purchase_price,  
+            'purchase_price': tx.purchase_price,
             'purchase_date': tx.purchase_date,
             'current_value': Decimal(tx.quantity) * converted_unit_price,
         })
@@ -832,7 +893,7 @@ def my_alerts(request):
 @login_required
 def share_wallet(request, wallet_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
-    
+
     friend_list, created = FriendList.objects.get_or_create(user=request.user)
     friends = friend_list.friends.all()
 
