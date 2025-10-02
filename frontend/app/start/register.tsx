@@ -40,7 +40,7 @@ const Register = () => {
                 return;
             }
 
-            router.replace('/welcome_pages/welcome');
+            router.replace('/start');
         } catch (error) {
             Alert.alert("Error", "Could not connect to the server.");
             console.error("Login error:", error);
@@ -100,7 +100,7 @@ const Register = () => {
 
 
                 <TouchableOpacity
-                    onPress={() => router.push('/welcome_pages/welcome')}
+                    onPress={() => router.replace('/start')}
                     className={`px-8 py-4 rounded-3xl min-h-10 min-w-40 mb-16 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
                 >
                     <Text className={`text-1xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>GO BACK</Text>

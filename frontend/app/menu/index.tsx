@@ -34,7 +34,7 @@ const MainMenu = () => {
                     onPress={() => router.replace('/history')}
                     className={`px-10 py-4 min-h-14 min-w-72 mt-14 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
                 >
-                    <Text className={`text-3xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>CHECK TRENDS</Text>
+                    <Text className={`text-3xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>CHECK HISTORY</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity

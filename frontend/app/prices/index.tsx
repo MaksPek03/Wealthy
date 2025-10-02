@@ -14,7 +14,7 @@ interface Price {
 
 type PriceKey = keyof Price;
 
-const checkPrices = () => {
+const prices = () => {
     const { isDark, toggleTheme } = useTheme();
     const router = useRouter();
     const [prices, setPrices] = useState<Price[]>([]);
@@ -129,4 +129,4 @@ const checkPrices = () => {
     );
 }
 
-export default checkPrices;
+export default prices;
