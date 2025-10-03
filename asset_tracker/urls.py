@@ -27,6 +27,7 @@ urlpatterns = [
     path('api/accounts/profile/wallets/remove_wallet/<int:wallet_id>/', views.api_remove_wallet, name='api_remove_wallet'),
     path('price/', views.price, name='price'),
     path('api/price/', views.api_price, name='api_price'),
+    path('api/exchange_rates/', views.api_exchange_rates, name='api_exchange_rates'),
     path('assets/', views.asset_list, name='asset_list'),
     path('api/asset/<str:symbol>/price/', views.api_asset_price, name='api_asset_price'),
     path('asset/<str:symbol>/history/', views.asset_history, name='historic_price'),
