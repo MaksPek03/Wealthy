@@ -108,13 +108,9 @@ def api_asset_price(request, symbol):
     
 def api_exchange_rates(request):
     currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']
-    rates = {}
-    for currency in currencies:
-        try:
-            asset = CurrentAsset.objects.get(symbol=currency)
-            rates[currency] = asset.current_price
-        except CurrentAsset.DoesNotExist:
-            rates[currency] = None
+    assets = CurrentAsset.objects.filter(symbol__in=currencies)
+    asset_map = {asset.symbol: asset.current_price for asset in assets}
+    rates = {currency: asset_map.get(currency, None) for currency in currencies}
     return JsonResponse(rates, safe = False)
 
 # for a specific asset, this function will be looking for all prices saved in the HistoricAsset
