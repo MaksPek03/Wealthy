@@ -138,7 +138,6 @@ def api_wallets(request, user_id):
     return JsonResponse(list(wallets), safe=False)
 
 # it creates the wallet, with a specific name for a given user
-
 @csrf_exempt
 def api_add_wallet(request):
     if request.method == 'POST':
@@ -977,9 +976,10 @@ def buy_asset_in_group(request, group_id):
     membership = get_object_or_404(Membership, group=group, user=request.user)
 
     now = timezone.now()
-    if not (group.start_time <= now <= group.end_time):
+    if not (group.start_time <= now <= group.purchase_end_time):
         messages.error(request, "Purchases are not allowed at this time!")
         return redirect("group_detail", group_id=group.id)
+
 
     if request.method == "POST":
         form = BuyAssetForm(request.POST)
