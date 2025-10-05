@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useEffect, useState} from 'react';
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import CurrencyChange from "@/app/components/CurrencyChange";
 
 interface Wallet {
     id: string;
@@ -24,6 +25,8 @@ const WalletScreen = () => {
     const [totalDifference, setTotalDifference] = useState(0);
     const [differenceInPercentage, setDifferenceInPercentage] = useState(0);
     const [uniqueAssets, setUniqueAssets] = useState<{ name: string, id: string}[]>([]);
+    const [exchangeRate, setExchangeRate] = useState(1);
+    const [currencySymbol, setCurrencySymbol] = useState("$");
 
     useEffect(() => {
         if (assets.length > 0) {
@@ -90,7 +93,14 @@ const WalletScreen = () => {
                 }
             ]
         )
+    }
 
+    const onSelectedExchangeRate = (selectedExchangeRate: number) => {
+        setExchangeRate(selectedExchangeRate);
+    }
+
+    const onSelectedCurrencySymbol = (selectedCurrencySymbol: string) => {
+        setCurrencySymbol(selectedCurrencySymbol);
     }
 
     return (
@@ -99,10 +109,17 @@ const WalletScreen = () => {
             <Header title={`${wallet.name} WALLET`} />
 
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
+                <CurrencyChange setExchangeRate={onSelectedExchangeRate} setCurrencySymbol={onSelectedCurrencySymbol} />
                 <View className={`w-max ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}>
-                    <Text className={`text-2xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>total purchase price: {totalPurchase}</Text>
-                    <Text className={`text-2xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>total actual price: {totalValue}</Text>
-                    <Text className={`text-2xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>balance: {totalDifference}$ in percentage: {differenceInPercentage}%</Text>
+                    <Text className={`text-2xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>
+                        total purchase price: {(totalPurchase / exchangeRate).toFixed(2)}{currencySymbol}
+                    </Text>
+                    <Text className={`text-2xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>
+                        total actual price: {(totalValue / exchangeRate).toFixed(2)}{currencySymbol}
+                    </Text>
+                    <Text className={`text-2xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>
+                        balance: {(totalDifference / exchangeRate).toFixed(2)}{currencySymbol} in percentage: {differenceInPercentage.toFixed(2)}%
+                    </Text>
                 </View>
 
                 <View className={`flex-row justify-around py-5`}>

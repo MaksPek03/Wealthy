@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import {ActivityIndicator, View} from 'react-native';
 import {useLocalSearchParams, useRouter} from 'expo-router';
 import {useTheme} from "@/app/context/ThemeContext";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -92,7 +92,11 @@ const AssetScreen = () => {
                 </View>
 
                 <View >
-                    <Graph points={graphPoints} currentPrice={price} />
+                    {loading ? (
+                        <ActivityIndicator size="large" />
+                    ):(
+                        <Graph points={graphPoints} currentPrice={price} />
+                    )}
                 </View>
 
             </View>

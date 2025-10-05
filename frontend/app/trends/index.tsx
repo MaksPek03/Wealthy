@@ -5,6 +5,7 @@ import {useTheme} from "@/app/context/ThemeContext";
 import Footer from "@/app/components/Footer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FilterHistory from "@/app/components/FilterHistory";
+import CurrencyChange from "@/app/components/CurrencyChange";
 
 interface TypeTrendItem {
     name: string;
@@ -40,6 +41,8 @@ const trends = () => {
     const [selectedFilter, setSelectedFilter] = useState<string>("day");
     const [filteredData, setFilteredData] = useState<TrendsDataItem[] | null>(null);
     const [filteredTrends, setFilteredTrends] = useState<TypeTrendItem[] | null>(null);
+    const [exchangeRate, setExchangeRate] = useState(1);
+    const [currencySymbol, setCurrencySymbol] = useState("$");
 
     useEffect(() => {
         fetchTrends();
@@ -128,6 +131,14 @@ const trends = () => {
         </View>
     );
 
+    const onSelectedExchangeRate = (selectedExchangeRate: number) => {
+        setExchangeRate(selectedExchangeRate);
+    }
+
+    const onSelectedCurrencySymbol = (selectedCurrencySymbol: string) => {
+        setCurrencySymbol(selectedCurrencySymbol);
+    }
+
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
             <Header title={"CHECK TRENDS"} />
@@ -137,8 +148,9 @@ const trends = () => {
                     <ActivityIndicator size="large" />
                 ):(
                     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                        <CurrencyChange setExchangeRate={onSelectedExchangeRate} setCurrencySymbol={onSelectedCurrencySymbol} />
                         <Text className={`text-2xl m-4 text-center ${isDark ? "text-text-dark" : "text-text"}`}>
-                            Total Portfolio Value: {data.total_value}
+                            Total Portfolio Value: {(data.total_value / exchangeRate).toFixed(2)}{currencySymbol}
                         </Text>
 
                         <Text className={`text-2xl text-center m-4 ${isDark ? "text-text-dark" : "text-text"}`}>
