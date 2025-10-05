@@ -10,9 +10,11 @@
     <ul class="wallet-assets">
       {% for goal in goals %}
         <li>
-          <strong>{{ goal.name }}</strong> <br>   goal value: {{ goal.current_amount }} $ /   actual value of the wallet: {{ goal.target_amount }} $
+          <strong>{{ goal.name }}</strong><br>
+          Target value: {{ goal.target_amount }} $ / Current wallet value: {{ current_value|floatformat:2 }} $
           ({{ goal.progress_percentage|floatformat:0 }}%)
           {% if goal.deadline %}<br>Deadline: {{ goal.deadline }}{% endif %}
+
 
           <form method="post" action="{% url 'delete_user_goal' goal.id %}" style="display:inline;">
             {% csrf_token %}

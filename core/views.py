@@ -754,7 +754,15 @@ def remove_friend(request, user_id):
 @login_required
 def user_goals(request):
     goals = UserGoal.objects.filter(user=request.user)
-    return render(request, 'core/user_goals.html', {'goals': goals})
+    total_value = sum(
+        wallet.quantity * CurrentAsset.objects.get(symbol=wallet.asset.symbol).current_price
+        for wallet in WalletAsset.objects.filter(wallet__user=request.user)
+    )
+    return render(request, 'core/user_goals.html', {
+        'goals': goals,
+        'current_value': total_value
+    })
+
 
 # after fulfill the form, the goal is added to the user
 @login_required
