@@ -268,3 +268,12 @@ body.dark-mode .trends-table tr:nth-child(even) {
     text-decoration: none;
     color: #333;
 }
+
+.wallet-assets,
+.profile,
+.wallets,
+.main_menu {
+    padding-left: 0; 
+    margin-left: auto;
+    margin-right: auto;
+}

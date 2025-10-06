@@ -7,12 +7,19 @@
   {% if groups %}
     <ul class="wallet-assets">
       {% for group in groups %}
-        <li>
-          <a href="{% url 'group_detail' group.id %}">
-        {{ group.name }}
-          </a>
-        </li>
+          <li>
+              <a href="{% url 'group_detail' group.id %}">{{ group.name }}</a>
+              {% if group.is_purchase_active %}
+                  <span>Purchases active</span>
+              {% else %}
+                  <span>Purchases closed</span>
+              {% endif %}
+              {% if group.is_summary_due %}
+                  <span>Summary due</span>
+              {% endif %}
+          </li>
       {% endfor %}
+
     </ul>
   {% else %}
     <h2 class="main_h2">There are no groups</h2>

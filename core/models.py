@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.utils import timezone
 from decimal import Decimal
+from django.utils import timezone
+from datetime import timedelta
 
 # basic model of an asset (name, type, symbol and the price)
 class Asset(models.Model):
@@ -164,15 +166,39 @@ class SharedWallet(models.Model):
     class Meta:
         unique_together = ('wallet', 'shared_with')
 
-# a group that user can join
+
 class Group(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+
+    start_time = models.DateTimeField(null=True, blank=True)
+    purchase_days = models.PositiveIntegerField(default=7) 
+    summary_days = models.PositiveIntegerField(default=14)  
+
+    purchase_end_time = models.DateTimeField(null=True, blank=True) 
+    summary_time = models.DateTimeField(null=True, blank=True)       
+
+    def save(self, *args, **kwargs):
+        if not self.start_time:
+            self.start_time = timezone.now()
+        self.purchase_end_time = self.start_time + timedelta(days=self.purchase_days)
+        self.summary_time = self.start_time + timedelta(days=self.summary_days)
+        super().save(*args, **kwargs)
+
+    def is_purchase_active(self):
+        now = timezone.now()
+        return self.start_time <= now <= self.purchase_end_time
+
+    def is_summary_due(self):
+        now = timezone.now()
+        return now >= self.summary_time
+
     def __str__(self):
         return self.name
+
     
 # membership in a group    
 class Membership(models.Model):
