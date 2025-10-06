@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useEffect, useState} from 'react';
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import CurrencyChange from "@/app/components/CurrencyChange";
 
 interface Price {
     name: string;
@@ -23,6 +24,8 @@ const prices = () => {
     const [sortKey, setSortKey] = useState('name');
     const [sortAsc, setSortAsc] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [exchangeRate, setExchangeRate] = useState(1);
+    const [currencySymbol, setCurrencySymbol] = useState("$");
 
     useEffect(() => {
         fetchPrices();
@@ -89,6 +92,13 @@ const prices = () => {
         </View>
     );
 
+    const onSelectedExchangeRate = (selectedExchangeRate: number) => {
+        setExchangeRate(selectedExchangeRate);
+    }
+
+    const onSelectedCurrencySymbol = (selectedCurrencySymbol: string) => {
+        setCurrencySymbol(selectedCurrencySymbol);
+    }
 
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
@@ -96,6 +106,7 @@ const prices = () => {
             <Header title={"CHECK PRICES"} />
 
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
+                <CurrencyChange setExchangeRate={onSelectedExchangeRate} setCurrencySymbol={onSelectedCurrencySymbol} />
                 <TextInput
                     className={`p-2 mb-2 ${isDark ? "text-text-dark" : "text-text"}`}
                     placeholder="Search by name..."
@@ -113,9 +124,15 @@ const prices = () => {
                         stickyHeaderIndices={[0]}
                         renderItem={({item}) => (
                             <View className={`flex-row py-2 border-b border-gray-300 px-4`}>
-                                <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>{item.name}</Text>
-                                <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>{item.symbol}</Text>
-                                <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>$ {item.current_price}</Text>
+                                <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>
+                                    {item.name}
+                                </Text>
+                                <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>
+                                    {item.symbol}
+                                </Text>
+                                <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>
+                                    {currencySymbol} {(item.current_price / exchangeRate).toFixed(2)}
+                                </Text>
                             </View>
                         )}
                         />

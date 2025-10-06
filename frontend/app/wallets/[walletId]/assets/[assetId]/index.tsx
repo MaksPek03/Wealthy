@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useEffect, useState} from 'react';
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import CurrencyChange from "@/app/components/CurrencyChange";
 
 interface Wallet {
     id: string;
@@ -36,6 +37,8 @@ const assetScreen = () => {
     const [totalDifference, setTotalDifference] = useState(0);
     const [totalDifferencePercentage, setTotalDifferencePercentage] = useState(0);
     const [currentPrice, setCurrentPrice] = useState(0);
+    const [exchangeRate, setExchangeRate] = useState(1);
+    const [currencySymbol, setCurrencySymbol] = useState("$");
 
     useEffect(() => {
         fetchDetails();
@@ -123,17 +126,34 @@ const assetScreen = () => {
         )
     }
 
+    const onSelectedExchangeRate = (selectedExchangeRate: number) => {
+        setExchangeRate(selectedExchangeRate);
+    }
+
+    const onSelectedCurrencySymbol = (selectedCurrencySymbol: string) => {
+        setCurrencySymbol(selectedCurrencySymbol);
+    }
+
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
 
             <Header title={`${asset.name} ASSET`} />
 
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
+                <CurrencyChange setExchangeRate={onSelectedExchangeRate} setCurrencySymbol={onSelectedCurrencySymbol} />
                 <View className={`w-max ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}>
-                    <Text className={`text-2xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>total purchase price: {assetTotalPurchasePrice}</Text>
-                    <Text className={`text-2xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>total actual value assets: {totalValueTransactions}</Text>
-                    <Text className={`text-2xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>balance: {totalDifference}$ in percentage: {totalDifferencePercentage}%</Text>
-                    <Text className={`text-2xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>current price: {currentPrice}</Text>
+                    <Text className={`text-2xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>
+                        total purchase price: {(assetTotalPurchasePrice / exchangeRate).toFixed(2)}{currencySymbol}
+                    </Text>
+                    <Text className={`text-2xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>
+                        total actual value assets: {(totalValueTransactions / exchangeRate).toFixed(2)}{currencySymbol}
+                    </Text>
+                    <Text className={`text-2xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>
+                        balance: {(totalDifference / exchangeRate).toFixed(2)}{currencySymbol} in percentage: {totalDifferencePercentage.toFixed(2)}%
+                    </Text>
+                    <Text className={`text-2xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>
+                        current price: {(currentPrice / exchangeRate).toFixed(2)}{currencySymbol}
+                    </Text>
                 </View>
 
 
@@ -151,7 +171,7 @@ const assetScreen = () => {
                         renderItem={({item}) => (
                             <View className={`flex-row py-2 border-b-2 border-gray-300 px-4`}>
                                 <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>
-                                    Quantity: {item.quantity} bought for: {item.purchasePrice}$ on: {item.purchaseDate}
+                                    Quantity: {item.quantity} bought for: {(item.purchasePrice / exchangeRate).toFixed(2)}{currencySymbol} on: {item.purchaseDate}
                                 </Text>
                                 <TouchableOpacity
                                     className={`py-3 px-2.5 m-3 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
