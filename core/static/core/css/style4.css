@@ -275,3 +275,25 @@ body.dark-mode .trends-table tr:nth-child(even) {
     margin-left: auto;
     margin-right: auto;
 }
+
+
+.form-check-inline {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+.form-check-inline label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-size: 16px;
+    vertical-align: middle;
+}
+
+.form-check-inline input[type="radio"] {
+    margin: 0;
+    vertical-align: middle;
+}
+
+
