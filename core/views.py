@@ -821,20 +821,33 @@ def my_alerts(request):
         except CurrentAsset.DoesNotExist:
             current_price = None
 
+        direction = "above" if alert.above else "below"
+        reached = False  
+
         if current_price is not None:
             difference = round(alert.target_price - current_price, 2)
+
+            if alert.above and current_price >= alert.target_price:
+                reached = True
+            elif not alert.above and current_price <= alert.target_price:
+                reached = True
         else:
             difference = "no data"
+            reached = None  
 
         alerts_with_diff.append({
             'alert': alert,
             'current_price': current_price,
             'difference': difference,
+            'direction': direction,
+            'reached': reached,
         })
 
     return render(request, 'core/my_alerts.html', {
         'alerts_with_diff': alerts_with_diff
     })
+
+
 
 # function to share the wallet, by the id to the other user, from the user friend list
 @login_required
