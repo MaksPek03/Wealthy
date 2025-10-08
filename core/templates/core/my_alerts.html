@@ -9,6 +9,7 @@
       <th>Alert price [$]</th>
       <th>Current price [$]</th>
       <th>Difference [$]</th>
+      <th>Below/above</th>
       <th>Status</th>
     </tr>
   </thead>
@@ -25,6 +26,7 @@
           {% endif %}
         </td>
         <td>{{ item.difference }}</td>
+        <td>{{ item.direction}} </td>
         <td>
           {% if item.reached is None %}
             No data
