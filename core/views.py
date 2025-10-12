@@ -952,12 +952,87 @@ def group_list(request):
 @login_required
 def group_detail(request, group_id):
     group = get_object_or_404(Group, id=group_id)
-    members = Membership.objects.filter(group=group).order_by('-balance')
+    members = Membership.objects.filter(group=group)
     assets = CurrentAsset.objects.all()
     membership = Membership.objects.filter(group=group, user=request.user).first()
 
-    now = timezone.now()
-    time_remaining = max((group.purchase_end_time - now).total_seconds(), 0) if group.purchase_end_time else None
+    now = timezone.localtime()
+
+    can_purchase = (
+        group.start_time
+        and group.purchase_end_time
+        and (group.start_time <= now <= group.purchase_end_time)
+    )
+
+    if group.purchase_end_time:
+        remaining = group.purchase_end_time - now
+        if remaining.total_seconds() > 0:
+            days = remaining.days
+            hours, remainder = divmod(remaining.seconds, 3600)
+            minutes, _ = divmod(remainder, 60)
+
+            if days > 0:
+                time_remaining = f"Ends in {days}d {hours}h {minutes}min"
+            elif hours > 0:
+                time_remaining = f"Ends in {hours}h {minutes}min"
+            elif minutes > 0:
+                time_remaining = f"Ends in {minutes} minutes"
+            else:
+                time_remaining = "Ending soon!"
+        else:
+            time_remaining = "Purchase period ended"
+    else:
+        time_remaining = "No purchase end time set"
+
+    if group.summary_time:
+        if now >= group.summary_time:
+            summary_status = f"Summary available since {group.summary_time.strftime('%Y-%m-%d %H:%M')}"
+        else:
+            summary_status = f"Next summary at {group.summary_time.strftime('%Y-%m-%d %H:%M')}"
+    else:
+        summary_status = "No summary scheduled"
+
+    user_total_value = Decimal(0)
+    group_total_value = Decimal(0)
+    user_purchases = []
+    asset_prices = {a.symbol: a.current_price for a in CurrentAsset.objects.all()}
+
+    use_live_prices = can_purchase
+
+    for m in members:
+        purchases = GroupAssetPurchase.objects.filter(membership=m)
+        total_invested = Decimal(0)
+        current_value = Decimal(0)
+
+        for p in purchases:
+            total_invested += p.quantity * p.price_at_purchase
+
+            if use_live_prices and p.asset.symbol in asset_prices:
+                price_now = asset_prices[p.asset.symbol]
+            else:
+                price_now = p.price_at_purchase
+
+            current_value += p.quantity * price_now
+
+            if membership and p.membership == membership:
+                user_purchases.append({
+                    "symbol": p.asset.symbol,
+                    "quantity": p.quantity,
+                    "buy_price": p.price_at_purchase,
+                    "current_price": price_now,
+                    "value_now": round(p.quantity * price_now, 2),
+                    "difference": round((price_now - p.price_at_purchase) * p.quantity, 2),
+                    "created_at": timezone.localtime(p.created_at),
+                })
+
+        m.total_invested = round(total_invested, 2)
+        m.portfolio_value = round(current_value + m.balance, 2)
+        group_total_value += current_value
+
+        if membership and m == membership:
+            user_total_value = round(current_value, 2)
+
+    members = sorted(members, key=lambda x: x.portfolio_value, reverse=True)
 
     return render(request, 'core/group_detail.html', {
         "group": group,
@@ -965,8 +1040,12 @@ def group_detail(request, group_id):
         "assets": assets,
         "membership": membership,
         "time_remaining": time_remaining,
+        "can_purchase": can_purchase,
+        "summary_status": summary_status,
+        "user_total_value": user_total_value,
+        "group_total_value": round(group_total_value, 2),
+        "user_purchases": user_purchases,
     })
-
 
 
 
