@@ -145,7 +145,6 @@ def api_wallets(request, user_id):
     return JsonResponse(list(wallets), safe=False)
 
 # it creates the wallet, with a specific name for a given user
-
 @csrf_exempt
 def api_add_wallet(request):
     if request.method == 'POST':
@@ -481,7 +480,7 @@ def register(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Account created')
+            messages.success(request, 'Account created!')
             return redirect('login')
 
     return render(request, 'registration/register.html', {'form': form})
@@ -701,6 +700,7 @@ def wallet_asset_detail(request, wallet_id, asset_id):
 def wallet_assets(request, wallet_id):
     assets = Asset.objects.all()
     return render(request, 'core/add_wallet_asset.html', {'wallet_id': wallet_id, 'assets': assets})
+
 # here the user can add the asset, to the wallet, after fulfill the form
 @login_required
 def add_wallet_asset_details(request, wallet_id, asset_id):
@@ -822,7 +822,15 @@ def remove_friend(request, user_id):
 @login_required
 def user_goals(request):
     goals = UserGoal.objects.filter(user=request.user)
-    return render(request, 'core/user_goals.html', {'goals': goals})
+    total_value = sum(
+        wallet.quantity * CurrentAsset.objects.get(symbol=wallet.asset.symbol).current_price
+        for wallet in WalletAsset.objects.filter(wallet__user=request.user)
+    )
+    return render(request, 'core/user_goals.html', {
+        'goals': goals,
+        'current_value': total_value
+    })
+
 
 # after fulfill the form, the goal is added to the user
 @login_required
@@ -951,11 +959,27 @@ def shared_wallet_detail(request, wallet_id):
         'total_value': total_value
     })
 
-# list all groups
+
 @login_required
 def group_list(request):
+    now = timezone.now()
     groups = Group.objects.all()
-    return render(request, 'core/group_list.html', {"groups": groups})
+
+    for g in groups:
+        if g.start_time and g.purchase_end_time:
+            g.is_purchase_active = g.start_time <= now <= g.purchase_end_time
+        else:
+            g.is_purchase_active = False
+
+        if g.summary_time:
+            g.is_summary_due = now >= g.summary_time
+        else:
+            g.is_summary_due = False
+
+
+    return render(request, 'core/group_list.html', {"groups": groups, "now": now})
+
+
 
 # details of group and ladeboard
 @login_required
@@ -963,15 +987,19 @@ def group_detail(request, group_id):
     group = get_object_or_404(Group, id=group_id)
     members = Membership.objects.filter(group=group).order_by('-balance')
     assets = CurrentAsset.objects.all()
-
     membership = Membership.objects.filter(group=group, user=request.user).first()
+
+    now = timezone.now()
+    time_remaining = max((group.purchase_end_time - now).total_seconds(), 0) if group.purchase_end_time else None
 
     return render(request, 'core/group_detail.html', {
         "group": group,
         "members": members,
         "assets": assets,
-        "membership": membership,  # <-- dodane
+        "membership": membership,
+        "time_remaining": time_remaining,
     })
+
 
 
 
@@ -1023,17 +1051,22 @@ def buy_asset_in_group(request, group_id):
     group = get_object_or_404(Group, id=group_id)
     membership = get_object_or_404(Membership, group=group, user=request.user)
 
+    now = timezone.now()
+    if not (group.start_time <= now <= group.purchase_end_time):
+        messages.error(request, "Purchases are not allowed at this time!")
+        return redirect("group_detail", group_id=group.id)
+
+
     if request.method == "POST":
         form = BuyAssetForm(request.POST)
         if form.is_valid():
             current_asset = form.cleaned_data["asset"]
             asset = get_object_or_404(Asset, symbol=current_asset.symbol)
             quantity = form.cleaned_data["quantity"]
-
             total_cost = Decimal(quantity) * current_asset.current_price
 
             if membership.balance < total_cost:
-                messages.error(request, "Not enough balance in group account!")
+                messages.error(request, "Not enough balance in group account")
                 return redirect("group_detail", group_id=group.id)
 
             GroupAssetPurchase.objects.create(
@@ -1056,6 +1089,7 @@ def buy_asset_in_group(request, group_id):
         "membership": membership,
         "form": form,
     })
+
 
 
 @login_required
@@ -1106,7 +1140,7 @@ def trends(request):
     wallets = Wallet.objects.filter(user=user)
     wallet_assets = WalletAsset.objects.filter(wallet__in=wallets).select_related('asset')
 
-    # Total portfolio value
+    # total portfolio value
     asset_prices = {a.symbol: a.current_price for a in CurrentAsset.objects.all()}
     total_value = sum(
         wa.quantity * asset_prices.get(wa.asset.symbol, wa.purchase_price)
@@ -1132,7 +1166,7 @@ def trends(request):
             })
         trends_data[tf] = paired
 
-    # Average change by asset type — **bierzemy wszystkie aktywa, nie tylko portfel**
+    # Average change by asset type 
     type_trends = {}
     asset_types = Asset.objects.values_list('type', flat=True).distinct()
     for atype in asset_types:
