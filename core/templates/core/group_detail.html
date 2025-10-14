@@ -5,7 +5,12 @@
   <h2 class="main_h2">{{ group.name }}</h2>
   <p style="text-align: center;">{{ group.description }}</p>
 
-  {% if request.user != group.created_by %}
+  <div style="text-align: center; margin-bottom: 20px;">
+   <p><b>Purchase period:</b> {{ time_remaining }}</p>
+    <p><b>Summary status:</b> {{ summary_status }}</p>
+  </div>
+
+  {% if request.user != group.created_by and not membership %}
     <p class="form-link-comeback">
       <a href="{% url 'request_to_join' group.id %}">Request to join</a>
     </p>
@@ -32,18 +37,18 @@
     {% endif %}
   {% endif %}
 
-  <h3 class="main_h2" style="font-size: 30px;">Ranking</h3>
+  <h3 class="main_h2" style="font-size: 30px;">Leaderboard</h3>
   <table class="wallet-assets" style="width:100%; text-align:left;">
     <tr>
       <th>User</th>
       <th>Balance</th>
-      <th>Total portfolio</th>
+      <th>Total invested</th>
     </tr>
     {% for member in members %}
       <tr>
         <td>{{ member.user.username }}</td>
-        <td>{{ member.balance }}</td>
-        <td>{{ member.portfolio_value }}</td>
+        <td>{{ member.balance }}$</td>
+        <td>{{ member.total_invested|default:"0" }}$</td>
       </tr>
     {% empty %}
       <tr>
@@ -52,6 +57,11 @@
     {% endfor %}
   </table>
 
+  <div style="margin-top:20px; text-align:center;">
+    <p><b>Your total investment:</b> {{ user_total_value }}$</p>
+    <p><b>Total group investment:</b> {{ group_total_value }}$</p>
+  </div>
+
   {% if request.user == group.created_by %}
     <p class="form-link-comeback">
       <a href="{% url 'distribute_balance' group.id %}">Distribute balance</a>
@@ -59,27 +69,59 @@
   {% endif %}
 
   {% if membership %}
-    <p class="form-link-comeback">
-      <a href="{% url 'buy_asset_in_group' group.id %}">Buy assets</a>
-    </p>
+    {% if can_purchase %}
+      <p class="form-link-comeback">
+        <a href="{% url 'buy_asset_in_group' group.id %}">Buy assets</a>
+      </p>
+    {% else %}
+      <p style="text-align: center; font-weight: bold;">
+        Purchases are currently closed.
+      </p>
+    {% endif %}
   {% endif %}
 
-  <h3 class="main_h2" style="font-size: 30px;">Group asset purchases</h3>
+    <h3 class="main_h2" style="font-size: 30px;">Your purchases</h3>
+  <table class="wallet-assets" style="width:100%; text-align:left;">
+    <tr>
+      <th>Asset</th>
+      <th>Quantity</th>
+      <th>Buy price</th>
+      <th>Current price</th>
+      <th>Value now</th>
+      <th>Profit/Loss</th>
+      <th>Date</th>
+    </tr>
+    {% for p in user_purchases %}
+      <tr>
+        <td>{{ p.symbol }}</td>
+        <td>{{ p.quantity }}</td>
+        <td>{{ p.buy_price }}$</td>
+        <td>{{ p.current_price }}$</td>
+        <td>{{ p.value_now }}$</td>
+        <td>
+          {{ p.difference }}$
+        </td>
+        <td>{{ p.created_at|date:"Y-m-d H:i" }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="7">No purchases yet</td></tr>
+    {% endfor %}
+  </table>
+
+
+  <h3 class="main_h2" style="font-size: 30px;">All group purchases</h3>
   <ul class="wallet-assets">
-    {% with total_purchases=0 %}
-      {% for membership in group.membership_set.all %}
-        {% for p in membership.groupassetpurchase_set.all %}
-          <li>
-            {{ p.membership.user.username }} bought {{ p.quantity }}
-            {{ p.asset.symbol }} at {{ p.price_at_purchase }}$
-            ({{ p.created_at }})
-          </li>
-        {% endfor %}
-      {% endfor %}
-      {% if total_purchases == 0 %}
+    {% for membership in group.membership_set.all %}
+      {% for p in membership.groupassetpurchase_set.all %}
+        <li>
+          {{ p.membership.user.username }} bought {{ p.quantity }}
+          {{ p.asset.symbol }} at {{ p.price_at_purchase }}$
+          ({{ p.created_at|date:"Y-m-d H:i" }})
+        </li>
+      {% empty %}
         <li>No purchases yet</li>
-      {% endif %}
-    {% endwith %}
+      {% endfor %}
+    {% endfor %}
   </ul>
 
   <p class="form-link-comeback">

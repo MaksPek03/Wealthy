@@ -889,20 +889,33 @@ def my_alerts(request):
         except CurrentAsset.DoesNotExist:
             current_price = None
 
+        direction = "above" if alert.above else "below"
+        reached = False  
+
         if current_price is not None:
             difference = round(alert.target_price - current_price, 2)
+
+            if alert.above and current_price >= alert.target_price:
+                reached = True
+            elif not alert.above and current_price <= alert.target_price:
+                reached = True
         else:
             difference = "no data"
+            reached = None  
 
         alerts_with_diff.append({
             'alert': alert,
             'current_price': current_price,
             'difference': difference,
+            'direction': direction,
+            'reached': reached,
         })
 
     return render(request, 'core/my_alerts.html', {
         'alerts_with_diff': alerts_with_diff
     })
+
+
 
 # function to share the wallet, by the id to the other user, from the user friend list
 @login_required
@@ -966,31 +979,128 @@ def group_list(request):
     groups = Group.objects.all()
 
     for g in groups:
+        # determine if group is in active purchase
         if g.start_time and g.purchase_end_time:
             g.is_purchase_active = g.start_time <= now <= g.purchase_end_time
+            if now < g.start_time:
+                g.purchase_status = f"Starts in {(g.start_time - now).days} days"
+            elif now > g.purchase_end_time:
+                g.purchase_status = "Purchasing closed"
+            else:
+                remaining = g.purchase_end_time - now
+                hours = remaining.total_seconds() // 3600
+                g.purchase_status = f"Ends in {int(hours)}h"
         else:
             g.is_purchase_active = False
+            g.purchase_status = "No time info"
 
+        # determine if group summary is due
         if g.summary_time:
-            g.is_summary_due = now >= g.summary_time
+            if now >= g.summary_time:
+                g.is_summary_due = True
+                g.summary_status = "Summary due now!"
+            else:
+                remaining = g.summary_time - now
+                g.is_summary_due = False
+                g.summary_status = f"Summary in {remaining.days} days"
         else:
             g.is_summary_due = False
+            g.summary_status = "No summary scheduled"
 
+        # Count members
+        g.member_count = Membership.objects.filter(group=g).count()
 
-    return render(request, 'core/group_list.html', {"groups": groups, "now": now})
-
+    return render(request, 'core/group_list.html', {
+        "groups": groups,
+        "now": now
+    })
 
 
 # details of group and ladeboard
 @login_required
 def group_detail(request, group_id):
     group = get_object_or_404(Group, id=group_id)
-    members = Membership.objects.filter(group=group).order_by('-balance')
+    members = Membership.objects.filter(group=group)
     assets = CurrentAsset.objects.all()
     membership = Membership.objects.filter(group=group, user=request.user).first()
 
-    now = timezone.now()
-    time_remaining = max((group.purchase_end_time - now).total_seconds(), 0) if group.purchase_end_time else None
+    now = timezone.localtime()
+
+    can_purchase = (
+        group.start_time
+        and group.purchase_end_time
+        and (group.start_time <= now <= group.purchase_end_time)
+    )
+
+    if group.purchase_end_time:
+        remaining = group.purchase_end_time - now
+        if remaining.total_seconds() > 0:
+            days = remaining.days
+            hours, remainder = divmod(remaining.seconds, 3600)
+            minutes, _ = divmod(remainder, 60)
+
+            if days > 0:
+                time_remaining = f"Ends in {days}d {hours}h {minutes}min"
+            elif hours > 0:
+                time_remaining = f"Ends in {hours}h {minutes}min"
+            elif minutes > 0:
+                time_remaining = f"Ends in {minutes} minutes"
+            else:
+                time_remaining = "Ending soon!"
+        else:
+            time_remaining = "Purchase period ended"
+    else:
+        time_remaining = "No purchase end time set"
+
+    if group.summary_time:
+        if now >= group.summary_time:
+            summary_status = f"Summary available since {group.summary_time.strftime('%Y-%m-%d %H:%M')}"
+        else:
+            summary_status = f"Next summary at {group.summary_time.strftime('%Y-%m-%d %H:%M')}"
+    else:
+        summary_status = "No summary scheduled"
+
+    user_total_value = Decimal(0)
+    group_total_value = Decimal(0)
+    user_purchases = []
+    asset_prices = {a.symbol: a.current_price for a in CurrentAsset.objects.all()}
+
+    use_live_prices = can_purchase
+
+    for m in members:
+        purchases = GroupAssetPurchase.objects.filter(membership=m)
+        total_invested = Decimal(0)
+        current_value = Decimal(0)
+
+        for p in purchases:
+            total_invested += p.quantity * p.price_at_purchase
+
+            if use_live_prices and p.asset.symbol in asset_prices:
+                price_now = asset_prices[p.asset.symbol]
+            else:
+                price_now = p.price_at_purchase
+
+            current_value += p.quantity * price_now
+
+            if membership and p.membership == membership:
+                user_purchases.append({
+                    "symbol": p.asset.symbol,
+                    "quantity": p.quantity,
+                    "buy_price": p.price_at_purchase,
+                    "current_price": price_now,
+                    "value_now": round(p.quantity * price_now, 2),
+                    "difference": round((price_now - p.price_at_purchase) * p.quantity, 2),
+                    "created_at": timezone.localtime(p.created_at),
+                })
+
+        m.total_invested = round(total_invested, 2)
+        m.portfolio_value = round(current_value + m.balance, 2)
+        group_total_value += current_value
+
+        if membership and m == membership:
+            user_total_value = round(current_value, 2)
+
+    members = sorted(members, key=lambda x: x.portfolio_value, reverse=True)
 
     return render(request, 'core/group_detail.html', {
         "group": group,
@@ -998,8 +1108,12 @@ def group_detail(request, group_id):
         "assets": assets,
         "membership": membership,
         "time_remaining": time_remaining,
+        "can_purchase": can_purchase,
+        "summary_status": summary_status,
+        "user_total_value": user_total_value,
+        "group_total_value": round(group_total_value, 2),
+        "user_purchases": user_purchases,
     })
-
 
 
 

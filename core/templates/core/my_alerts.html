@@ -2,36 +2,50 @@
 {% block content %}
   <h2 class="main_h2">Your alerts</h2>
 
-  <table class="wallet-assets" style="width:100%; text-align:left;">
-    <thead>
+  <table class="wallet-assets" style="width:100%; text-align:center;">
+  <thead>
+    <tr>
+      <th>Asset</th>
+      <th>Alert price [$]</th>
+      <th>Current price [$]</th>
+      <th>Difference [$]</th>
+      <th>Below/above</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in alerts_with_diff %}
       <tr>
-        <th>Asset</th>
-        <th>Alert price [$]</th>
-        <th>Current price [$]</th>
-        <th>Difference [$]</th>
+        <td>{{ item.alert.asset.name }} ({{ item.alert.asset.symbol }})</td>
+        <td>{{ item.alert.target_price }}</td>
+        <td>
+          {% if item.current_price %}
+            {{ item.current_price }}
+          {% else %}
+            No data
+          {% endif %}
+        </td>
+        <td>{{ item.difference }}</td>
+        <td>{{ item.direction}} </td>
+        <td>
+          {% if item.reached is None %}
+            No data
+          {% elif item.reached %}
+             Reached
+          {% else %}
+            Not yet
+          {% endif %}
+        </td>
       </tr>
-    </thead>
-    <tbody>
-      {% for item in alerts_with_diff %}
-        <tr>
-          <td>{{ item.alert.asset.name }} ({{ item.alert.asset.symbol }})</td>
-          <td>{{ item.alert.target_price }}</td>
-          <td>
-            {% if item.current_price %}
-              {{ item.current_price }}
-            {% else %}
-              No data
-            {% endif %}
-          </td>
-          <td>{{ item.difference }} {{ item.direction }}</td>
-        </tr>
-      {% empty %}
-        <tr>
-          <td colspan="4">You have no alerts</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    {% empty %}
+      <tr>
+        <td colspan="6">You have no alerts</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
 
   <p class="form-link-comeback">
     <a href="{% url 'asset_list' %}">Add new alert</a>
