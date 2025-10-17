@@ -289,7 +289,7 @@ def api_add_user_goal(request):
 
         user = get_object_or_404(User, id=userId)
 
-        goal = Goals.objects.create(
+        goal = UserGoal.objects.create(
             user=user,
             name=name,
             description=description,
