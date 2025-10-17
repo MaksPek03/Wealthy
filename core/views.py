@@ -274,6 +274,7 @@ def api_add_wallet_asset_details(request, wallet_id, asset_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+@csrf_exempt
 def api_add_user_goal(request):
     if request.method != "POST":
             return JsonResponse({'error': 'POST method required'}, status=405)
