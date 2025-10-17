@@ -274,6 +274,40 @@ def api_add_wallet_asset_details(request, wallet_id, asset_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+def api_add_user_goal(request):
+    if request.method != "POST":
+            return JsonResponse({'error': 'POST method required'}, status=405)
+
+        try:
+            data = json.loads(request.body)
+            name = data.get('name')
+            description = data.get('description')
+            targetAmount = data.get('targetAmount')
+            deadline = data.get('deadline')
+            userId = data.get('userId')
+
+            user = get_object_or_404(User, id=userId)
+
+            goal = Goals.objects.create(
+                user=user,
+                name=name,
+                description=description,
+                target_amount=targetAmount,
+                deadline=deadline
+            )
+
+            return JsonResponse({
+                'name': goal.name,
+                'description': goal.description,
+                'target_amount': goal.target_amount,
+                'deadline': goal.deadline,
+            }, status=201)
+
+        except json.JSONDecodeError as e:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
 def api_wallet_asset_detail(request, wallet_id, asset_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
     asset = get_object_or_404(Asset, id=asset_id)
