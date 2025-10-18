@@ -144,37 +144,6 @@ def api_wallets(request, user_id):
     wallets = Wallet.objects.filter(user=user_id).values('id', 'name')
     return JsonResponse(list(wallets), safe=False)
 
-def api_user_goals(request):
-    goals = UserGoal.objects.filter(user=request.user)
-
-    goals_list = []
-    for goal in goals:
-        goal_id = goal_id
-        name = goal.name
-        targetAmount = goal.target_amount
-        totalValue = sum(
-                wallet.quantity * CurrentAsset.objects.get(symbol=wallet.asset.symbol).current_price
-                for wallet in WalletAsset.objects.filter(wallet__user=request.user)
-            )
-        deadline = goal.deadline
-        percent = 100 if total_value >= target_amount else round(total_value/target_amount*100, 2)
-
-
-        goals_list.append({
-            "goal_id": goal_id,
-            "name": name,
-            "targetAmount": targetAmount,
-            "totalValue": totalValue,
-            "deadline": deadline,
-            "percent": percent
-        })
-
-    data = {
-        "goalsList": goals_list
-    }
-
-    return JsonResponse(data, safe=False)
-
 # it creates the wallet, with a specific name for a given user
 @csrf_exempt
 def api_add_wallet(request):
@@ -298,41 +267,6 @@ def api_add_wallet_asset_details(request, wallet_id, asset_id):
             'quantity': wallet_asset.quantity,
             'purchase_price': wallet_asset.purchase_price,
             'purchase_date': str(wallet_asset.purchase_date)
-        }, status=201)
-
-    except json.JSONDecodeError as e:
-        return JsonResponse({'error': 'Invalid JSON'}, status=400)
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-
-@csrf_exempt
-def api_add_user_goal(request):
-    if request.method != "POST":
-            return JsonResponse({'error': 'POST method required'}, status=405)
-
-    try:
-        data = json.loads(request.body)
-        name = data.get('name')
-        description = data.get('description')
-        targetAmount = data.get('targetAmount')
-        deadline = data.get('deadline')
-        userId = data.get('userId')
-
-        user = get_object_or_404(User, id=userId)
-
-        goal = UserGoal.objects.create(
-            user=user,
-            name=name,
-            description=description,
-            target_amount=targetAmount,
-            deadline=deadline
-        )
-
-        return JsonResponse({
-            'name': goal.name,
-            'description': goal.description,
-            'target_amount': goal.target_amount,
-            'deadline': goal.deadline,
         }, status=201)
 
     except json.JSONDecodeError as e:
@@ -539,6 +473,78 @@ def api_trends(request, user_id):
         "type_trends": type_trends,
         "timeframes": timeframes,
     }, safe=False)
+
+def api_user_goals(request):
+    goals = UserGoal.objects.filter(user=request.user)
+
+    goals_list = []
+    for goal in goals:
+        goal_id = goal_id
+        name = goal.name
+        targetAmount = goal.target_amount
+        totalValue = sum(
+                wallet.quantity * CurrentAsset.objects.get(symbol=wallet.asset.symbol).current_price
+                for wallet in WalletAsset.objects.filter(wallet__user=request.user)
+            )
+        deadline = goal.deadline
+        percent = 100 if total_value >= target_amount else round(total_value/target_amount*100, 2)
+
+
+        goals_list.append({
+            "goal_id": goal_id,
+            "name": name,
+            "targetAmount": targetAmount,
+            "totalValue": totalValue,
+            "deadline": deadline,
+            "percent": percent
+        })
+
+    data = {
+        "goalsList": goals_list
+    }
+
+    return JsonResponse(data, safe=False)
+
+@csrf_exempt
+def api_add_user_goal(request):
+    if request.method != "POST":
+            return JsonResponse({'error': 'POST method required'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        name = data.get('name')
+        description = data.get('description')
+        targetAmount = data.get('targetAmount')
+        deadline = data.get('deadline')
+        userId = data.get('userId')
+
+        user = get_object_or_404(User, id=userId)
+
+        goal = UserGoal.objects.create(
+            user=user,
+            name=name,
+            description=description,
+            target_amount=targetAmount,
+            deadline=deadline
+        )
+
+        return JsonResponse({
+            'name': goal.name,
+            'description': goal.description,
+            'target_amount': goal.target_amount,
+            'deadline': goal.deadline,
+        }, status=201)
+
+    except json.JSONDecodeError as e:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+def api_delete_user_goal(request, goal_id):
+    goal = get_object_or_404(UserGoal, id=goal_id, user=request.user)
+    goal.delete()
+
+    return JsonResponse({"message": "Goal removed successfully"})
 
 def register(request):
     form = UserCreationForm(request.POST or None)
