@@ -115,7 +115,7 @@ class FriendRequest(models.Model):
 
 # every user can set the goal, with the name, description 
 # and the target to aim, it shows also the deadline and the created of a goal
-# the idead is to show how in percentages is near to obtain it
+# the idea is to show how in percentages is near to obtain it
 class UserGoal(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
