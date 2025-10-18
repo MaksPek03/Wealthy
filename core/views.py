@@ -157,7 +157,7 @@ def api_user_goals(request):
                 for wallet in WalletAsset.objects.filter(wallet__user=request.user)
             )
         deadline = goal.deadline
-        percent = 100 if total_value >= target_amount else round(total_value/target_amount*100, 2)
+        percent = 100 if totalValue >= targetAmount else round(totalValue/targetAmount*100, 2)
 
 
         goals_list.append({
