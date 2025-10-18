@@ -479,7 +479,7 @@ def api_user_goals(request):
 
     goals_list = []
     for goal in goals:
-        goal_id = goal_id
+        goal_id = goal.id
         name = goal.name
         targetAmount = goal.target_amount
         totalValue = sum(
@@ -487,7 +487,7 @@ def api_user_goals(request):
                 for wallet in WalletAsset.objects.filter(wallet__user=request.user)
             )
         deadline = goal.deadline
-        percent = 100 if total_value >= target_amount else round(total_value/target_amount*100, 2)
+        percent = 100 if totalValue >= targetAmount else round(totalValue/targetAmount*100, 2)
 
 
         goals_list.append({
