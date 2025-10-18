@@ -133,7 +133,7 @@ const addGoal = () => {
                     />
 
                     <Text className={`text-1xl text-center mt-12 font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
-                        Purchase date:
+                        Deadline:
                     </Text>
 
                     <TouchableOpacity
