@@ -149,7 +149,7 @@ def api_user_goals(request):
 
     goals_list = []
     for goal in goals:
-        goal_id = goal_id
+        goal_id = goal.id
         name = goal.name
         targetAmount = goal.target_amount
         totalValue = sum(
