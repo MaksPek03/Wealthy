@@ -55,6 +55,7 @@ urlpatterns = [
     path("group_list/<int:group_id>/<int:request_id>/approve/", views.approve_request, name="approve_request"),
     path("group_list/<int:group_id>/<int:request_id>/reject/", views.reject_request, name="reject_request"),
     path("group_list/new/", views.group_create, name="group_create"),
+    path("api/group_list/new/", views.api_group_create, name="api_group_create"),
     path("group_list/<int:group_id>/distribute/", views.distribute_balance, name="distribute_balance"),
     path('goals/', views.user_goals, name='user_goals'),
     path('api/goals/', views.api_user_goals, name='api_user_goals'),

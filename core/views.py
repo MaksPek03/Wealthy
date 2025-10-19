@@ -627,7 +627,7 @@ def api_my_alerts(request):
 
     return JsonResponse(data, safe=False)
 
-def group_list(request):
+def api_group_list(request):
     now = timezone.now()
     groups = Group.objects.all()
 
@@ -679,6 +679,46 @@ def group_list(request):
     }
 
     return JsonResponse(data, safe=False)
+
+@csrf_exempt
+def group_create(request):
+    if request.method != "POST":
+        return JsonResponse({'error': 'POST method required'}, status=405)
+    try:
+        data = json.loads(request.body)
+        name = data.get('name')
+        description = data.get('descritpion')
+        purchase_days = data.get('purchase_days')
+        summary_days = data.get('summary_days')
+        start_time = data.get('start_time')
+        userId = data.get('user_id')
+
+        user = get_object_or_404(User, id=userId)
+
+        group = Group.objects.create(
+            name=name,
+            description=description,
+            created_by=user,
+            start_time=start_time,
+            purchase_days=purchase_days,
+            summary_days=summary_days
+        )
+
+        group.save()
+
+        return JsonResponse({
+            'user': user.username,
+            'name': name,
+            'description': description,
+            'startTime': start_time,
+            'purchaseDays': purchase_days,
+            'summaryDays': summary_days
+        }, status=201)
+
+    except json.JSONDecodeError as e:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 def register(request):
     form = UserCreationForm(request.POST or None)
