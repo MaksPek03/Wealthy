@@ -22,13 +22,42 @@ class Command(BaseCommand):
         'amazon': 'AMZN',
         'fb': 'META',
         'meta': 'META',
-        'sp500': 'SPY',
-        'nasdaq': 'QQQ',
-        'dow_jones': 'DIA',
-        'gold': 'GLD',
-        'silver': 'SLV',
-        'oil': 'USO',
+         # ETFs connected with market indexes
+        'sp500': 'SPY',        
+        'nasdaq': 'QQQ',       
+        'dow_jones': 'DIA',    
+
+        # ETFs connected with the commodity market
+        'gold': 'GLD',        
+        'silver': 'SLV',      
+        'oil': 'USO',           
         'platinum': 'PPLT',
+
+        'nvidia': 'NVDA',
+        'adobe': 'ADBE',
+        'netflix': 'NFLX',
+        'intel': 'INTC',
+        'paypal': 'PYPL',
+        'starbucks': 'SBUX',
+        'boeing': 'BA',
+        'coca_cola': 'KO',
+        'johnson_johnson': 'JNJ',
+        'walmart': 'WMT',
+        'emerging_markets': 'EEM',
+        'technology_etf': 'XLK',
+        'bond_etf': 'BND',
+        'real_estate_etf': 'VNQ',
+        'energy_etf': 'XLE',
+        'dividend_etf': 'VIG',
+        'copper': 'CPER',
+        'natural_gas': 'UNG',
+        'wheat': 'WEAT',
+        'corn': 'CORN',
+        'coffee': 'COFFEE',
+        'canadian_dollar': 'CAD',
+        'australian_dollar': 'AUD',
+        'new_zealand_dollar': 'NZD',
+        'chinese_yuan': 'CNY',     
     }
 
     KUCOIN_SYMBOL_MAP = {
@@ -40,6 +69,16 @@ class Command(BaseCommand):
     'ethereum': 'ETH',
     'solana': 'SOL',
     'litecoin': 'LTC',
+    'avalanche': 'AVAX',
+    'polygon': 'MATIC',
+    'chainlink': 'LINK',
+    'stellar': 'XLM',
+    'algorand': 'ALGO',
+    'vechain': 'VET',
+    'tezos': 'XTZ',
+    'shiba_inu': 'SHIB',
+    'tron': 'TRX',
+    'cosmos': 'ATOM',
     }
 
 
@@ -146,3 +185,4 @@ class Command(BaseCommand):
             date_recorded=timezone.now()
 
         ) 
+
