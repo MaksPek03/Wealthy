@@ -123,7 +123,7 @@ const addAsset = () => {
             <Header title={"ADD ASSET"} />
 
             <View className={`flex-[5] items-center ${isDark ? "bg-background-dark" : "bg-background"}`}>
-                <View style={{ width: '50%', marginTop: 16 }}>
+                <View className={`w-1/2 mt-16`}>
                     <DropDownPicker
                         open={open}
                         value={selectedAssetId}
