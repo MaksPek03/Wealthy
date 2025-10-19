@@ -584,45 +584,45 @@ def api_add_price_alert(request, asset_id):
 # the idea is to show the all alerts that are connected with the user, but also showing how is far
 # to get such price by the asset
 def api_my_alerts(request):
-    # user_alerts = PriceAlert.objects.filter(user=request.user).select_related('asset')
-    #
-    # alerts_with_diff = []
-    # for alert in user_alerts:
-    #     alert_id = alert.id
-    #     try:
-    #         current_asset = CurrentAsset.objects.get(symbol=alert.asset.symbol)
-    #         current_asset_name = current_asset.name
-    #         current_price = current_asset.current_price
-    #     except CurrentAsset.DoesNotExist:
-    #         current_price = None
-    #         current_asset_name = ''
-    #
-    #     reached = False
-    #     targetPrice = alert.target_price
-    #
-    #     if current_price is not None:
-    #         difference = round(targetPrice - current_price, 2)
-    #
-    #         if alert.above and current_price >= targetPrice:
-    #             reached = True
-    #         elif not alert.above and current_price <= targetPrice:
-    #             reached = True
-    #     else:
-    #         difference = "no data"
-    #         reached = None
-    #
-    #     alerts_with_diff.append({
-    #         'alertId': alert_id,
-    #         'asset': current_asset_name,
-    #         'alertPrice': targetPrice,
-    #         'current_price': current_price,
-    #         'difference': difference,
-    #         'above': alert.above,
-    #         'reached': reached
-    #     })
+    user_alerts = PriceAlert.objects.filter(user=request.user).select_related('asset')
+
+    alerts_with_diff = []
+    for alert in user_alerts:
+        alert_id = alert.id
+        try:
+            current_asset = CurrentAsset.objects.get(symbol=alert.asset.symbol)
+            current_asset_name = current_asset.name
+            current_price = current_asset.current_price
+        except CurrentAsset.DoesNotExist:
+            current_price = None
+            current_asset_name = ''
+
+        reached = False
+        targetPrice = alert.target_price
+
+        if current_price is not None:
+            difference = round(targetPrice - current_price, 2)
+
+            if alert.above and current_price >= targetPrice:
+                reached = True
+            elif not alert.above and current_price <= targetPrice:
+                reached = True
+        else:
+            difference = "no data"
+            reached = None
+
+        alerts_with_diff.append({
+            'alertId': alert_id,
+            'asset': current_asset_name,
+            'alertPrice': targetPrice,
+            'current_price': current_price,
+            'difference': difference,
+            'above': alert.above,
+            'reached': reached
+        })
 
     data = {
-        "alerts": 'alerts'
+        "alerts": alerts_with_diff
     }
 
     return JsonResponse(data, safe=False)
