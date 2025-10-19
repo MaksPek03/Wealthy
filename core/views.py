@@ -571,9 +571,9 @@ def api_add_price_alert(request, asset_id):
 
         return JsonResponse({
             'asset': asset.symbol,
-            'targetPrice': PriceAlert.target_price,
-            'above': PriceAlert.above,
-            'createdAt': PriceAlert.created_at,
+            'targetPrice': goal.target_price,
+            'above': goal.above,
+            'createdAt': goal.created_at.isoformat(),
         }, status=201)
 
     except json.JSONDecodeError as e:
