@@ -547,7 +547,7 @@ def api_delete_user_goal(request, goal_id):
     return JsonResponse({"message": "Goal removed successfully"})
 
 
-# after fullfill the form about the price alerts the price allert is added to the
+# after fulfill the form about the price alerts the price alert is added to the
 @csrf_exempt
 def api_add_price_alert(request, asset_id):
     if request.method != "POST":
