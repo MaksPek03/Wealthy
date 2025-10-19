@@ -33,7 +33,7 @@ const addAsset = () => {
 
             if (!response.ok) {
                 console.log(data)
-                Alert.alert("Error", data.error || "Failed to add aler");
+                Alert.alert("Error", data.error || "Failed to add alert");
                 return;
             }
 
