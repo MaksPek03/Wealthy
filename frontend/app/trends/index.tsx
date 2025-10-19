@@ -73,7 +73,7 @@ const trends = () => {
         try {
             const userId = await AsyncStorage.getItem('user_id');
 
-            const response = await fetch(`https://wealthy-0mga.onrender.com/api_trends/${userId}`)
+            const response = await fetch(`https://wealthy-0mga.onrender.com/api/trends/${userId}`)
 
             if (!response.ok) {
                 const text = await response.text();

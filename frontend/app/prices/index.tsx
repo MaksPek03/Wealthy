@@ -1,13 +1,14 @@
 import {View, Text, TouchableOpacity, ActivityIndicator, FlatList, TextInput} from 'react-native';
-import { useRouter} from 'expo-router';
 import {useTheme} from "@/app/context/ThemeContext";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useEffect, useState} from 'react';
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import CurrencyChange from "@/app/components/CurrencyChange";
+import {router} from "expo-router";
 
 interface Price {
+    id: string;
     name: string;
     symbol: string;
     current_price: number;
@@ -17,7 +18,6 @@ type PriceKey = keyof Price;
 
 const prices = () => {
     const { isDark, toggleTheme } = useTheme();
-    const router = useRouter();
     const [prices, setPrices] = useState<Price[]>([]);
     const [filteredPrices, setFilteredPrices] = useState<Price[]>([]);
     const [search, setSearch] = useState('');
@@ -89,6 +89,9 @@ const prices = () => {
                     Current price {sortKey === 'current_price' ? (sortAsc ? '↑' : '↓') : ''}
                 </Text>
             </TouchableOpacity>
+            <Text className={`font-bold text-xl ${isDark ? "text-text-dark" : "text-text"}`}>
+                Add alert
+            </Text>
         </View>
     );
 
@@ -133,6 +136,14 @@ const prices = () => {
                                 <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>
                                     {currencySymbol} {(item.current_price / exchangeRate).toFixed(2)}
                                 </Text>
+                                <TouchableOpacity
+                                    onPress={() => router.replace(`/alerts/${item.id}`)}
+                                    className={`px-8 py-3 min-h-12 min-w-10`}
+                                >
+                                    <Text className={`text-l text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
+                                        ➕
+                                    </Text>
+                                </TouchableOpacity>
                             </View>
                         )}
                         />

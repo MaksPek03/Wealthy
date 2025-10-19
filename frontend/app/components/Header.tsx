@@ -6,9 +6,10 @@ import {useRouter} from "expo-router";
 interface Props {
     title?: string;
     settings?: boolean;
+    alerts?: boolean;
 }
 
-const Header = ({ title = "", settings = false}: Props) => {
+const Header = ({ title = "", settings = false, alerts = false }: Props) => {
     const { isDark, toggleTheme } = useTheme();
     const router = useRouter();
 
@@ -28,6 +29,17 @@ const Header = ({ title = "", settings = false}: Props) => {
             <Text className={`text-6xl text-center ${isDark ? "text-headers-text-dark" : "text-headers-text"}`}>
                 {title.toUpperCase()}
             </Text>
+
+            {alerts && (
+                <TouchableOpacity
+                    onPress={() => router.push('/alerts')}
+                    className={`absolute top-10 right-5 ${isDark ? "text-headers-text-dark" : "text-headers-text"}`}
+                >
+                    <Text className={`text-lg font-bold ${isDark ? "text-headers-text-dark" : "text-headers-text"}`}>
+                        ALT
+                    </Text>
+                </TouchableOpacity>
+            )}
         </View>
     )
 }
