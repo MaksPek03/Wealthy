@@ -69,7 +69,7 @@ const alerts = () => {
                 Below/above status
             </Text>
             <Text className={`font-bold text-l ${isDark ? "text-text-dark" : "text-text"}`}>
-                Rached
+                Reached
             </Text>
         </View>
     );
