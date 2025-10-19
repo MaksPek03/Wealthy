@@ -627,6 +627,59 @@ def api_my_alerts(request):
 
     return JsonResponse(data, safe=False)
 
+def group_list(request):
+    now = timezone.now()
+    groups = Group.objects.all()
+
+    groups = []
+
+    for g in groups:
+        # determine if group is in active purchase
+        if g.start_time and g.purchase_end_time:
+            is_purchase_active = g.start_time <= now <= g.purchase_end_time
+            if now < g.start_time:
+                g.purchase_status = f"Starts in {(g.start_time - now).days} days"
+            elif now > g.purchase_end_time:
+                g.purchase_status = "Purchasing closed"
+            else:
+                remaining = g.purchase_end_time - now
+                hours = remaining.total_seconds() // 3600
+                g.purchase_status = f"Ends in {int(hours)}h"
+        else:
+            g.is_purchase_active = False
+            g.purchase_status = "No time info"
+
+        # determine if group summary is due
+        if g.summary_time:
+            if now >= g.summary_time:
+                g.is_summary_due = True
+                g.summary_status = "Summary due now!"
+            else:
+                remaining = g.summary_time - now
+                g.is_summary_due = False
+                g.summary_status = f"Summary in {remaining.days} days"
+        else:
+            g.is_summary_due = False
+            g.summary_status = "No summary scheduled"
+
+        # Count members
+        g.member_count = Membership.objects.filter(group=g).count()
+
+        groups.append({
+            'groupId': g.id,
+            'name': g.name,
+            'active': g.is_purchase_active,
+            'purchaseStatus': g.purchase_status,
+            'summaryStatus': g.summary_status,
+            'memberCount': g.member_count
+        })
+
+    data = {
+        'groups': groups
+    }
+
+    return JsonResponse(data, safe=False)
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':

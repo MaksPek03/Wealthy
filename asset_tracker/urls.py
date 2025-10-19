@@ -48,6 +48,7 @@ urlpatterns = [
     path('friends/remove-friend/<int:user_id>/', views.remove_friend, name='remove_friend'),
     path('api/friends/remove-friend/<int:user_id>/', views.api_remove_friend, name='api_remove_friend'),
     path('group_list/', views.group_list, name='group_list'),
+    path('api/group_list/', views.api_group_list, name='api_group_list'),
     path("group_list/<int:group_id>/", views.group_detail, name="group_detail"),
     path("group_list/<int:group_id>/buy/", views.buy_asset_in_group, name="buy_asset_in_group"),
     path("group_list/<int:group_id>/request/", views.request_to_join, name='request_to_join'),
