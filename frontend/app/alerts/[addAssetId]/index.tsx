@@ -50,7 +50,7 @@ const addAsset = () => {
         const priceParsed = parseFloat(targetPrice.replace(',', '.'));
 
         if (isNaN(priceParsed)) {
-            Alert.alert("Invalid input", "Target price must be numeric values.");
+            Alert.alert("Invalid input", "Target price must be a numeric value.");
             return;
         }
 
