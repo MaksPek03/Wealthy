@@ -105,7 +105,7 @@ def api_asset_price(request, symbol):
     return JsonResponse({'name': asset['name'],
                                      'symbol': asset['symbol'],
                                      'current_price': asset['current_price']}, safe = False)
-    
+
 def api_exchange_rates(request):
     currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']
     assets = CurrentAsset.objects.filter(symbol__in=currencies)
@@ -546,6 +546,87 @@ def api_delete_user_goal(request, goal_id):
 
     return JsonResponse({"message": "Goal removed successfully"})
 
+
+# after fulfill the form about the price alerts the price alert is added to the
+@csrf_exempt
+def api_add_price_alert(request, asset_id):
+    if request.method != "POST":
+        return JsonResponse({'error': 'POST method required'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        targetPrice = data.get('targetPrice')
+        above = data.get('above')
+        userId = data.get('userId')
+
+        user = get_object_or_404(User, id=userId)
+        asset = get_object_or_404(Asset, id=asset_id)
+
+        goal = PriceAlert.objects.create(
+            user=user,
+            asset=asset,
+            target_price=targetPrice,
+            above=above
+        )
+
+        return JsonResponse({
+            'asset': PriceAlert.asset,
+            'targetPrice': PriceAlert.target_price,
+            'above': PriceAlert.above,
+            'createdAt': PriceAlert.created_at,
+        }, status=201)
+
+    except json.JSONDecodeError as e:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+# the idea is to show the all alerts that are connected with the user, but also showing how is far
+# to get such price by the asset
+def api_my_alerts(request):
+    user_alerts = PriceAlert.objects.filter(user=request.user).select_related('asset')
+
+    alerts_with_diff = []
+    for alert in user_alerts:
+        alert_id = alert.id
+        try:
+            current_asset = CurrentAsset.objects.get(symbol=alert.asset.symbol)
+            current_asset_name = current_asset.name
+            current_price = current_asset.current_price
+        except CurrentAsset.DoesNotExist:
+            current_price = None
+            current_asset_name = ''
+
+        reached = False
+        targetPrice = alert.target_price
+
+        if current_price is not None:
+            difference = round(targetPrice - current_price, 2)
+
+            if alert.above and current_price >= targetPrice:
+                reached = True
+            elif not alert.above and current_price <= targetPrice:
+                reached = True
+        else:
+            difference = "no data"
+            reached = None
+
+        alerts_with_diff.append({
+            'alertId': alert_id,
+            'asset': current_asset_name,
+            'alertPrice': targetPrice,
+            'current_price': current_price,
+            'difference': difference,
+            'above': alert.above,
+            'reached': reached
+        })
+
+    data = {
+        "alerts": alerts_with_diff
+    }
+
+    return JsonResponse(data, safe=False)
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
@@ -962,7 +1043,7 @@ def my_alerts(request):
             current_price = None
 
         direction = "above" if alert.above else "below"
-        reached = False  
+        reached = False
 
         if current_price is not None:
             difference = round(alert.target_price - current_price, 2)
@@ -973,7 +1054,7 @@ def my_alerts(request):
                 reached = True
         else:
             difference = "no data"
-            reached = None  
+            reached = None
 
         alerts_with_diff.append({
             'alert': alert,
@@ -1352,7 +1433,7 @@ def trends(request):
             })
         trends_data[tf] = paired
 
-    # Average change by asset type 
+    # Average change by asset type
     type_trends = {}
     asset_types = Asset.objects.values_list('type', flat=True).distinct()
     for atype in asset_types:
