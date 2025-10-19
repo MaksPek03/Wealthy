@@ -64,7 +64,7 @@ const addAsset = () => {
 
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
-            <Header title={"ADD ALLERT"} />
+            <Header title={"ADD ALERT"} />
             <View className={`flex-[5] items-center ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <Text className={`text-1xl text-center mt-12 font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
                     Target price:
