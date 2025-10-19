@@ -570,7 +570,7 @@ def api_add_price_alert(request, asset_id):
         )
 
         return JsonResponse({
-            'asset': PriceAlert.asset,
+            'asset': PriceAlert.asset.symbol,
             'targetPrice': PriceAlert.target_price,
             'above': PriceAlert.above,
             'createdAt': PriceAlert.created_at,
