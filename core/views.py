@@ -447,7 +447,7 @@ def price(request):
 
     asset_types = CurrentAsset.objects.values_list('type', flat=True).distinct()
 
-    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']
+    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad', 'pln']
 
     return render(request, 'core/price.html', {
         'prices': prices,
@@ -537,7 +537,7 @@ def wallet_detail(request, wallet_id):
 
     # Waluta
     currency = request.GET.get('currency', 'usd').lower()
-    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']
+    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad', 'pln']
     try:
         currency_rate = Decimal(CurrentAsset.objects.get(symbol=currency).current_price)
     except CurrentAsset.DoesNotExist:
@@ -588,7 +588,7 @@ def wallet_asset_detail(request, wallet_id, asset_id):
         base_price = Decimal('0')
 
     currency = request.GET.get('currency', 'usd').lower()
-    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad']
+    currencies = ['usd', 'eur', 'gbp', 'jpy', 'cad', 'pln']
     try:
         currency_rate = Decimal(CurrentAsset.objects.get(symbol=currency).current_price)
     except CurrentAsset.DoesNotExist:
