@@ -96,7 +96,7 @@ def api_register(request):
 # it get all values from currentAsset, so the newest prices, and return it as a list of dictonaries, where we
 # have name, symbol and price
 def api_price(request):
-    prices = CurrentAsset.objects.all().values('name', 'symbol', 'current_price')
+    prices = CurrentAsset.objects.all().values('id', 'name', 'symbol', 'current_price')
     return JsonResponse(list(prices), safe = False)
 
 # it checks the price for a specific asset (symbol), and returns all the properties for a given asset
