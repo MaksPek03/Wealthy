@@ -627,6 +627,97 @@ def api_my_alerts(request):
 
     return JsonResponse(data, safe=False)
 
+def api_group_list(request):
+    now = timezone.now()
+    groups = Group.objects.all()
+
+    _groups = []
+
+    for g in groups:
+        # determine if group is in active purchase
+        if g.start_time and g.purchase_end_time:
+            is_purchase_active = g.start_time <= now <= g.purchase_end_time
+            if now < g.start_time:
+                g.purchase_status = f"Starts in {(g.start_time - now).days} days"
+            elif now > g.purchase_end_time:
+                g.purchase_status = "Purchasing closed"
+            else:
+                remaining = g.purchase_end_time - now
+                hours = remaining.total_seconds() // 3600
+                g.purchase_status = f"Ends in {int(hours)}h"
+        else:
+            is_purchase_active = False
+            g.purchase_status = "No time info"
+
+        # determine if group summary is due
+        if g.summary_time:
+            if now >= g.summary_time:
+                g.is_summary_due = True
+                g.summary_status = "Summary due now!"
+            else:
+                remaining = g.summary_time - now
+                g.is_summary_due = False
+                g.summary_status = f"Summary in {remaining.days} days"
+        else:
+            g.is_summary_due = False
+            g.summary_status = "No summary scheduled"
+
+        # Count members
+        g.member_count = Membership.objects.filter(group=g).count()
+
+        _groups.append({
+            'groupId': g.id,
+            'name': g.name,
+            'active': is_purchase_active,
+            'purchaseStatus': g.purchase_status,
+            'summaryStatus': g.summary_status,
+            'memberCount': g.member_count
+        })
+
+    data = {
+        'groups': _groups
+    }
+
+    return JsonResponse(data, safe=False)
+
+@csrf_exempt
+def api_group_create(request):
+    if request.method != "POST":
+        return JsonResponse({'error': 'POST method required'}, status=405)
+    try:
+        data = json.loads(request.body)
+        name = data.get('name')
+        description = data.get('description')
+        purchase_days = data.get('purchase_days')
+        summary_days = data.get('summary_days')
+        start_time = data.get('start_time')
+        userId = data.get('user_id')
+
+        user = get_object_or_404(User, id=userId)
+
+        group = Group.objects.create(
+            name=name,
+            description=description,
+            created_by=user,
+            start_time=start_time,
+            purchase_days=purchase_days,
+            summary_days=summary_days
+        )
+
+        return JsonResponse({
+            'user': user.username,
+            'name': name,
+            'description': description,
+            'startTime': start_time,
+            'purchaseDays': purchase_days,
+            'summaryDays': summary_days
+        }, status=201)
+
+    except json.JSONDecodeError as e:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
