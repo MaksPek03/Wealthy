@@ -695,6 +695,13 @@ def api_group_create(request):
 
         user = get_object_or_404(User, id=userId)
 
+        if isinstance(start_time, str):
+            try:
+                start_time = datetime.fromisoformat(start_time.replace("Z", ""))
+            except ValueError:
+                return JsonResponse({'error': 'Invalid date format for start_time'}, status=400)
+
+
         group = Group.objects.create(
             name=name,
             description=description,
@@ -703,6 +710,8 @@ def api_group_create(request):
             purchase_days=purchase_days,
             summary_days=summary_days
         )
+
+        group.save()
 
         return JsonResponse({
             'user': user.username,
