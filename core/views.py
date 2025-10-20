@@ -704,8 +704,6 @@ def api_group_create(request):
             summary_days=summary_days
         )
 
-        group.save()
-
         return JsonResponse({
             'user': user.username,
             'name': name,
