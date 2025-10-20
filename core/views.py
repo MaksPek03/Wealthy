@@ -681,7 +681,7 @@ def api_group_list(request):
     return JsonResponse(data, safe=False)
 
 @csrf_exempt
-def group_create(request):
+def api_group_create(request):
     if request.method != "POST":
         return JsonResponse({'error': 'POST method required'}, status=405)
     try:
