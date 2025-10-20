@@ -13,7 +13,7 @@ const MainMenu = () => {
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
 
-            <Header title={"MAIN PAGE"} settings={true}/>
+            <Header title={"MAIN PAGE"} settings={true} alerts={true} />
 
             <View className={`flex-[5] justify-center items-center ${isDark ? "bg-background-dark" : "bg-background"}`}>
 
