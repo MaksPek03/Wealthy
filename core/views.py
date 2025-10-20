@@ -703,7 +703,6 @@ def api_group_create(request):
             except ValueError:
                 return JsonResponse({'error': 'Invalid date format for start_time'}, status=400)
 
-
         group = Group.objects.create(
             name=name,
             description=description,
@@ -714,6 +713,8 @@ def api_group_create(request):
         )
 
         group.save()
+
+        Membership.objects.create(user=user, group=group, balance=0)
 
         return JsonResponse({
             'user': user.username,
