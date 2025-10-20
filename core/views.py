@@ -631,7 +631,7 @@ def api_group_list(request):
     now = timezone.now()
     groups = Group.objects.all()
 
-    groups = []
+    _groups = []
 
     for g in groups:
         # determine if group is in active purchase
@@ -665,7 +665,7 @@ def api_group_list(request):
         # Count members
         g.member_count = Membership.objects.filter(group=g).count()
 
-        groups.append({
+        _groups.append({
             'groupId': g.id,
             'name': g.name,
             'active': g.is_purchase_active,
@@ -675,7 +675,7 @@ def api_group_list(request):
         })
 
     data = {
-        'groups': groups
+        'groups': _groups
     }
 
     return JsonResponse(data, safe=False)
