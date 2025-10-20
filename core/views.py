@@ -646,7 +646,7 @@ def api_group_list(request):
                 hours = remaining.total_seconds() // 3600
                 g.purchase_status = f"Ends in {int(hours)}h"
         else:
-            g.is_purchase_active = False
+            is_purchase_active = False
             g.purchase_status = "No time info"
 
         # determine if group summary is due
