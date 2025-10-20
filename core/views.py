@@ -687,7 +687,7 @@ def api_group_create(request):
     try:
         data = json.loads(request.body)
         name = data.get('name')
-        description = data.get('descritpion')
+        description = data.get('description')
         purchase_days = data.get('purchase_days')
         summary_days = data.get('summary_days')
         start_time = data.get('start_time')
