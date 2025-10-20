@@ -668,7 +668,7 @@ def api_group_list(request):
         _groups.append({
             'groupId': g.id,
             'name': g.name,
-            'active': g.is_purchase_active,
+            'active': is_purchase_active,
             'purchaseStatus': g.purchase_status,
             'summaryStatus': g.summary_status,
             'memberCount': g.member_count
