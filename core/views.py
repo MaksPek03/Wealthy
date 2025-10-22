@@ -749,16 +749,6 @@ def api_group_detail(request, group_id):
         "summary_time": group.summary_time
     }
 
-    members_ = []
-    for member in members:
-        members_.append({
-            "id": member.id,
-            "user_id": member.user.id,
-            "group_id": member.group.id,
-            "balance": member.balance,
-            "joined_at": member.joined_at
-        })
-
     assets_ = []
     for asset in assets:
         assets_.append({
@@ -853,7 +843,19 @@ def api_group_detail(request, group_id):
         if membership and m == membership:
             user_total_value = round(current_value, 2)
 
-    members = sorted(members, key=lambda x: x.portfolio_value, reverse=True)
+    members = sorted(members_, key=lambda x: x.portfolio_value, reverse=True)
+
+    members_ = []
+    for member in members:
+        members_.append({
+            "id": member.id,
+            "user_id": member.user.id,
+            "group_id": member.group.id,
+            "balance": member.balance,
+            "joined_at": member.joined_at,
+            "total_invested": member.total_invested,
+            "portfolio_value": member.portfolio_value
+        })
 
     data = {
         "group": group_,
