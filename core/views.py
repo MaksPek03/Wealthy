@@ -736,6 +736,47 @@ def api_group_detail(request, group_id):
     assets = CurrentAsset.objects.all()
     membership = Membership.objects.filter(group=group, user=request.user).first()
 
+    group_details = {
+        "id": group.id,
+        "name": group.name,
+        "description": group.description,
+        "created_by_user_id": group.created_by.id,
+        "created_at": group.created_at,
+        "start_time": group.start_time,
+        "purchase_days": group.purchase_days,
+        "summary_days": group.summary_days,
+        "purchase_end_time": group.purchase_end_time,
+        "summary_time": group.summary_time
+    }
+
+    members_ = []
+    for member in members:
+        members_.append({
+            "id": member.id,
+            "user_id": member.user.id,
+            "group_id": member.group.id,
+            "balance": member.balance,
+            "joined_at": member.joined_at
+        })
+
+    assets_ = []
+    for asset in assets:
+        assets_.append({
+            "id": asset.id,
+            "name": asset.name,
+            "type": asset.type,
+            "symbol": asset.symbol,
+            "current_price": asset.current_price
+        })
+
+    memberships = {
+        "id": membership.id,
+        "user_id": membership.user.id,
+        "group_id": membership.group.id,
+        "balance": membership.balance,
+        "joined_at": membership.joined_at
+    }
+
     now = timezone.localtime()
 
     can_purchase = (
@@ -815,9 +856,9 @@ def api_group_detail(request, group_id):
     members = sorted(members, key=lambda x: x.portfolio_value, reverse=True)
 
     dat = {
-        "group": group,
-        "members": members,
-        "assets": assets,
+        "group": group_details,
+        "members": members_,
+        "assets": assets_,
         "membership": membership,
         "time_remaining": time_remaining,
         "can_purchase": can_purchase,
