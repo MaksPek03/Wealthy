@@ -845,6 +845,18 @@ def api_group_detail(request, group_id):
 
     members = sorted(members, key=lambda x: x.portfolio_value, reverse=True)
 
+    join_requests = JoinRequest.objects.filter(group = group)
+    join_requests_ = []
+    for request in join_requests:
+        join_requests_.append({
+            "id": request.id,
+            "user_id": request.user.id,
+            "group_id": request.group.id,
+            "created_at": request.created_at,
+            "is_approved": request.is_approved
+        })
+
+
     members_ = []
     for member in members:
         members_.append({
@@ -868,6 +880,7 @@ def api_group_detail(request, group_id):
         "user_total_value": user_total_value,
         "group_total_value": round(group_total_value, 2),
         "user_purchases": user_purchases,
+        "join_requests": join_requests_
     }
 
     return JsonResponse(data, safe=False)
