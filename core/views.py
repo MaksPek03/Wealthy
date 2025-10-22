@@ -759,7 +759,7 @@ def api_group_detail(request, group_id):
             "current_price": asset.current_price
         })
 
-    membership_ = {
+    membership_ = None if not membership else {
         "id": membership.id,
         "user_id": membership.user.id,
         "group_id": membership.group.id,
@@ -843,7 +843,7 @@ def api_group_detail(request, group_id):
         if membership and m == membership:
             user_total_value = round(current_value, 2)
 
-    members = sorted(members_, key=lambda x: x.portfolio_value, reverse=True)
+    members = sorted(members, key=lambda x: x.portfolio_value, reverse=True)
 
     members_ = []
     for member in members:
