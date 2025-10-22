@@ -736,7 +736,7 @@ def api_group_detail(request, group_id):
     assets = CurrentAsset.objects.all()
     membership = Membership.objects.filter(group=group, user=request.user).first()
 
-    group_details = {
+    group_ = {
         "id": group.id,
         "name": group.name,
         "description": group.description,
@@ -769,7 +769,7 @@ def api_group_detail(request, group_id):
             "current_price": asset.current_price
         })
 
-    memberships = {
+    membership_ = {
         "id": membership.id,
         "user_id": membership.user.id,
         "group_id": membership.group.id,
@@ -816,7 +816,7 @@ def api_group_detail(request, group_id):
     user_total_value = Decimal(0)
     group_total_value = Decimal(0)
     user_purchases = []
-    asset_prices = {a.symbol: a.current_price for a in CurrentAsset.objects.all()}
+    asset_prices = {a.symbol: a.current_price for a in assets}
 
     use_live_prices = can_purchase
 
@@ -855,11 +855,11 @@ def api_group_detail(request, group_id):
 
     members = sorted(members, key=lambda x: x.portfolio_value, reverse=True)
 
-    dat = {
-        "group": group_details,
+    data = {
+        "group": group_,
         "members": members_,
         "assets": assets_,
-        "membership": membership,
+        "membership": membership_,
         "time_remaining": time_remaining,
         "can_purchase": can_purchase,
         "summary_status": summary_status,
