@@ -864,6 +864,7 @@ def api_group_detail(request, group_id):
         members_.append({
             "id": member.id,
             "user_id": member.user.id,
+            "user_username": member.user.username,
             "group_id": member.group.id,
             "balance": member.balance,
             "joined_at": member.joined_at,
