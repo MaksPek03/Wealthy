@@ -852,7 +852,7 @@ def api_group_detail(request, group_id):
         join_requests_.append({
             "id": request.id,
             "user_id": request.user.id,
-            "user_username": request.user.usurname,
+            "user_username": request.user.username,
             "group_id": request.group.id,
             "created_at": request.created_at,
             "is_approved": request.is_approved
