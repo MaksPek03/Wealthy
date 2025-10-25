@@ -861,6 +861,15 @@ def api_group_detail(request, group_id):
 
     members_ = []
     for member in members:
+        group_purchases = []
+        for purchase in member.groupassetpurchase_set.all():
+            group_purchases.append({
+                "quantity": purchase.quantity,
+                "asset_symbol": p.asset.symbol,
+                "price_at_purchase": p.price_at_purchase,
+                "created_at": p.created_at
+            })
+
         members_.append({
             "id": member.id,
             "user_id": member.user.id,
@@ -869,7 +878,8 @@ def api_group_detail(request, group_id):
             "balance": member.balance,
             "joined_at": member.joined_at,
             "total_invested": member.total_invested,
-            "portfolio_value": member.portfolio_value
+            "portfolio_value": member.portfolio_value,
+            "group_purchases": group_purchases
         })
 
 
