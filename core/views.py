@@ -912,7 +912,7 @@ def api_approve_request(request, group_id, request_id):
     return JsonResponse({
         'user': join_request.user.username,
         'group': group.name
-    }, status=201)
+    }, status=200)
 
 @csrf_exempt
 def api_reject_request(request, group_id, request_id):
@@ -923,7 +923,7 @@ def api_reject_request(request, group_id, request_id):
 
     return JsonResponse({
         'group': group.name
-    }, status=201)
+    }, status=200)
 
 def register(request):
     form = UserCreationForm(request.POST or None)
