@@ -53,6 +53,7 @@ urlpatterns = [
     path("api/group_list/<int:group_id>/", views.api_group_detail, name="api_group_detail"),
     path("group_list/<int:group_id>/buy/", views.buy_asset_in_group, name="buy_asset_in_group"),
     path("group_list/<int:group_id>/request/", views.request_to_join, name='request_to_join'),
+    path("api/group_list/<int:group_id>/request/", views.api_request_to_join, name='api_request_to_join'),
     path("group_list/<int:group_id>/<int:request_id>/approve/", views.approve_request, name="approve_request"),
     path("group_list/<int:group_id>/<int:request_id>/reject/", views.reject_request, name="reject_request"),
     path("api_group_list/<int:group_id>/<int:request_id>/approve/", views.api_approve_request, name="api_approve_request"),

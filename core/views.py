@@ -900,6 +900,15 @@ def api_group_detail(request, group_id):
     return JsonResponse(data, safe=False)
 
 @csrf_exempt
+def request_to_join(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
+    JoinRequest.objects.get_or_create(user=request.user, group=group)
+    return JsonResponse({
+        'user': request.user.username,
+        'group': group.name
+    }, status=200)
+
+@csrf_exempt
 def api_approve_request(request, group_id, request_id):
     join_request = get_object_or_404(JoinRequest, id=request_id, group_id=group_id)
     group = join_request.group
