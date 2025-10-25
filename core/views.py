@@ -934,6 +934,35 @@ def api_reject_request(request, group_id, request_id):
         'group': group.name
     }, status=200)
 
+@csrf_exempt
+def distribute_balance(request, group_id):
+    try:
+        group = get_object_or_404(Group, id=group_id)
+
+        if request.user != group.created_by:
+            return JsonResponse({'error': 'You are not the owner'}, status=403)
+
+        if request.method == "POST":
+            amount = request.POST.get("amount")
+            try:
+                amount = Decimal(amount)
+            except InvalidOperation:
+
+                return JsonResponse({'error': 'Invalid amount'}, status=400)
+
+            memberships = Membership.objects.filter(group=group)
+            for membership in memberships:
+                membership.balance += amount
+                membership.save()
+
+            return JsonResponse({
+                'amount': amount,
+                'group': group.name
+            }, status=201)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
