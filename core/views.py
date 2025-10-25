@@ -846,12 +846,9 @@ def api_group_detail(request, group_id):
     members = sorted(members, key=lambda x: x.portfolio_value, reverse=True)
 
     join_requests = JoinRequest.objects.filter(group = group)
-    join_requests1 = group.join_requests.all()
-    print(join_requests)
-    print(join_requests1)
     join_requests_ = []
 
-    for request in join_requests1:
+    for request in join_requests:
         join_requests_.append({
             "id": request.id,
             "user_id": request.user.id,
@@ -901,6 +898,32 @@ def api_group_detail(request, group_id):
     }
 
     return JsonResponse(data, safe=False)
+
+@csrf_exempt
+def api_approve_request(request, group_id, request_id):
+    join_request = get_object_or_404(JoinRequest, id=request_id, group_id=group_id)
+    group = join_request.group
+
+    join_request.is_approved = True
+    join_request.save()
+
+    Membership.objects.get_or_create(user=join_request.user, group=group)
+
+    return JsonResponse({
+        'user': join_request.user.username,
+        'group': group.name
+    }, status=200)
+
+@csrf_exempt
+def api_reject_request(request, group_id, request_id):
+    join_request = get_object_or_404(JoinRequest, id=request_id, group_id=group_id)
+    group = join_request.group
+
+    join_request.delete()
+
+    return JsonResponse({
+        'group': group.name
+    }, status=200)
 
 def register(request):
     form = UserCreationForm(request.POST or None)
