@@ -981,9 +981,10 @@ def api_buy_asset_in_group(request, group_id):
         if not (group.start_time <= now <= group.purchase_end_time):
             return JsonResponse({"error": "Purchases are not allowed at this time!"}, status=400)
 
-        asset = get_object_or_404(CurrentAsset, symbol=asset_symbol)
+        current_asset = get_object_or_404(CurrentAsset, symbol=asset_symbol)
+        asset = get_object_or_404(Asset, symbol=current_asset.symbol)
 
-        total_cost = Decimal(quantity) * Decimal(asset.current_price)
+        total_cost = Decimal(quantity) * Decimal(current_asset.current_price)
 
         if membership.balance < total_cost:
             return JsonResponse({"error": "Not enough balance in group account"}, status=400)
@@ -992,7 +993,7 @@ def api_buy_asset_in_group(request, group_id):
             membership=membership,
             asset=asset,
             quantity=quantity,
-            price_at_purchase=asset.current_price,
+            price_at_purchase=current_asset.current_price,
         )
 
         membership.balance -= total_cost
