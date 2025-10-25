@@ -115,13 +115,13 @@ const groupDetails = () => {
 
     const renderHeader = () => (
         <View className={`flex-row ${isDark ? "bg-buttons-dark" : "bg-buttons"} p-2 px-4 border-b border-gray-300`}>
-            <Text className={`font-bold text-xl ${isDark ? "text-text-dark" : "text-text"}`}>
+            <Text className={`font-bold text-xl flex-1 ${isDark ? "text-text-dark" : "text-text"}`}>
                 Username
             </Text>
-            <Text className={`font-bold text-xl ${isDark ? "text-text-dark" : "text-text"}`}>
+            <Text className={`font-bold text-xl flex-1 ${isDark ? "text-text-dark" : "text-text"}`}>
                 Balance
             </Text>
-            <Text className={`font-bold text-xl ${isDark ? "text-text-dark" : "text-text"}`}>
+            <Text className={`font-bold text-xl flex-1 ${isDark ? "text-text-dark" : "text-text"}`}>
                 Total invested
             </Text>
         </View>
@@ -136,6 +136,10 @@ const groupDetails = () => {
         } finally {
             console.log('Setting distribution...');
         }
+    }
+
+    const handleBuyingAssets = async () => {
+        console.log('Buying ...');
     }
 
     return (
@@ -170,13 +174,12 @@ const groupDetails = () => {
                             <Text className={`text-3xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>
                                 Pending requests:
                             </Text>
-                            ((joinRequests) && (
+                                {joinRequests && joinRequests.length > 0 ? (
                                 <FlatList
-                                    data={joinRequests}
+                                    data={joinRequests?.filter(item => item.is_approved)}
                                     keyExtractor={(item) => item.id}
                                     contentContainerStyle={{ alignItems: 'center' }}
-                                    renderItem={({ item }) =>
-                                        item.is_approved ? (
+                                    renderItem={({ item }) => (
                                             <View>
                                                 <Text className={`text-center text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>
                                                     {item.user_username}
@@ -200,73 +203,95 @@ const groupDetails = () => {
                                                     </TouchableOpacity>
                                                 </View>
                                             </View>
-                                        ) : null
+                                        )
                                     }
                                 />
-                            )) : (
-                                <Text className={`text-center text-3xl ${isDark ? "text-text-dark" : "text-text"}`}>
+                            ) : (
+                                <Text className={`text-center text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>
                                     No pending requests
                                 </Text>
-                                )
+                                )}
                             </View>
                         )}
-                        <Text className={`text-2xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>
+                        <Text className={`text-3xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>
                             Leaderboard
                         </Text>
-                        ((mebers) && (
+                        {members && members.length > 0 ? (
                         <FlatList
                             data={members}
                             keyExtractor={(item) => item.id}
                             ListHeaderComponent={renderHeader}
-                            contentContainerStyle={{ alignItems: 'center' }}
                             renderItem={({ item }) =>(
                                 <View className={`flex-row py-2 border-b border-gray-300 px-4`}>
-                                    <Text className={`text-center text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>
+                                    <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>
                                         {item.user_username}
                                     </Text>
-                                    <Text className={`text-center text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>
+                                    <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>
                                         {item.balance}
                                     </Text>
-                                    <Text className={`text-center text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>
+                                    <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>
                                         {item.total_invested}
                                     </Text>
                                 </View>
                                 )
                             }
                         />
-                        )) : (
+                        ) : (
                         <Text className={`text-center text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>
                             No members
                         </Text>
-                        )
+                        )}
                         <Text className={`text-center text-3xl ${isDark ? "text-text-dark" : "text-text"}`}>
                             Your total investment: {userTotalValue}
                         </Text>
                         <Text className={`text-center text-3xl ${isDark ? "text-text-dark" : "text-text"}`}>
                             Group total investment: {groupTotalValue}
                         </Text>
-                        ((userId == group?.created_by_user_id) && (
-                            <Text className={`text-center text-3xl ${isDark ? "text-text-dark" : "text-text"}`}>
-                                Distribute balance:
-                            </Text>
-                            <TextInput
-                                className={`px-8 py-4 min-h-14 min-w-60 text-center text-lg font-bold ${isDark ?
-                                    "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
-                                placeholder={"Distribution value:"}
-                                placeholderTextColor={"#000000"}
-                                value={distribution}
-                                onChangeText={setDistribution}
-                                autoCapitalize="none"
-                            />
-                            <TouchableOpacity
-                                onPress={onDistributionSet}
-                                className={`px-8 py-4 rounded-3xl min-h-10 min-w-32 mt-14 mb-14 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
-                            >
-                                <Text className={`text-1xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
-                                    Set distribution
+                        { userId == group?.created_by_user_id ? (
+                            <View className={"items-center mt-3"}>
+                                <Text className={`text-center text-3xl ${isDark ? "text-text-dark" : "text-text"}`}>
+                                    Distribute balance:
                                 </Text>
-                            </TouchableOpacity>
-                        ))
+                                <TextInput
+                                    className={`px-8 py-4 min-h-14 text-center text-lg font-bold ${isDark ?
+                                        "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
+                                    placeholder={"Distribution value:"}
+                                    placeholderTextColor={"#000000"}
+                                    value={distribution}
+                                    onChangeText={setDistribution}
+                                    autoCapitalize="none"
+                                />
+                                <TouchableOpacity
+                                    onPress={onDistributionSet}
+                                    className={`px-8 py-4 rounded-3xl min-h-10 min-w-32 mt-4 mb-4 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
+                                >
+                                    <Text className={`text-1xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
+                                        Set distribution
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        ) : null}
+                        <Text className={`text-3xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
+                            Buy assets
+                        </Text>
+                        { membership ? (
+                            <View>
+                                {canPurchase ? (
+                                    <TouchableOpacity
+                                        onPress={handleBuyingAssets}
+                                        className={`px-8 py-4 rounded-3xl min-h-10 min-w-32 mt-4 mb-4 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
+                                    >
+                                        <Text className={`text-1xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
+                                            Buy assets
+                                        </Text>
+                                    </TouchableOpacity>
+                                 ) : (
+                                     <Text className={`text-2xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
+                                         Purchases are currently closed
+                                     </Text>
+                                )}
+                            </View>
+                        ) : null }
                     </View>
                 )}
 
