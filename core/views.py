@@ -984,7 +984,8 @@ def api_buy_asset_in_group(request, group_id):
         asset = get_object_or_404(Asset, symbol=asset_symbol)
 
         total_cost = Decimal(quantity) * Decimal(asset.price)
-
+        print(total_cost)
+        print(asset)
         if membership.balance < total_cost:
             return JsonResponse({"error": "Not enough balance in group account"}, status=400)
 
