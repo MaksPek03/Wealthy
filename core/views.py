@@ -935,7 +935,7 @@ def api_reject_request(request, group_id, request_id):
     }, status=200)
 
 @csrf_exempt
-def distribute_balance(request, group_id):
+def api_distribute_balance(request, group_id):
     try:
         group = get_object_or_404(Group, id=group_id)
 
