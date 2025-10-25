@@ -943,7 +943,8 @@ def api_distribute_balance(request, group_id):
             return JsonResponse({'error': 'You are not the owner'}, status=403)
 
         if request.method == "POST":
-            amount = request.POST.get("amount")
+            data = json.loads(request.body)
+            amount = data.get("amount")
             try:
                 amount = Decimal(amount)
             except InvalidOperation:
