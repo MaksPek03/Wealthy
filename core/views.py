@@ -851,7 +851,7 @@ def api_group_detail(request, group_id):
     print(join_requests1)
     join_requests_ = []
 
-    for request in join_requests:
+    for request in join_requests1:
         join_requests_.append({
             "id": request.id,
             "user_id": request.user.id,
