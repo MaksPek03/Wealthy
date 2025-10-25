@@ -865,9 +865,9 @@ def api_group_detail(request, group_id):
         for purchase in member.groupassetpurchase_set.all():
             group_purchases.append({
                 "quantity": purchase.quantity,
-                "asset_symbol": p.asset.symbol,
-                "price_at_purchase": p.price_at_purchase,
-                "created_at": p.created_at
+                "asset_symbol": purchase.asset.symbol,
+                "price_at_purchase": purchase.price_at_purchase,
+                "created_at": purchase.created_at
             })
 
         members_.append({
