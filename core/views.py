@@ -846,6 +846,9 @@ def api_group_detail(request, group_id):
     members = sorted(members, key=lambda x: x.portfolio_value, reverse=True)
 
     join_requests = JoinRequest.objects.filter(group = group)
+    join_requests1 = group.join_requests.all()
+    print(join_requests)
+    print(join_requests1)
     join_requests_ = []
 
     for request in join_requests:
