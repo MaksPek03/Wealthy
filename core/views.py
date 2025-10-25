@@ -964,6 +964,51 @@ def api_distribute_balance(request, group_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+@csrf_exempt
+def api_buy_asset_in_group(request, group_id):
+    try:
+        data = json.loads(request.body)
+        asset_symbol = data.get("asset_symbol")
+        quantity = data.get("quantity")
+
+        if not asset_symbol or not quantity:
+            return JsonResponse({"error": "Missing asset_symbol or quantity"}, status=400)
+
+        group = get_object_or_404(Group, id=group_id)
+        membership = get_object_or_404(Membership, group=group, user=request.user)
+
+        now = timezone.now()
+        if not (group.start_time <= now <= group.purchase_end_time):
+            return JsonResponse({"error": "Purchases are not allowed at this time!"}, status=400)
+
+        asset = get_object_or_404(Asset, symbol=asset_symbol)
+
+        total_cost = Decimal(quantity) * Decimal(asset.current_price)
+
+        if membership.balance < total_cost:
+            return JsonResponse({"error": "Not enough balance in group account"}, status=400)
+
+        GroupAssetPurchase.objects.create(
+            membership=membership,
+            asset=asset,
+            quantity=quantity,
+            price_at_purchase=asset.current_price,
+        )
+
+        membership.balance -= total_cost
+        membership.save()
+
+        return JsonResponse({
+            "success": True,
+            "message": f"Bought {quantity} {asset.symbol} for {total_cost}$",
+            "new_balance": float(membership.balance),
+        })
+
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON data"}, status=400)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == 'POST':
