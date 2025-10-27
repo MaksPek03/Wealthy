@@ -391,7 +391,7 @@ const groupDetails = () => {
                             {(userId != group?.created_by_user_id) &&
                                 !(membership) && (
                                     <View>
-                                        {joinRequests.some(req => req.user_id === userId) ? (
+                                        {!joinRequests.some(req => req.user_id === userId) ? (
                                         <View className={`items-center`}>
                                             <TouchableOpacity
                                                 onPress={handleJoining}
