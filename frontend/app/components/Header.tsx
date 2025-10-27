@@ -26,7 +26,7 @@ const Header = ({ title = "", settings = false, alerts = false }: Props) => {
                 </TouchableOpacity>
             )}
 
-            <Text className={`text-6xl text-center ${isDark ? "text-headers-text-dark" : "text-headers-text"}`}>
+            <Text className={`text-5xl text-center ${isDark ? "text-headers-text-dark" : "text-headers-text"}`}>
                 {title.toUpperCase()}
             </Text>
 

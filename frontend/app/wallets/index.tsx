@@ -65,7 +65,9 @@ const wallets = () => {
                                 onPress={() => router.replace(`/wallets/${item.id}`)}
                             >
                                 <View className={`flex-row py-2 border-b-2 border-gray-300 px-4`}>
-                                    <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>{item.name}</Text>
+                                    <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>
+                                        {item.name}
+                                    </Text>
                                 </View>
                             </TouchableOpacity>
                         )}
