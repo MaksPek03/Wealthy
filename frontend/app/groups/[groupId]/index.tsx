@@ -182,7 +182,7 @@ const groupDetails = () => {
                     text: "Yes",
                     onPress: async () => {
                         try {
-                            const response = await fetch(`https://wealthy-0mga.onrender.com/api_group_list/${groupId}/${requestId}/approve/`);
+                            const response = await fetch(`https://wealthy-0mga.onrender.com/api/group_list/${groupId}/${requestId}/approve/`);
                         } catch (err) {
                             console.error('Error accepting request:', err);
                         }
@@ -208,7 +208,7 @@ const groupDetails = () => {
                     text: "Yes",
                     onPress: async () => {
                         try {
-                            const response = await fetch(`https://wealthy-0mga.onrender.com/api_group_list/${groupId}/${requestId}/reject/`);
+                            const response = await fetch(`https://wealthy-0mga.onrender.com/api/group_list/${groupId}/${requestId}/reject/`);
                         } catch (err) {
                             console.error('Error declining request:', err);
                         }
@@ -285,7 +285,7 @@ const groupDetails = () => {
                 return;
             }
 
-            Alert.alert("Success", "Succeded to set distribution!");
+            Alert.alert("Success", "Succeeded to set distribution!");
             fetchGroupDetails()
 
         } catch (err) {
@@ -326,7 +326,7 @@ const groupDetails = () => {
                 return;
             }
 
-            Alert.alert("Success", "Succeded to buy asset!");
+            Alert.alert("Success", "Succeeded to buy asset!");
             fetchGroupDetails()
 
         } catch (err) {
@@ -339,8 +339,13 @@ const groupDetails = () => {
         try {
             const quantityParsed = parseFloat(quantity)
 
+            if (value === null || membership?.balance === null) {
+                Alert.alert("Invalid input");
+                return;
+            }
+
             if (quantityParsed < 0) {
-                Alert.alert("Invalid input", "Quantity must be positive .");
+                Alert.alert("Invalid input", "Quantity must be positive.");
                 return;
             }
             if (value > membership?.balance) {
