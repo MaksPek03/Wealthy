@@ -74,11 +74,11 @@ const CurrencyChange = ({ setExchangeRate, setCurrencySymbol }: Props) => {
             placeholder="Select currency"
             loading={loading}
             style={{
-                backgroundColor: isDark ? '#2a2a2a' : '#ffffff',
+                backgroundColor: isDark ? '#868686' : '#ffffff',
                 borderColor: isDark ? '#444' : '#ccc',
             }}
             dropDownContainerStyle={{
-                backgroundColor: isDark ? '#2a2a2a' : '#ffffff',
+                backgroundColor: isDark ? '#868686' : '#ffffff',
                 borderColor: isDark ? '#444' : '#ccc',
             }}
             listMode="SCROLLVIEW"

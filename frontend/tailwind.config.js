@@ -8,9 +8,9 @@ module.exports = {
       colors: {
         "background": "#ffffff",
         "background-dark": "#868686",
-        "headers": "#868686",
-        "headers-dark": "#373737",
-        "buttons": "#D9D9D9",
+        "headers": "#cccccc",
+        "headers-dark": "#1e1e1e",
+        "buttons": "#dfdfdf",
         "buttons-dark": "#737373",
         "text": "#000000",
         "text-dark": "#ffffff",

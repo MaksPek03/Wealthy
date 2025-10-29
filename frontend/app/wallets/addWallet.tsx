@@ -10,8 +10,8 @@ import {useTheme} from "@/app/context/ThemeContext";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useState} from 'react';
 import Header from "@/app/components/Header";
-import Footer from "@/app/components/Footer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Menu from "@/app/components/Menu";
 
 const addWallet = () => {
     const { isDark, toggleTheme } = useTheme();
@@ -55,7 +55,7 @@ const addWallet = () => {
 
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
-            <Header title={"ADD WALLET"} />
+            <Header title={"ADD WALLET"} back={`/wallets`} />
 
             <View className={`flex-[5] items-center ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <TextInput
@@ -78,7 +78,7 @@ const addWallet = () => {
                 </TouchableOpacity>
             </View>
 
-            <Footer path={`/wallets`}/>
+            <Menu />
 
         </SafeAreaView>
     );

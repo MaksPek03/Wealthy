@@ -37,7 +37,7 @@ const Login = () => {
 
             await AsyncStorage.setItem('user_id', String(data.user_id));
 
-            router.replace('/menu');
+            router.replace('/trends');
         } catch (error) {
             Alert.alert("Error", "Could not connect to the server.");
             console.error("Login error:", error);

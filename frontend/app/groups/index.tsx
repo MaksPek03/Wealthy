@@ -3,9 +3,9 @@ import React, {useEffect, useState} from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
 import Header from "@/app/components/Header";
 import {ActivityIndicator, FlatList, Text, TouchableOpacity, View} from "react-native";
-import Footer from "@/app/components/Footer";
 import {router} from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Menu from "@/app/components/Menu";
 
 
 interface Group {
@@ -90,7 +90,7 @@ const groups = () => {
                 </TouchableOpacity>
             </View>
 
-            <Footer path={`/menu`}/>
+            <Menu />
 
         </SafeAreaView>
     );

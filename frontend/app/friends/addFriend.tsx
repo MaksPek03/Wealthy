@@ -2,8 +2,7 @@ import React, {useEffect, useState} from "react";
 import {ActivityIndicator, Alert, FlatList, SafeAreaView, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {useTheme} from "@/app/context/ThemeContext";
 import Header from "@/app/components/Header";
-import Footer from "@/app/components/Footer";
-import {router} from "expo-router";
+import Menu from "@/app/components/Menu";
 
 interface User {
     id: number;
@@ -70,7 +69,7 @@ const addFriend = () => {
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
 
-            <Header title={"ADD FRIEND"}/>
+            <Header title={"ADD FRIEND"} back={`/friends`}/>
 
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <TextInput
@@ -106,7 +105,7 @@ const addFriend = () => {
 
             </View>
 
-            <Footer path = {`/friends`}/>
+            <Menu />
 
         </SafeAreaView>
     )

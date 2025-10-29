@@ -5,8 +5,8 @@ import React, {useEffect, useState} from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
 import Header from "@/app/components/Header";
 import {ActivityIndicator, Alert, FlatList, Text, TouchableOpacity, View} from "react-native";
-import Footer from "@/app/components/Footer";
 import CurrencyChange from "@/app/components/CurrencyChange";
+import Menu from "@/app/components/Menu";
 
 interface Goal {
     goal_id: string;
@@ -84,7 +84,7 @@ const goals = () => {
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
             <Header title={"GOALS"} />
 
-            <View className={`flex-[5] w-full ${isDark ? "bg-background-dark" : "bg-background"}`}>
+            <View className={`flex-[5] w-full z-0 ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <CurrencyChange setExchangeRate={onSelectedExchangeRate} setCurrencySymbol={onSelectedCurrencySymbol} />
 
                 {loading ? (
@@ -128,7 +128,7 @@ const goals = () => {
                 </TouchableOpacity>
             </View>
 
-            <Footer path={`/menu`}/>
+            <Menu />
 
         </SafeAreaView>
     );

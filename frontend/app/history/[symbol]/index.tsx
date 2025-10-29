@@ -6,7 +6,7 @@ import React, {useEffect, useState} from 'react';
 import Graph from "@/app/components/Graph";
 import FilterHistory from "@/app/components/FilterHistory";
 import Header from "@/app/components/Header";
-import Footer from "@/app/components/Footer";
+import Menu from "@/app/components/Menu";
 
 
 interface Price {
@@ -79,7 +79,7 @@ const AssetScreen = () => {
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
 
-            <Header title={`${name} HISTORY`} />
+            <Header title={`${name} HISTORY`} back={`/history`}/>
 
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
 
@@ -101,7 +101,7 @@ const AssetScreen = () => {
 
             </View>
 
-            <Footer path={`/history`}/>
+            <Menu />
 
         </SafeAreaView>
     );

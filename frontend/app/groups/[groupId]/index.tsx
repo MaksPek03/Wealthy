@@ -3,7 +3,6 @@ import {useTheme} from "@/app/context/ThemeContext";
 import {useEffect, useState} from "react";
 import React from "react";
 import Header from "@/app/components/Header";
-import Footer from "@/app/components/Footer";
 import {
     ActivityIndicator,
     Alert,
@@ -16,6 +15,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DropDownPicker from "react-native-dropdown-picker";
+import Menu from "@/app/components/Menu";
 
 
 interface Group {
@@ -374,7 +374,7 @@ const groupDetails = () => {
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
 
-            <Header title={`${group ? group.name : ''} GROUP`} />
+            <Header title={`${group ? group.name : ''} GROUP`} back={`/groups`} />
 
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 {loading ? (
@@ -647,7 +647,7 @@ const groupDetails = () => {
 
             </View>
 
-            <Footer path={`/groups`}/>
+            <Menu />
 
         </SafeAreaView>
 

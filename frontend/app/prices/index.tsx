@@ -3,9 +3,9 @@ import {useTheme} from "@/app/context/ThemeContext";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useEffect, useState} from 'react';
 import Header from "@/app/components/Header";
-import Footer from "@/app/components/Footer";
 import CurrencyChange from "@/app/components/CurrencyChange";
 import {router} from "expo-router";
+import Menu from "@/app/components/Menu";
 
 interface Price {
     id: string;
@@ -108,7 +108,7 @@ const prices = () => {
 
             <Header title={"CHECK PRICES"} />
 
-            <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
+            <View className={`flex-[5] z-0 ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <CurrencyChange setExchangeRate={onSelectedExchangeRate} setCurrencySymbol={onSelectedCurrencySymbol} />
                 <TextInput
                     className={`p-2 mb-2 ${isDark ? "text-text-dark" : "text-text"}`}
@@ -151,7 +151,7 @@ const prices = () => {
                 }
             </View>
 
-            <Footer path={`/menu`}/>
+            <Menu />
 
         </SafeAreaView>
     );

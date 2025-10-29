@@ -4,8 +4,8 @@ import { useTheme } from "@/app/context/ThemeContext";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useEffect, useState} from 'react';
 import Header from "@/app/components/Header";
-import Footer from "@/app/components/Footer";
 import CurrencyChange from "@/app/components/CurrencyChange";
+import Menu from "@/app/components/Menu";
 
 interface Wallet {
     id: string;
@@ -137,9 +137,9 @@ const assetScreen = () => {
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
 
-            <Header title={`${asset.name} ASSET`} />
+            <Header title={`${asset.name} ASSET`} back={`/wallets/${walletId}`}/>
 
-            <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
+            <View className={`flex-[5] z-0 ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <CurrencyChange setExchangeRate={onSelectedExchangeRate} setCurrencySymbol={onSelectedCurrencySymbol} />
                 <View className={`w-max ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}>
                     <Text className={`text-2xl text-center mt-3  ${isDark ? "text-text-dark" : "text-text"}`}>
@@ -195,7 +195,7 @@ const assetScreen = () => {
                 </TouchableOpacity>
             </View>
 
-            <Footer path={`/wallets/${walletId}`}/>
+            <Menu />
 
         </SafeAreaView>
     )

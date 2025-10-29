@@ -3,9 +3,9 @@ import React, {useEffect, useState} from "react";
 import Header from "@/app/components/Header";
 import {ActivityIndicator, FlatList, Text, TextInput, TouchableOpacity, View} from "react-native";
 import CurrencyChange from "@/app/components/CurrencyChange";
-import Footer from "@/app/components/Footer";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {router} from "expo-router";
+import Menu from "@/app/components/Menu";
 
 
 interface Alert {
@@ -77,9 +77,9 @@ const alerts = () => {
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
 
-            <Header title={"ALERTS"} />
+            <Header title={"ALERTS"} back={`/trends`} />
 
-            <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
+            <View className={`flex-[5] z-0 ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <CurrencyChange setExchangeRate={onSelectedExchangeRate} setCurrencySymbol={onSelectedCurrencySymbol} />
 
                 {loading ? (
@@ -125,7 +125,7 @@ const alerts = () => {
                 </TouchableOpacity>
             </View>
 
-            <Footer path={`/menu`}/>
+            <Menu />
 
         </SafeAreaView>
     );

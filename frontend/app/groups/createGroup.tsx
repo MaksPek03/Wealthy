@@ -1,11 +1,11 @@
 import {useTheme} from "@/app/context/ThemeContext";
 import React, {useState} from "react";
 import Header from "@/app/components/Header";
-import Footer from "@/app/components/Footer";
 import {Alert, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {router} from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Menu from "@/app/components/Menu";
 
 
 const createGroup = () => {
@@ -85,7 +85,7 @@ const createGroup = () => {
 
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
-            <Header title={"CREATE GROUP"} />
+            <Header title={"CREATE GROUP"} back={`/groups`}/>
 
             <View className={`flex-[5] items-center ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
@@ -176,7 +176,7 @@ const createGroup = () => {
                 </ScrollView>
             </View>
 
-            <Footer path={`/groups`}/>
+            <Menu />
 
         </SafeAreaView>
     );
