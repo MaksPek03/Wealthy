@@ -20,4 +20,25 @@ class AssetTestCase(TestCase):
 
     def test_asset_str(self):
         self.assertEqual(str(self.asset), "NewBitcoin")
-        print("Asset string representation test passed")
+        print("Asset representation test passed")
+        self.assertEqual(str(self.historic), "NewBitcoin")
+        print("historic representation test passed")
+        self.assertEqual(str(self.current), "NewBitcoin")
+        print("Asset current price test passed")
+
+
+
+class WalletTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="walletuser", password="password")
+        self.asset = Asset.objects.create(name="NewEthereum", type="crypto", symbol="NETH", price=Decimal("2000"))
+        self.wallet = Wallet.objects.create(user=self.user, name="My Wallet")
+        self.wallet_asset = WalletAsset.objects.create(wallet=self.wallet, asset=self.asset, quantity=Decimal("2"), purchase_price=Decimal("1800"), purchase_date=date.today())
+        self.shared_wallet = SharedWallet.objects.create(wallet=self.wallet, shared_with=self.user)
+
+    def test_wallet_assets(self):
+        self.assertIn(self.asset, self.wallet.assets.all())
+        self.assertEqual(str(self.wallet), "My Wallet")
+        print("Create wallet test passed")
+        self.assertEqual(self.wallet.walletasset_set.first().quantity, Decimal("2"))
+        print("Wallet and WalletAsset test passed")
