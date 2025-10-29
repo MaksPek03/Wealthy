@@ -23,6 +23,9 @@ class HistoricAsset(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     date_recorded = models.DateTimeField()  
 
+    def __str__(self):
+        return self.name
+
 # thre is show the newest price
 class CurrentAsset(models.Model):
     name = models.CharField(max_length = 50)
@@ -30,11 +33,17 @@ class CurrentAsset(models.Model):
     symbol = models.CharField(max_length = 10)
     current_price = models.DecimalField(max_digits = 10, decimal_places = 2)
 
+    def __str__(self):
+        return self.name
+
 # wallet is connected to the user, it has its own name and list of assets
 class Wallet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length = 50)
     assets = models.ManyToManyField(Asset, through = 'WalletAsset')
+
+    def __str__(self):
+        return self.name
 
 # wallet asset is the table between the wallet and assets, with mean it 
 # shows how many given assets the user bought for a given wallet, with the price and date
