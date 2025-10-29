@@ -42,3 +42,44 @@ class WalletTestCase(TestCase):
         print("Create wallet test passed")
         self.assertEqual(self.wallet.walletasset_set.first().quantity, Decimal("2"))
         print("Wallet and WalletAsset test passed")
+
+
+class FriendTestCase(TestCase):
+    def setUp(self):
+        self.user1 = User.objects.create_user(username="user1", password="pass")
+        self.user2 = User.objects.create_user(username="user2", password="pass")
+        self.friend_list1 = FriendList.objects.create(user=self.user1)
+        self.friend_list2 = FriendList.objects.create(user=self.user2)
+        self.request = FriendRequest.objects.create(sender=self.user1, receiver=self.user2)
+
+    def test_add_remove_friend(self):
+        self.friend_list1.add_friend(self.user2)
+        self.assertIn(self.user2, self.friend_list1.friends.all())
+        print("friend add test passed")
+        self.friend_list1.remove_friend(self.user2)
+        self.assertNotIn(self.user2, self.friend_list1.friends.all())
+        print("friend remove test passed")
+
+    def test_unfriend(self):
+        self.friend_list1.add_friend(self.user2)
+        self.friend_list1.unfriend(self.user2)
+        self.assertNotIn(self.user2, self.friend_list1.friends.all())
+        self.assertNotIn(self.user1, self.friend_list2.friends.all())
+        print("unfriend test passed")
+
+    def test_friend_request_accept_decline_cancel(self):
+        self.request.accept()
+        self.assertFalse(self.request.is_active)
+        self.assertIn(self.user1, self.friend_list2.friends.all())
+        print("FriendRequest accept test passed")
+
+        fr2 = FriendRequest.objects.create(sender=self.user2, receiver=self.user1)
+        fr2.decline()
+        self.assertFalse(fr2.is_active)
+        print("FriendRequest decline test passed")
+
+        fr3 = FriendRequest.objects.create(sender=self.user1, receiver=self.user2)
+        fr3.cancel()
+        self.assertFalse(fr3.is_active)
+        print("FriendRequest cancel test passed")
+
