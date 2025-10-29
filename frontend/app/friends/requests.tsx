@@ -1,9 +1,8 @@
 import Header from "@/app/components/Header";
 import {ActivityIndicator, Alert, FlatList, SafeAreaView, Text, TouchableOpacity, View} from "react-native";
-import {router} from "expo-router";
-import Footer from "@/app/components/Footer";
 import React, {useEffect, useState} from "react";
 import {useTheme} from "@/app/context/ThemeContext";
+import Menu from "@/app/components/Menu";
 
 interface Request {
     id: number;
@@ -90,7 +89,7 @@ const requests = () => {
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
 
-            <Header title={"FRIEND REQUESTS"}/>
+            <Header title={"FRIEND REQUESTS"} back={`/friends`}/>
 
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 {loading ? (
@@ -123,7 +122,7 @@ const requests = () => {
 
             </View>
 
-            <Footer path = {`/friends`}/>
+            <Menu />
 
         </SafeAreaView>
     )

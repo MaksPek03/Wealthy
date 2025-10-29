@@ -10,8 +10,8 @@ import {useTheme} from "@/app/context/ThemeContext";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useEffect, useState} from 'react';
 import Header from "@/app/components/Header";
-import Footer from "@/app/components/Footer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Menu from "@/app/components/Menu";
 
 interface Wallet {
     id: string;
@@ -82,7 +82,7 @@ const wallets = () => {
                 </TouchableOpacity>
             </View>
 
-            <Footer path={`/menu`}/>
+            <Menu />
 
         </SafeAreaView>
     );

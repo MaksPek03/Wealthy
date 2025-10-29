@@ -2,10 +2,10 @@ import React, {useEffect, useState} from "react";
 import {ActivityIndicator, SafeAreaView, ScrollView, Text, View} from "react-native";
 import Header from "@/app/components/Header";
 import {useTheme} from "@/app/context/ThemeContext";
-import Footer from "@/app/components/Footer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FilterHistory from "@/app/components/FilterHistory";
 import CurrencyChange from "@/app/components/CurrencyChange";
+import Menu from "@/app/components/Menu";
 
 interface TypeTrendItem {
     name: string;
@@ -143,7 +143,7 @@ const trends = () => {
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
             <Header title={"CHECK TRENDS"} />
 
-            <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
+            <View className={`flex-[5] z-0 ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 {loading ? (
                     <ActivityIndicator size="large" />
                 ):(
@@ -193,7 +193,7 @@ const trends = () => {
                 }
             </View>
 
-            <Footer path={`/menu`}/>
+            <Menu />
         </SafeAreaView>
     );
 }

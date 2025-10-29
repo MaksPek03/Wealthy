@@ -10,9 +10,9 @@ import {useTheme} from "@/app/context/ThemeContext";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useEffect, useState} from 'react';
 import Header from "@/app/components/Header";
-import Footer from "@/app/components/Footer"
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import Menu from "@/app/components/Menu";
 
 interface Asset {
     id: string;
@@ -120,7 +120,7 @@ const addAsset = () => {
 
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
-            <Header title={"ADD ASSET"} />
+            <Header title={"ADD ASSET"} back={`/wallets/${walletId}`}/>
 
             <View className={`flex-[5] items-center ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <View className={`w-1/2 mt-16`}>
@@ -204,7 +204,7 @@ const addAsset = () => {
                 </TouchableOpacity>
             </View>
 
-            <Footer path={`/wallets/${walletId}`}/>
+            <Menu />
 
         </SafeAreaView>
     );

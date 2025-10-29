@@ -1,10 +1,10 @@
 import {useTheme} from "@/app/context/ThemeContext";
-import Footer from "@/app/components/Footer";
 import React, {useEffect, useState} from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
 import Header from "@/app/components/Header";
 import {ActivityIndicator, Alert, FlatList, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {router} from "expo-router";
+import Menu from "@/app/components/Menu";
 
 interface User {
     id: number;
@@ -123,7 +123,7 @@ const friends = () => {
 
             </View>
 
-            <Footer path={`/menu`}/>
+            <Menu />
 
         </SafeAreaView>
     );

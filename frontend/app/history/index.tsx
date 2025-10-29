@@ -4,7 +4,7 @@ import { useTheme } from "@/app/context/ThemeContext";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, {useEffect, useState} from 'react';
 import Header from "@/app/components/Header";
-import Footer from "@/app/components/Footer";
+import Menu from "@/app/components/Menu";
 
 interface Price {
     name: string;
@@ -96,7 +96,7 @@ const history = () => {
                 }
             </View>
 
-            <Footer path={`/menu`}/>
+            <Menu />
 
         </SafeAreaView>
     );
