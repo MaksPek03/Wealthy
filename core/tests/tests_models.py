@@ -83,3 +83,33 @@ class FriendTestCase(TestCase):
         self.assertFalse(fr3.is_active)
         print("FriendRequest cancel test passed")
 
+
+
+
+class UserGoalTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="goaluser", password="pass")
+        self.wallet = Wallet.objects.create(user=self.user, name="Wallet1")
+        self.asset = Asset.objects.create(name="BTC", type="crypto", symbol="BTC", price=Decimal("30000"))
+        WalletAsset.objects.create(wallet=self.wallet, asset=self.asset, quantity=Decimal("0.5"), purchase_price=Decimal("25000"), purchase_date=date.today())
+        CurrentAsset.objects.create(name="BTC", type="crypto", symbol="BTC", current_price=Decimal("35000"))
+        self.goal = UserGoal.objects.create(user=self.user, name="new goal", target_amount=Decimal("20000"))
+
+    def test_progress_percentage(self):
+        perc = self.goal.progress_percentage()
+        self.assertGreater(perc, 0)
+        self.assertLessEqual(perc, 100)
+        print("UserGoal progress percentage test passed")
+
+class PriceAlertTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="alertuser", password="pass")
+        self.asset = Asset.objects.create(name="Ethereum", type="crypto", symbol="ETH", price=Decimal("2000"))
+        self.alert = PriceAlert.objects.create(user=self.user, asset=self.asset, target_price=Decimal("2500"), above=True)
+
+    def test_alert_str(self):
+        self.assertIn("ETH", str(self.alert))
+        self.assertIn("above", str(self.alert))
+        print("Price alert string test passed")
+
+
