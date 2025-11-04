@@ -2,11 +2,11 @@ import {useTheme} from "@/app/context/ThemeContext";
 import {useRouter} from "expo-router";
 import Header from "@/app/components/Header";
 import React, {useState} from "react";
-import Footer from "@/app/components/Footer";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {ActivityIndicator, Alert, FlatList, Text, TextInput, TouchableOpacity, View} from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Menu from "@/app/components/Menu";
 
 const addGoal = () => {
     const { isDark, toggleTheme } = useTheme();
@@ -85,7 +85,7 @@ const addGoal = () => {
 
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
-            <Header title={"ADD GOAL"} />
+            <Header title={"ADD GOAL"} back={`/goals`}/>
 
             <View className={`flex-[5] items-center ${isDark ? "bg-background-dark" : "bg-background"}`}>
 
@@ -165,7 +165,7 @@ const addGoal = () => {
 
             </View>
 
-            <Footer path={`/goals`}/>
+            <Menu />
 
         </SafeAreaView>
     );

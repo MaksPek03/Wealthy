@@ -2,9 +2,9 @@ import {router, useLocalSearchParams} from "expo-router";
 import {useTheme} from "@/app/context/ThemeContext";
 import Header from "@/app/components/Header";
 import React, {useState} from "react";
-import Footer from "@/app/components/Footer";
 import {Alert, SafeAreaView, Text, TextInput, TouchableOpacity, View} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Menu from "@/app/components/Menu";
 
 
 const addAsset = () => {
@@ -64,7 +64,7 @@ const addAsset = () => {
 
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
-            <Header title={"ADD ALERT"} />
+            <Header title={"ADD ALERT"} back={`/alerts`} />
             <View className={`flex-[5] items-center ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <Text className={`text-1xl text-center mt-12 font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
                     Target price:
@@ -122,7 +122,7 @@ const addAsset = () => {
 
             </View>
 
-            <Footer path={`/alerts`}/>
+            <Menu />
 
         </SafeAreaView>
     );
