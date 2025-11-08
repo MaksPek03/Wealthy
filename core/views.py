@@ -1312,6 +1312,7 @@ def delete_wallet_transaction(request, wallet_id, asset_id, transaction_id):
 def friends_list(request):
     friend_list = FriendList.objects.get_or_create(user=request.user)[0]
     friends = friend_list.friends.all()
+    friends = friend_list.friends.all().order_by('username')
     friend_requests = FriendRequest.objects.filter(receiver=request.user, is_active=True)
 
     users = None
