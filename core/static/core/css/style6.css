@@ -370,3 +370,68 @@ body.dark-mode .trends-table tr:nth-child(even) {
   font-style: italic;
 }
 
+.error-message {
+    background-color: #f8d7da;
+    border: 1px solid #f8d7da;
+    color: #842029;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 0.9em;
+}
+.show-password-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    font-size: 0.9em;
+    color: #444;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+.help-text {
+    display: block;
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 4px;
+}
+.error-text {
+    color: red;
+    font-size: 0.9em;
+}
+.show-password-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 0.9em;
+    color: #444;
+}
+
+.search-form {
+  margin-bottom: 15px;
+  display: flex;
+  gap: 8px;
+}
+
+.search-form input {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.search-form button {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.search-form button:hover {
+  background-color: #0069d9;
+}

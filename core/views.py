@@ -1234,9 +1234,16 @@ def wallet_asset_detail(request, wallet_id, asset_id):
 # it shows all the assets in a wallet, basically it should not named 'add'
 @login_required
 def wallet_assets(request, wallet_id):
+    query = request.GET.get('q', '')
     assets = Asset.objects.all()
-    return render(request, 'core/add_wallet_asset.html', {'wallet_id': wallet_id, 'assets': assets})
-
+    assets = Asset.objects.all().order_by('name')
+    if query:
+        assets = assets.filter(name__icontains=query)
+    return render(request, 'core/add_wallet_asset.html', {
+        'wallet_id': wallet_id,
+        'assets': assets,
+        'query': query,
+    })
 # here the user can add the asset, to the wallet, after fulfill the form
 @login_required
 def add_wallet_asset_details(request, wallet_id, asset_id):
