@@ -1265,7 +1265,9 @@ def add_wallet_asset_details(request, wallet_id, asset_id):
 @login_required
 def remove_wallet(request, wallet_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    wallet_name = wallet.name
     wallet.delete()
+    messages.success(request, f'Wallet "{wallet_name}" deleted successfully.')
     return redirect('wallet_list')
 
 # from a given, we deleted a specific asset, with its own 'transactions'
