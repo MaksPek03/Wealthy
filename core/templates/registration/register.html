@@ -3,9 +3,61 @@
 <div class="form-container">
     <form method="POST">
         {% csrf_token %}
-        {{ form.as_p }}
+        {% for field in form %}
+        <div class="form-group">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.help_text %}
+                <small class="help-text">{{ field.help_text|safe }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+                <div class="error-text">{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+
+        <div class="show-password-container">
+            <label for="showPasswords">Show passwords</label>
+            <input type="checkbox" id="showPasswords">
+        </div>
+
         <button type="submit" class="btn">Submit</button>
     </form>
-    <p class="form-link">You have an account? <a href="{% url 'login' %}">Log in </a></p>
+    <p class="form-link">
+        You have an account? <a href="{% url 'login' %}">Log in</a>
+    </p>
 </div>
+<style>
+.form-group {
+    margin-bottom: 12px;
+}
+.help-text {
+    display: block;
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 4px;
+}
+.error-text {
+    color: red;
+    font-size: 0.9em;
+}
+.show-password-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 0.9em;
+    color: #444;
+}
+</style>
+
+<script>
+document.getElementById('showPasswords').addEventListener('change', function() {
+    const pwd1 = document.getElementById('id_password1');
+    const pwd2 = document.getElementById('id_password2');
+    const type = this.checked ? 'text' : 'password';
+    if (pwd1) pwd1.type = type;
+    if (pwd2) pwd2.type = type;
+});
+</script>
 {% endblock %}
