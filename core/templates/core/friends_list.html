@@ -13,7 +13,7 @@
       {% endfor %}
     </ul>
   {% else %}
-    <h2 class="main_h2">You have no friends</h2>
+    <h2 class="main_h2">Your friend list is empty</h2>
   {% endif %}
 
   <h3 class="main_h2" style="font-size: 30px;">Friend requests</h3>
@@ -30,10 +30,10 @@
       {% endfor %}
     </ul>
   {% else %}
-    <p class="form-link-comeback">No new friend requests</p>
+    <p class="form-link-comeback">There is no new friend requests</p>
   {% endif %}
 
-  <h3 class="main_h2" style="font-size: 30px;">Send Friend Request</h3>
+  <h3 class="main_h2" style="font-size: 30px;">Send friend request</h3>
   <div class="form-container">
     <form method="get" action="">
       <input type="text" name="q" placeholder="Username...">
@@ -48,7 +48,7 @@
           <li>
             {{ u.username }}
             <p class="form-link-comeback">
-              <a href="{% url 'send_friend_request' u.id %}">Send request</a>
+              <a href="{% url 'send_friend_request' u.id %}">Send a request</a>
               <br><br>
             </p>
           </li>
@@ -58,6 +58,6 @@
   {% endif %}
 
   <p class="form-link-comeback">
-    <a href="{% url 'profile' %}">Back to profile</a>
+    <a href="{% url 'profile' %}">Back to the profile</a>
   </p>
 {% endblock %}
