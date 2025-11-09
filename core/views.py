@@ -37,6 +37,7 @@ from django.db.models import Sum, F, DecimalField, ExpressionWrapper, FloatField
 
 
 
+
 # it returns the main page, it does not require log in
 def home(request):
     return render(request, 'core/home.html')
@@ -1072,10 +1073,20 @@ def asset_list(request):
 @login_required
 def asset_history(request, symbol):
     asset = get_object_or_404(Asset, symbol__iexact=symbol)
-    history = HistoricAsset.objects.filter(symbol__iexact=symbol).order_by('-date_recorded')
+    history_qs = HistoricAsset.objects.filter(symbol__iexact=symbol).order_by('date_recorded')
+
+    history = list(history_qs.values('date_recorded', 'price'))
+    history_json = json.dumps([
+        {
+            'date_recorded': record['date_recorded'].strftime('%Y-%m-%d %H:%M'),
+            'price': float(record['price'])
+        }
+        for record in history
+    ])
+
     return render(request, 'core/historic_price.html', {
         'asset': asset,
-        'history': history
+        'history_json': history_json,
     })
 
 

@@ -1,23 +1,97 @@
 {% extends 'core/base.html' %}
 {% block content %}
-  <h2 class="main_h2">
-    Historical prices for {{ asset.name }} ({{ asset.symbol }})
+  <h2 class="main_h2 text-2xl font-semibold mb-4">
+    Historical Prices for {{ asset.name }} ({{ asset.symbol }})
   </h2>
 
-  {% if history %}
-    <ul class="wallet-assets">
-      {% for record in history %}
-        <li>
-          {{ record.date_recorded|date:"Y-m-d H:i:s" }} — ${{ record.price }}
-          <p></p>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <h2 class="main_h2">No historical data available</h2>
-  {% endif %}
+<div class="bg-white p-6 rounded-2xl shadow-lg">
+  <div class="flex justify-between items-center mb-4">
+    <h3 class="text-lg font-medium">Select time range:</h3>
+    <select id="rangeSelect" class="border rounded-lg p-2">
+      <option value="7">Last 7 days</option>
+      <option value="30" selected>Last 30 days</option>
+      <option value="90">Last 3 months</option>
+      <option value="all">All time</option>
+    </select>
+  </div>
 
-    <p class="form-link-comeback">
-    <a href="{% url 'profile' %}">Back to profile</a>
+  <div style="height: 400px;">
+    <canvas id="priceChart"></canvas>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const fullHistory = JSON.parse('{{ history_json|escapejs }}');
+
+  function filterData(days) {
+    if (days === 'all') return fullHistory;
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - parseInt(days));
+    return fullHistory.filter(item => new Date(item.date_recorded) >= cutoff);
+  }
+
+  const ctx = document.getElementById('priceChart').getContext('2d');
+  let currentData = filterData(30);
+
+  const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: currentData.map(item => item.date_recorded),
+      datasets: [{
+        label: 'Price (USD)',
+        data: currentData.map(item => item.price),
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.15)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 0,
+        pointHoverRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+          backgroundColor: 'rgba(0,0,0,0.8)',
+          titleFont: { size: 14 },
+          bodyFont: { size: 13 }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Date', color: '#666' },
+          ticks: {
+            color: '#666',
+            maxRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 8
+          }
+        },
+        y: {
+          title: { display: true, text: 'Price (USD)', color: '#666' },
+          ticks: { color: '#666' },
+          beginAtZero: false
+        }
+      }
+    }
+  });
+
+  document.getElementById('rangeSelect').addEventListener('change', (e) => {
+    const range = e.target.value;
+    const filtered = filterData(range);
+    chart.data.labels = filtered.map(item => item.date_recorded);
+    chart.data.datasets[0].data = filtered.map(item => item.price);
+    chart.update();
+  });
+</script>
+
+
+  <p class="form-link-comeback mt-6">
+    <a href="{% url 'profile' %}" class="text-blue-600 hover:text-blue-800 underline">Back to profile</a>
   </p>
 {% endblock %}
