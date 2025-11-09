@@ -1473,6 +1473,18 @@ def my_alerts(request):
     })
 
 
+@login_required
+def delete_alert(request, alert_id):
+    alert = get_object_or_404(PriceAlert, id=alert_id, user=request.user)
+
+    if request.method == 'POST':
+        symbol = alert.asset.symbol
+        alert.delete()
+        messages.success(request, f"Alert deleted successfully.")
+        return redirect('my_alerts')
+
+    return redirect('my_alerts')
+
 
 # function to share the wallet, by the id to the other user, from the user friend list
 @login_required

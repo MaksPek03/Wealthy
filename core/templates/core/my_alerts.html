@@ -3,55 +3,62 @@
   <h2 class="main_h2">Your alerts</h2>
 
   <table class="wallet-assets" style="width:100%; text-align:center;">
-  <thead>
-    <tr>
-      <th>Asset</th>
-      <th>Alert price [$]</th>
-      <th>Current price [$]</th>
-      <th>Difference [$]</th>
-      <th>Below/above</th>
-      <th>Status</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for item in alerts_with_diff %}
+    <thead>
       <tr>
-        <td>{{ item.alert.asset.name }} ({{ item.alert.asset.symbol }})</td>
-        <td>{{ item.alert.target_price }}</td>
-        <td>
-          {% if item.current_price %}
-            {{ item.current_price }}
-          {% else %}
-            No data
-          {% endif %}
-        </td>
-        <td>{{ item.difference }}</td>
-        <td>{{ item.direction}} </td>
-        <td>
-          {% if item.reached is None %}
-            No data
-          {% elif item.reached %}
-             Reached
-          {% else %}
-            Not yet
-          {% endif %}
-        </td>
+        <th>Asset</th>
+        <th>Alert price [$]</th>
+        <th>Current price [$]</th>
+        <th>Difference [$]</th>
+        <th>Below/above</th>
+        <th>Status</th>
+        <th>Action</th>
       </tr>
-    {% empty %}
-      <tr>
-        <td colspan="6">You have no alerts</td>
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-
+    </thead>
+    <tbody>
+      {% for item in alerts_with_diff %}
+        <tr>
+          <td>{{ item.alert.asset.name }} ({{ item.alert.asset.symbol }})</td>
+          <td>{{ item.alert.target_price }}</td>
+          <td>
+            {% if item.current_price %}
+              {{ item.current_price }}
+            {% else %}
+              No data
+            {% endif %}
+          </td>
+          <td>{{ item.difference }}</td>
+          <td>{{ item.direction }}</td>
+          <td>
+            {% if item.reached is None %}
+              No data
+            {% elif item.reached %}
+              <span">Reached</span>
+            {% else %}
+              <span>Not yet</span>
+            {% endif %}
+          </td>
+          <td>
+            <form method="post" action="{% url 'delete_alert' item.alert.id %}" onsubmit="return confirm('Are you sure you want to delete this alert?');">
+              {% csrf_token %}
+              <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
+                Delete
+              </button>
+            </form>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="7">You have no alerts</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
   <p class="form-link-comeback">
     <a href="{% url 'asset_list' %}">Add a new alert</a>
   </p>
 
   <p class="form-link-comeback">
-    <a href="{% url 'profile' %}">Back to the profile</a>
+    <a href="{% url 'profile' %}">Back to profile</a>
   </p>
 {% endblock %}
