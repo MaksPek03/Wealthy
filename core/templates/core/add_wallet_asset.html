@@ -1,20 +1,28 @@
 {% extends 'core/base.html' %}
 {% block content %}
 <h2 class="main_h2">Add asset to wallet</h2>
+
 {% if assets %}
-<ul class="wallet-assets">
-    {% for asset in assets %}
-    <li>
-        <a href="{% url 'add_wallet_asset_details' wallet_id asset.id %}">
-            {{asset.name}}
-        </a>
-    </li>
-    {% endfor %}
-</ul>
+<form method="get" class="search-form">
+  <input type="text" name="q" placeholder="search assets" value="{{ query }}">
+  <button type="submit">Search</button>
+</form>
+<div class="asset-list">
+  {% for asset in assets %}
+    <div class="asset-item">
+      <div class="asset-name">{{ asset.name }}</div>
+      <a class="btn-add" href="{% url 'add_wallet_asset_details' wallet_id asset.id %}">
+        ➕ Add
+      </a>
+    </div>
+  {% endfor %}
+</div>
 {% else %}
-<h2 class="main_h2">No assets</h2>
+  <p class="no-assets">No assets available</p>
 {% endif %}
+
 <p class="form-link-comeback">
-    <a href="{% url 'wallet_detail' wallet_id %}">Come back</a>
+  <a href="{% url 'wallet_detail' wallet_id %}">Back to wallet</a>
 </p>
+
 {% endblock %}

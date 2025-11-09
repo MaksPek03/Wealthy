@@ -17,7 +17,7 @@
   {% endif %}
 
   {% if request.user == group.created_by %}
-    <h3 class="main_h2" style="font-size: 30px;">Pending Requests</h3>
+    <h3 class="main_h2" style="font-size: 30px;">Pending requests</h3>
     {% if group.join_requests.all %}
       <ul class="wallet-assets">
         {% for req in group.join_requests.all %}
@@ -125,6 +125,6 @@
   </ul>
 
   <p class="form-link-comeback">
-    <a href="{% url 'group_list' %}">Back to groups</a>
+    <a href="{% url 'group_list' %}">Back to a group list</a>
   </p>
 {% endblock %}

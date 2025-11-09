@@ -6,11 +6,11 @@
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="btn">Add alert</button>
+            <button type="submit" class="btn">Add an alert</button>
         </form>
     </div>
     <p class="form-link-comeback">
-    <a href="{% url 'profile' %}">Back to assets</a>
+    <a href="{% url 'asset_list' %}">Back to an asset list</a>
   </p>
 {% endblock %}
 
