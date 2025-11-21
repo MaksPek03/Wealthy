@@ -1,13 +1,39 @@
 {% extends 'registration/auth.html' %}
+
 {% block content %}
 <div class="form-container">
     <form method="POST">
         {% csrf_token %}
-        {{ form }}
+        {% if form.non_field_errors %}
+            <div class="error-message">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="form-group">
+            {{ form.username.label_tag }}
+            {{ form.username }}
+        </div>
+        <div class="form-group">
+            {{ form.password.label_tag }}
+            {{ form.password }}
+            <div class="show-password-container">
+                <label for="showPassword">Show password</label>
+                <input type="checkbox" id="showPassword">
+            </div>
+        </div>
         <button type="submit" class="btn">Submit</button>
     </form>
     <p class="form-link">
         You do not have an account? <a href="{% url 'register' %}">Register</a>
     </p>
 </div>
+
+<script>
+document.getElementById('showPassword').addEventListener('change', function() {
+    const pwd = document.getElementById('id_password');
+    pwd.type = this.checked ? 'text' : 'password';
+});
+</script>
 {% endblock %}

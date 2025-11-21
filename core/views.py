@@ -37,6 +37,7 @@ from django.db.models import Sum, F, DecimalField, ExpressionWrapper, FloatField
 
 
 
+
 # it returns the main page, it does not require log in
 def home(request):
     return render(request, 'core/home.html')
@@ -1072,10 +1073,20 @@ def asset_list(request):
 @login_required
 def asset_history(request, symbol):
     asset = get_object_or_404(Asset, symbol__iexact=symbol)
-    history = HistoricAsset.objects.filter(symbol__iexact=symbol).order_by('-date_recorded')
+    history_qs = HistoricAsset.objects.filter(symbol__iexact=symbol).order_by('date_recorded')
+
+    history = list(history_qs.values('date_recorded', 'price'))
+    history_json = json.dumps([
+        {
+            'date_recorded': record['date_recorded'].strftime('%Y-%m-%d %H:%M'),
+            'price': float(record['price'])
+        }
+        for record in history
+    ])
+
     return render(request, 'core/historic_price.html', {
         'asset': asset,
-        'history': history
+        'history_json': history_json,
     })
 
 
@@ -1234,9 +1245,16 @@ def wallet_asset_detail(request, wallet_id, asset_id):
 # it shows all the assets in a wallet, basically it should not named 'add'
 @login_required
 def wallet_assets(request, wallet_id):
+    query = request.GET.get('q', '')
     assets = Asset.objects.all()
-    return render(request, 'core/add_wallet_asset.html', {'wallet_id': wallet_id, 'assets': assets})
-
+    assets = Asset.objects.all().order_by('name')
+    if query:
+        assets = assets.filter(name__icontains=query)
+    return render(request, 'core/add_wallet_asset.html', {
+        'wallet_id': wallet_id,
+        'assets': assets,
+        'query': query,
+    })
 # here the user can add the asset, to the wallet, after fulfill the form
 @login_required
 def add_wallet_asset_details(request, wallet_id, asset_id):
@@ -1265,7 +1283,9 @@ def add_wallet_asset_details(request, wallet_id, asset_id):
 @login_required
 def remove_wallet(request, wallet_id):
     wallet = get_object_or_404(Wallet, id=wallet_id, user=request.user)
+    wallet_name = wallet.name
     wallet.delete()
+    messages.success(request, f'Wallet "{wallet_name}" deleted successfully.')
     return redirect('wallet_list')
 
 # from a given, we deleted a specific asset, with its own 'transactions'
@@ -1303,6 +1323,7 @@ def delete_wallet_transaction(request, wallet_id, asset_id, transaction_id):
 def friends_list(request):
     friend_list = FriendList.objects.get_or_create(user=request.user)[0]
     friends = friend_list.friends.all()
+    friends = friend_list.friends.all().order_by('username')
     friend_requests = FriendRequest.objects.filter(receiver=request.user, is_active=True)
 
     users = None
@@ -1451,6 +1472,18 @@ def my_alerts(request):
         'alerts_with_diff': alerts_with_diff
     })
 
+
+@login_required
+def delete_alert(request, alert_id):
+    alert = get_object_or_404(PriceAlert, id=alert_id, user=request.user)
+
+    if request.method == 'POST':
+        symbol = alert.asset.symbol
+        alert.delete()
+        messages.success(request, f"Alert deleted successfully.")
+        return redirect('my_alerts')
+
+    return redirect('my_alerts')
 
 
 # function to share the wallet, by the id to the other user, from the user friend list

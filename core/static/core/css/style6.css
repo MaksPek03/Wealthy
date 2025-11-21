@@ -35,6 +35,8 @@ body {
     margin-top: 50px;
 }
 
+
+
 .form-container {
     max-width: 450px;
     margin: auto;
@@ -297,3 +299,139 @@ body.dark-mode .trends-table tr:nth-child(even) {
 }
 
 
+.messages {
+    margin: 10px auto;
+    width: 80%;
+    max-width: 600px;
+}
+
+.message {
+    border-radius: 6px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+
+.message.success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.asset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.asset-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+  transition: background-color 0.2s;
+}
+
+.asset-item:hover {
+  background-color: #f1f1f1;
+}
+
+.asset-name {
+  font-weight: 500;
+  font-size: 1.05em;
+}
+
+.btn-add {
+  background-color: #4CAF50;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.9em;
+}
+
+.btn-add:hover {
+  background-color: #45a049;
+}
+
+.no-assets {
+  text-align: center;
+  color: #777;
+  font-style: italic;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    border: 1px solid #f8d7da;
+    color: #842029;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 0.9em;
+}
+.show-password-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    font-size: 0.9em;
+    color: #444;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+.help-text {
+    display: block;
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 4px;
+}
+.error-text {
+    color: red;
+    font-size: 0.9em;
+}
+.show-password-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 0.9em;
+    color: #444;
+}
+
+.search-form {
+  margin-bottom: 15px;
+  display: flex;
+  gap: 8px;
+}
+
+.search-form input {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.search-form button {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.search-form button:hover {
+  background-color: #0069d9;
+}
