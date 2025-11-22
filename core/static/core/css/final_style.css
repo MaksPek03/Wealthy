@@ -200,3 +200,30 @@ h1, h2, h3, h4 {
     color: #721c24;
 }
 
+.search-form {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.search-form input {
+    flex: 1;
+    padding: 10px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+}
+
+.search-form button {
+    background-color: var(--primary);
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+
+.search-form button:hover {
+    background-color: var(--primary-light);
+}
+
+
