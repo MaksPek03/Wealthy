@@ -97,3 +97,28 @@ h1, h2, h3, h4 {
     text-decoration: underline;
 }
 
+.profile, .wallets, .wallet-assets {
+    padding-left: 0;
+    max-width: 450px;
+    margin: 40px auto;
+}
+
+.profile li a, .wallets li a, .wallet-assets li a {
+    display: block;
+    padding: 15px;
+    background-color: var(--light-gray);
+    border-radius: var(--radius);
+    text-align: center;
+    color: var(--text);
+    font-size: 22px;
+    border: 1px solid var(--border);
+    transition: 0.2s;
+}
+
+.profile li a:hover,
+.wallets li a:hover,
+.wallet-assets li a:hover {
+    background-color: var(--hover-gray);
+    transform: translateY(-2px);
+}
+
