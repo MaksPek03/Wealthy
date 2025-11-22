@@ -226,4 +226,10 @@ h1, h2, h3, h4 {
     background-color: var(--primary-light);
 }
 
+:root {
+    --rev-blue: #4C6EF5;
+    --rev-purple: #7950F2;
+    --rev-gradient: linear-gradient(135deg, #4C6EF5, #7950F2);
+}
+
 
