@@ -233,3 +233,29 @@ h1, h2, h3, h4 {
 }
 
 
+.main_menu li a {
+    background: var(--rev-gradient);
+    color: #fff;
+    border:none;
+    font-size: 32px;
+    font-weight: 600;
+    padding: 18px 40px;
+    transition: 0.25s;
+    box-shadow: 0 4px 15px rgba(76,110,245,0.35);
+}
+
+.main_menu li a:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(76,110,245,0.45);
+}
+
+.main_h2 {
+    font-size: 48px;
+    font-weight: 700;
+    background: var(--rev-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 40px;
+}
+
+
