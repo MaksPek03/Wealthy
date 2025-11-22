@@ -121,4 +121,26 @@ h1, h2, h3, h4 {
     background-color: var(--hover-gray);
     transform: translateY(-2px);
 }
+.wallet-summary {
+    max-width: 500px;
+    margin: 30px auto;
+    text-align: center;
+}
+
+.wallet-links a {
+    display: block;
+    width: 60%;
+    margin: 20px auto;
+    padding: 12px;
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: #fff;
+    background-color: var(--primary);
+    font-size: 24px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+.wallet-links a:hover {
+    background-color: var(--primary-light);
+}
 
