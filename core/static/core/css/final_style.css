@@ -175,4 +175,28 @@ h1, h2, h3, h4 {
 .trends-table tr:nth-child(even) {
     background-color: #fafafa;
 }
+.messages {
+    margin: 20px auto;
+    width: 80%;
+    max-width: 600px;
+}
+
+.message {
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    font-size: 0.95em;
+}
+
+.message.success {
+    background-color: #d4edda;
+    border: 1px solid #bcdcc3;
+    color: #155724;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    border: 1px solid #e6b7bc;
+    color: #721c24;
+}
 
