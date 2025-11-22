@@ -53,3 +53,47 @@ h1, h2, h3, h4 {
     margin-top: 50px;
     font-weight: bold;
 }
+
+.form-container {
+    max-width: 450px;
+    margin: auto;
+    padding: 35px;
+    background-color: var(--light-gray);
+    border-radius: var(--radius);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+}
+
+.form-container input {
+    width: 100%;
+    margin: 10px 0;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 16px;
+}
+
+.btn {
+    background-color: var(--primary);
+    color: #fff;
+    border-radius: var(--radius);
+    font-size: 20px;
+    padding: 15px;
+    width: 100%;
+    margin-top: 10px;
+    border: none;
+    transition: 0.2s;
+}
+
+.btn:hover {
+    background-color: var(--primary-light);
+    cursor: pointer;
+}
+
+.form-link a {
+    text-decoration: none;
+    color: var(--primary);
+}
+.form-link a:hover {
+    text-decoration: underline;
+}
+
