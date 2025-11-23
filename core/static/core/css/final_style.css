@@ -325,4 +325,56 @@ body {
     margin-right: auto;
 }
 
+.main_menu li,
+.profile li,
+.wallets li,
+.wallet-assets li {
+    list-style: none !important;
+}
+
+.profile li a,
+.wallets li a,
+.wallet-assets li a {
+    text-decoration: none !important;
+    border-bottom: none !important;
+}
+.asset-list {
+  max-width: 450px;
+  margin: 20px auto;
+}
+
+.asset-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 18px;
+  transition: 0.2s;
+}
+
+.asset-item:hover {
+  background: #f5f7ff;
+  border-color: var(--rev-blue);
+}
+
+.asset-name {
+  font-weight: 600;
+}
+
+.btn-add {
+  background: var(--rev-gradient);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.9em;
+}
+
+.btn-add:hover {
+  transform: translateY(-2px);
+}
+
 
