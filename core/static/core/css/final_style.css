@@ -307,4 +307,22 @@ h1, h2, h3, h4 {
     color: #555;
 }
 
+body {
+    background: linear-gradient(180deg,#f7f9ff,#ffffff);
+}
+.show-password-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+.main_menu,
+.profile,
+.wallets,
+.wallet-assets {
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 
