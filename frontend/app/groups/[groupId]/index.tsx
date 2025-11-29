@@ -374,7 +374,7 @@ const groupDetails = () => {
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
 
-            <Header title={`${group ? group.name : ''} GROUP`} back={`/groups`} />
+            <Header title={`${group ? group.name : ''}`} back={`/groups`} />
 
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 {loading ? (
