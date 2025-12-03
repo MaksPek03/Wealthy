@@ -193,7 +193,7 @@ const trends = () => {
                 }
             </View>
 
-            <Menu />
+            <Menu page={"TRENDS"}/>
         </SafeAreaView>
     );
 }

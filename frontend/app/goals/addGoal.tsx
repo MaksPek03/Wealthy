@@ -166,7 +166,7 @@ const addGoal = () => {
 
             </View>
 
-            <Menu />
+            <Menu  page={"GOALS"}/>
 
         </SafeAreaView>
     );

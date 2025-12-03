@@ -195,7 +195,7 @@ const assetScreen = () => {
                 </TouchableOpacity>
             </View>
 
-            <Menu />
+            <Menu  page={"WALLETS"}/>
 
         </SafeAreaView>
     )

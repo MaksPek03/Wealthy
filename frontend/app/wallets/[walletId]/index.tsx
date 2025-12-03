@@ -162,7 +162,7 @@ const WalletScreen = () => {
 
             </View>
 
-            <Menu />
+            <Menu  page={"WALLETS"}/>
 
         </SafeAreaView>
     );

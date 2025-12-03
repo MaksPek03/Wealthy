@@ -78,7 +78,7 @@ const addWallet = () => {
                 </TouchableOpacity>
             </View>
 
-            <Menu />
+            <Menu  page={"WALLETS"}/>
 
         </SafeAreaView>
     );

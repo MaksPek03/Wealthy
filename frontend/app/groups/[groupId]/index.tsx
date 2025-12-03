@@ -651,7 +651,7 @@ const groupDetails = () => {
 
             </View>
 
-            <Menu />
+            <Menu  page={"GROUPS"}/>
 
         </SafeAreaView>
 

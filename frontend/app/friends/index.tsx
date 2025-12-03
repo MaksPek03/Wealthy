@@ -123,7 +123,7 @@ const friends = () => {
 
             </View>
 
-            <Menu />
+            <Menu  page={"FRIENDS"}/>
 
         </SafeAreaView>
     );

@@ -151,7 +151,7 @@ const prices = () => {
                 }
             </View>
 
-            <Menu />
+            <Menu  page={"PRICES"}/>
 
         </SafeAreaView>
     );

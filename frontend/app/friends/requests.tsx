@@ -122,7 +122,7 @@ const requests = () => {
 
             </View>
 
-            <Menu />
+            <Menu  page={"FRIENDS"}/>
 
         </SafeAreaView>
     )

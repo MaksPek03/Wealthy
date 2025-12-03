@@ -128,7 +128,7 @@ const goals = () => {
                 </TouchableOpacity>
             </View>
 
-            <Menu />
+            <Menu  page={"GOALS"}/>
 
         </SafeAreaView>
     );

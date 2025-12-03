@@ -105,7 +105,7 @@ const addFriend = () => {
 
             </View>
 
-            <Menu />
+            <Menu  page={"FRIENDS"}/>
 
         </SafeAreaView>
     )

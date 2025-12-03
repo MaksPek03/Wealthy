@@ -206,7 +206,7 @@ const addAsset = () => {
                 </TouchableOpacity>
             </View>
 
-            <Menu />
+            <Menu  page={"WALLETS"}/>
 
         </SafeAreaView>
     );
