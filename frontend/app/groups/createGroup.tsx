@@ -125,7 +125,7 @@ const createGroup = () => {
                         className={`px-8 py-4 min-h-14 min-w-60 text-center text-lg font-bold ${isDark ?
                             "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
                         keyboardType={"number-pad"}
-                        placeholder={purchaseDays}
+                        placeholder={"Purchase days:"}
                         placeholderTextColor={"#000000"}
                         value={purchaseDays}
                         onChangeText={setPurchaseDays}
@@ -140,7 +140,7 @@ const createGroup = () => {
                         className={`px-8 py-4 min-h-14 min-w-60 text-center text-lg font-bold ${isDark ?
                             "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
                         keyboardType={"number-pad"}
-                        placeholder={summaryDays}
+                        placeholder={"Summary days:"}
                         placeholderTextColor={"#000000"}
                         value={summaryDays}
                         onChangeText={setSummaryDays}

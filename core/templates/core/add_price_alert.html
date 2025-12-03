@@ -5,7 +5,23 @@
   <div class="form-container">
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
+<div class="form-group">
+    {{ form.target_price.label_tag }}
+    {{ form.target_price }}
+</div>
+
+<div class="form-group">
+    {{ form.above.label_tag }}
+    <div class="radio-group" id="id_above">
+        {% for radio in form.above %}
+            <div class="radio-option">
+                {{ radio.tag }} {{ radio.choice_label }}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+
             <button type="submit" class="btn">Add an alert</button>
         </form>
     </div>
