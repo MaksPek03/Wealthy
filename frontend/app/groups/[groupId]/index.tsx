@@ -162,6 +162,8 @@ const groupDetails = () => {
                             const response = await fetch(`https://wealthy-0mga.onrender.com/api/group_list/${groupId}/request/`);
                         } catch (err) {
                             console.error('Error sending request:', err);
+                        } finally {
+                            fetchGroupDetails();
                         }
                     }
                 },
@@ -391,7 +393,7 @@ const groupDetails = () => {
                             {(userId != group?.created_by_user_id) &&
                                 !(membership) && (
                                     <View>
-                                        {!joinRequests.some(req => req.user_id === userId) ? (
+                                        {!joinRequests.some(req => req.user_id == userId) ? (
                                         <View className={`items-center`}>
                                             <TouchableOpacity
                                                 onPress={handleJoining}
