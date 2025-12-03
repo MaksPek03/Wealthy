@@ -374,7 +374,7 @@ const groupDetails = () => {
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
 
-            <Header title={`${group ? group.name : ''} GROUP`} back={`/groups`} />
+            <Header title={`${group ? group.name : ''}`} back={`/groups`} />
 
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 {loading ? (
@@ -487,6 +487,7 @@ const groupDetails = () => {
                                     <TextInput
                                         className={`px-8 py-4 min-h-14 min-w-32 text-center text-lg font-bold ${isDark ?
                                             "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
+                                        keyboardType={"decimal-pad"}
                                         placeholder={"Distribution value:"}
                                         placeholderTextColor={"#000000"}
                                         value={distribution}
@@ -540,6 +541,7 @@ const groupDetails = () => {
                                             <TextInput
                                                 className={`px-8 py-4 min-h-14 min-w-60 text-center text-lg font-bold ${isDark ?
                                                     "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
+                                                keyboardType={"decimal-pad"}
                                                 placeholder={"Quantity:"}
                                                 placeholderTextColor={"#000000"}
                                                 value={quantity}

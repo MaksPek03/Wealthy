@@ -124,7 +124,8 @@ const createGroup = () => {
                     <TextInput
                         className={`px-8 py-4 min-h-14 min-w-60 text-center text-lg font-bold ${isDark ?
                             "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
-                        placeholder={purchaseDays}
+                        keyboardType={"number-pad"}
+                        placeholder={"Purchase days:"}
                         placeholderTextColor={"#000000"}
                         value={purchaseDays}
                         onChangeText={setPurchaseDays}
@@ -138,7 +139,8 @@ const createGroup = () => {
                     <TextInput
                         className={`px-8 py-4 min-h-14 min-w-60 text-center text-lg font-bold ${isDark ?
                             "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
-                        placeholder={summaryDays}
+                        keyboardType={"number-pad"}
+                        placeholder={"Summary days:"}
                         placeholderTextColor={"#000000"}
                         value={summaryDays}
                         onChangeText={setSummaryDays}

@@ -152,6 +152,7 @@ const addAsset = () => {
                 <TextInput
                     className={`px-8 py-4 min-h-14 min-w-60 text-center text-lg font-bold ${isDark ?
                         "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
+                    keyboardType={"decimal-pad"}
                     placeholder={"Quantity:"}
                     placeholderTextColor={"#000000"}
                     value={quantity}
@@ -166,6 +167,7 @@ const addAsset = () => {
                 <TextInput
                     className={`px-8 py-4 min-h-14 min-w-60 text-center text-lg font-bold ${isDark ?
                         "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
+                    keyboardType={"decimal-pad"}
                     placeholder={"Purchase price:"}
                     placeholderTextColor={"#000000"}
                     value={purchasePrice}

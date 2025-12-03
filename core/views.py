@@ -849,14 +849,14 @@ def api_group_detail(request, group_id):
     join_requests = JoinRequest.objects.filter(group = group)
     join_requests_ = []
 
-    for request in join_requests:
+    for jr in join_requests:
         join_requests_.append({
-            "id": request.id,
-            "user_id": request.user.id,
-            "user_username": request.user.username,
-            "group_id": request.group.id,
-            "created_at": request.created_at,
-            "is_approved": request.is_approved
+            "id": jr.id,
+            "user_id": jr.user.id,
+            "user_username": jr.user.username,
+            "group_id": jr.group.id,
+            "created_at": jr.created_at,
+            "is_approved": jr.is_approved
         })
 
 
