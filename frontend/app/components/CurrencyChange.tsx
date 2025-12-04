@@ -81,6 +81,9 @@ const CurrencyChange = ({ setExchangeRate, setCurrencySymbol }: Props) => {
                 backgroundColor: isDark ? '#868686' : '#ffffff',
                 borderColor: isDark ? '#444' : '#ccc',
             }}
+            textStyle={{
+                color: isDark ? '#ffffff' : '#000000'
+            }}
             listMode="SCROLLVIEW"
         />
     );

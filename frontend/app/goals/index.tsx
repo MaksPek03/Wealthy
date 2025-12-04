@@ -111,7 +111,8 @@ const goals = () => {
                                     className={`py-3 px-2.5 m-3 max-h-10 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
                                     onPress={() =>handleRemoveGoal(item.goal_id)}
                                 >
-                                    <Text>
+                                    <Text
+                                        className={`${isDark ? "text-text-dark" : "text-text"}`}>
                                         DEL
                                     </Text>
                                 </TouchableOpacity>
@@ -128,7 +129,7 @@ const goals = () => {
                 </TouchableOpacity>
             </View>
 
-            <Menu />
+            <Menu  page={"GOALS"}/>
 
         </SafeAreaView>
     );

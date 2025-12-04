@@ -82,7 +82,7 @@ const wallets = () => {
                 </TouchableOpacity>
             </View>
 
-            <Menu />
+            <Menu  page={"WALLETS"}/>
 
         </SafeAreaView>
     );

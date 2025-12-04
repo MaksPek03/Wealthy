@@ -19,7 +19,8 @@ const Graph = ({ points = [], currentPrice }: Props) => {
     return (
         <View>
             <View className={`flex-row mt-7 ml-7`}>
-                <Text>
+                <Text
+                    className={`${isDark ? "text-text-dark" : "text-text"}`}>
                     Current price: {currentPrice}
                 </Text>
 
@@ -28,14 +29,18 @@ const Graph = ({ points = [], currentPrice }: Props) => {
                 {points?.length ? (
                     <LineChart.Provider data={points}>
                         <LineChart>
-                            <LineChart.Path />
-                            <LineChart.CursorCrosshair/>
+                            <LineChart.Path
+                                color={isDark ? "#ffffff" : "#000000"} />
+                            <LineChart.CursorCrosshair
+                                color={isDark ? "#ffffff" : "#000000"} />
                         </LineChart>
-                        <LineChart.PriceText style={{textAlign:"center"}}/>
-                        <LineChart.DatetimeText style={{textAlign:"center"}}/>
+                        <LineChart.PriceText style={{textAlign:"center",
+                            color: isDark ? "#ffffff" : "#000000"}}/>
+                        <LineChart.DatetimeText style={{textAlign:"center",
+                            color: isDark ? "#ffffff" : "#000000"}}/>
                     </LineChart.Provider>
                     ) : (
-                        <Text className={` text-center `}>
+                        <Text className={` text-center ${isDark ? "text-text-dark" : "text-text"}`}>
                             We don't have any historic prices to show
                         </Text>
                     )}

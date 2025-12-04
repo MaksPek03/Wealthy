@@ -90,7 +90,7 @@ const groups = () => {
                 </TouchableOpacity>
             </View>
 
-            <Menu />
+            <Menu  page={"GROUPS"}/>
 
         </SafeAreaView>
     );

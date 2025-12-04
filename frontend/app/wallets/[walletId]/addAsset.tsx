@@ -134,12 +134,15 @@ const addAsset = () => {
                         placeholder="Select asset"
                         loading={loading}
                         style={{
-                            backgroundColor: isDark ? '#2a2a2a' : '#ffffff',
+                            backgroundColor: isDark ? '#868686' : '#ffffff',
                             borderColor: isDark ? '#444' : '#ccc',
                         }}
                         dropDownContainerStyle={{
-                            backgroundColor: isDark ? '#2a2a2a' : '#ffffff',
+                            backgroundColor: isDark ? '#868686' : '#ffffff',
                             borderColor: isDark ? '#444' : '#ccc',
+                        }}
+                        textStyle={{
+                            color: isDark ? '#ffffff' : '#000000'
                         }}
                         listMode="SCROLLVIEW"
                     />
@@ -154,7 +157,7 @@ const addAsset = () => {
                         "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
                     keyboardType={"decimal-pad"}
                     placeholder={"Quantity:"}
-                    placeholderTextColor={"#000000"}
+                    placeholderTextColor={isDark ? '#ffffff' : '#000000'}
                     value={quantity}
                     onChangeText={setQuantity}
                     autoCapitalize="none"
@@ -169,7 +172,7 @@ const addAsset = () => {
                         "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
                     keyboardType={"decimal-pad"}
                     placeholder={"Purchase price:"}
-                    placeholderTextColor={"#000000"}
+                    placeholderTextColor={isDark ? '#ffffff' : '#000000'}
                     value={purchasePrice}
                     onChangeText={setPurchasePrice}
                     autoCapitalize="none"
@@ -206,7 +209,7 @@ const addAsset = () => {
                 </TouchableOpacity>
             </View>
 
-            <Menu />
+            <Menu  page={"WALLETS"}/>
 
         </SafeAreaView>
     );

@@ -101,7 +101,7 @@ const AssetScreen = () => {
 
             </View>
 
-            <Menu />
+            <Menu  page={"HISTORY"}/>
 
         </SafeAreaView>
     );
