@@ -177,7 +177,8 @@ const assetScreen = () => {
                                     className={`py-3 px-2.5 m-3 ${isDark ? "bg-buttons-dark" : "bg-buttons"}`}
                                     onPress={() =>handleRemoveTransaction(item.id)}
                                 >
-                                    <Text>
+                                    <Text
+                                        className={ `${isDark ? "text-text-dark" : "text-text"}`}>
                                         DEL
                                     </Text>
                                 </TouchableOpacity>

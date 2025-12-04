@@ -78,7 +78,8 @@ const friends = () => {
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <TextInput
                     className={`p-2 mb-2 ${isDark ? "text-text-dark" : "text-text"}`}
-                    placeholder="Search by name..."
+                    placeholder={"Search by name..."}
+                    placeholderTextColor={isDark ? '#ffffff' : '#000000'}
                     value={search}
                     onChangeText={handleSearch}
                 />
@@ -99,7 +100,10 @@ const friends = () => {
                                 <Text className={`flex-1 text-2xl ${isDark ? "text-text-dark" : "text-text"}`}>{item.username}</Text>
                                 <TouchableOpacity className={`w-25 ${isDark ? "bg-buttons-dark" : "bg-buttons"} py-2.5 px-2.5`}
                                                   onPress={() => handleRemove(item.id)}>
-                                        <Text>Remove Friend</Text>
+                                        <Text
+                                            className={`${isDark ? "text-text-dark" : "text-text"}`}>
+                                            Remove Friend
+                                        </Text>
                                 </TouchableOpacity>
                             </View>
                         )}

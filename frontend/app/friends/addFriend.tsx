@@ -74,7 +74,8 @@ const addFriend = () => {
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <TextInput
                     className={`p-2 mb-2 ${isDark ? "text-text-dark" : "text-text"}`}
-                    placeholder="Search by name..."
+                    placeholder={"Search by name..."}
+                    placeholderTextColor={isDark ? '#ffffff' : '#000000'}
                     value={search}
                     onChangeText={handleSearch}
                 />

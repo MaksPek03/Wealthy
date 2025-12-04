@@ -125,13 +125,15 @@ const WalletScreen = () => {
                 <View className={`flex-row justify-around py-5`}>
                     <TouchableOpacity className={`w-25 ${isDark ? "bg-buttons-dark" : "bg-buttons"} py-2.5 px-2.5`}
                                       onPress={() => router.replace(`/wallets/${walletId}/addAsset`)}>
-                        <Text>
+                        <Text
+                            className={ `${isDark ? "text-text-dark" : "text-text"}`}>
                             add asset
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity className={`w-25 ${isDark ? "bg-buttons-dark" : "bg-buttons"} py-2.5 px-2.5`}
                                       onPress={handleRemove}>
-                        <Text>
+                        <Text
+                            className={ `${isDark ? "text-text-dark" : "text-text"}`}>
                             remove wallet
                         </Text>
                     </TouchableOpacity>

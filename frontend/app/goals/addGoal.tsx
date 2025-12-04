@@ -98,7 +98,7 @@ const addGoal = () => {
                         className={`px-8 py-4 min-h-14 min-w-60 text-center text-lg font-bold ${isDark ?
                             "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
                         placeholder={"Name:"}
-                        placeholderTextColor={"#000000"}
+                        placeholderTextColor={isDark ? '#ffffff' : '#000000'}
                         value={name}
                         onChangeText={setName}
                         autoCapitalize="none"
@@ -112,7 +112,7 @@ const addGoal = () => {
                         className={`px-8 py-4 min-h-14 min-w-60 text-center text-lg font-bold ${isDark ?
                             "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
                         placeholder={"Description:"}
-                        placeholderTextColor={"#000000"}
+                        placeholderTextColor={isDark ? '#ffffff' : '#000000'}
                         value={description}
                         onChangeText={setDescription}
                         autoCapitalize="none"
@@ -127,7 +127,7 @@ const addGoal = () => {
                             "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
                         keyboardType={"decimal-pad"}
                         placeholder={"Target amount:"}
-                        placeholderTextColor={"#000000"}
+                        placeholderTextColor={isDark ? '#ffffff' : '#000000'}
                         value={targetAmount}
                         onChangeText={setTargetAmount}
                         autoCapitalize="none"
