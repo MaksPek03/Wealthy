@@ -5,12 +5,32 @@
     <meta charset="UTF-8">
     <title>{% block title %}Wealthy{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'core/css/final_style.css' %}">
+
+    <style>
+        .form-link {
+            display: flex;
+            justify-content: flex-end; /* przesunięcie w prawo */
+            margin: 20px 40px 0 0;     /* odsunięcie od góry i prawej */
+        }
+
+        .form-link a {
+            font-size: 22px;          /* większy tekst */
+            font-weight: bold;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        .form-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
 
-    <p class="form-link">
+    <div class="form-link">
         <a href="{% url 'profile' %}">Main page</a>
-    </p>
+        <a href="{% url 'home' %}">Log out</a>
+    </div>
 
     {% if messages %}
       <div class="messages">
