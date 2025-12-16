@@ -14,9 +14,9 @@ class AssetTestCase(TestCase):
     def setUp(self):
         self.asset = Asset.objects.create(name="NewBitcoin", type="crypto", symbol="NBTC", price=Decimal("100000"))
         self.historic = HistoricAsset.objects.create(
-            name="NewBitcoin", type="crypto", symbol="NBTC", price=Decimal("90000"), date_recorded=timezone.now()
+            name="NewBitcoin", type="CryptoCurrency", symbol="NBTC", price=Decimal("90000"), date_recorded=timezone.now()
         )
-        self.current = CurrentAsset.objects.create(name="NewBitcoin", type="crypto", symbol="BTC", current_price=Decimal("35000"))
+        self.current = CurrentAsset.objects.create(name="NewBitcoin", type="CryptoCurrency", symbol="BTC", current_price=Decimal("35000"))
 
     def test_asset_str(self):
         self.assertEqual(str(self.asset), "NewBitcoin")
