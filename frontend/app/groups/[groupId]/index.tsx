@@ -376,7 +376,7 @@ const groupDetails = () => {
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
 
-            <Header title={`${group ? group.name : ''}`} back={`/groups`} />
+            <Header title={`${group ? group.name : ''} GROUP`} back={`/groups`} />
 
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 {loading ? (
@@ -555,7 +555,7 @@ const groupDetails = () => {
                                             />
                                             {(value && value <= membership.balance) ? (
                                             <Text className={`text-1xl text-center ${isDark ? "text-text-dark" : "text-text"}`}>
-                                                Value of buying assets: {value}$
+                                                Value of buying assets: {Math.round(value * 100) / 100}$
                                             </Text>
                                                 ): null
                                             }

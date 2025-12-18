@@ -106,7 +106,7 @@ const WalletScreen = () => {
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
 
-            <Header title={`${wallet.name} WALLET`} back={`/wallets`} />
+            <Header title={`${wallet.name}`} back={`/wallets`} />
 
             <View className={`flex-[5] z-0 ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <CurrencyChange setExchangeRate={onSelectedExchangeRate} setCurrencySymbol={onSelectedCurrencySymbol} />
