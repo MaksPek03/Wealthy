@@ -96,7 +96,7 @@ const history = () => {
                 }
             </View>
 
-            <Menu />
+            <Menu  page={"HISTORY"}/>
 
         </SafeAreaView>
     );

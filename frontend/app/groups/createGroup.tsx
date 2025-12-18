@@ -178,7 +178,7 @@ const createGroup = () => {
                 </ScrollView>
             </View>
 
-            <Menu />
+            <Menu  page={"GROUPS"}/>
 
         </SafeAreaView>
     );

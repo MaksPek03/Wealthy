@@ -4,7 +4,11 @@ import React from "react";
 import {Text, TouchableOpacity, Image, View} from "react-native";
 
 
-const Menu = () => {
+interface Props {
+    page?: string;
+}
+
+const Menu = ({ page = ""}: Props) => {
     const { isDark, toggleTheme } = useTheme();
     const router = useRouter();
 
@@ -20,17 +24,34 @@ const Menu = () => {
 
     return (
         <View className={`flex-[0.1] justify-center flex-wrap flex-row gap-6 mt-4 mb-4  ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
-            {buttons.map((btn) => (
-                <TouchableOpacity
-                    key={btn.id}
-                    onPress={() => router.replace(btn.path)}
-                    className={`items-center`}
-                >
-                    <Image source={btn.icon} className={`w-5 h-5`}
-                           style={{ tintColor: isDark ? '#ffffff' : '#000000' }} resizeMode="contain" />
-                    <Text className={`text-xs text-center ${isDark ? "text-text-dark" : "text-text"}`}>{btn.label}</Text>
-                </TouchableOpacity>
-            ))}
+            {buttons.map((btn) => {
+
+                const isActive = page === btn.label;
+
+                return (
+                        <TouchableOpacity
+                            key={btn.id}
+                            onPress={() => router.replace(btn.path)}
+                            className={`items-center py-0.5 rounded-md
+                                        ${isActive
+                                ? (isDark ? "bg-headers" : "bg-headers-dark")
+                                : ""}`}
+                        >
+                            <Image source={btn.icon} className={`w-5 h-5`}
+                                   style={{
+                                       tintColor: isActive
+                                           ? (isDark ? "#000000" : "#ffffff")
+                                           : (isDark ? "#ffffff" : "#000000")
+                                   }}
+                                   resizeMode="contain" />
+                            <Text className={`text-xs text-center ${
+                                isActive
+                                    ? (isDark ? "text-text" : "text-text-dark")
+                                    : (isDark ? "text-text-dark" : "text-text")
+                                }`}>{btn.label}</Text>
+                        </TouchableOpacity>
+                )
+            })}
         </View>
 
     )

@@ -162,6 +162,8 @@ const groupDetails = () => {
                             const response = await fetch(`https://wealthy-0mga.onrender.com/api/group_list/${groupId}/request/`);
                         } catch (err) {
                             console.error('Error sending request:', err);
+                        } finally {
+                            fetchGroupDetails();
                         }
                     }
                 },
@@ -374,7 +376,7 @@ const groupDetails = () => {
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
 
-            <Header title={`${group ? group.name : ''}`} back={`/groups`} />
+            <Header title={`${group ? group.name : ''} GROUP`} back={`/groups`} />
 
             <View className={`flex-[5] ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 {loading ? (
@@ -391,7 +393,7 @@ const groupDetails = () => {
                             {(userId != group?.created_by_user_id) &&
                                 !(membership) && (
                                     <View>
-                                        {!joinRequests.some(req => req.user_id === userId) ? (
+                                        {!joinRequests.some(req => req.user_id == userId) ? (
                                         <View className={`items-center`}>
                                             <TouchableOpacity
                                                 onPress={handleJoining}
@@ -489,7 +491,7 @@ const groupDetails = () => {
                                             "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
                                         keyboardType={"decimal-pad"}
                                         placeholder={"Distribution value:"}
-                                        placeholderTextColor={"#000000"}
+                                        placeholderTextColor={isDark ? '#ffffff' : '#000000'}
                                         value={distribution}
                                         onChangeText={setDistribution}
                                         autoCapitalize="none"
@@ -525,17 +527,20 @@ const groupDetails = () => {
                                                     placeholder="Select asset"
                                                     loading={loading}
                                                     style={{
-                                                        backgroundColor: isDark ? '#2a2a2a' : '#ffffff',
+                                                        backgroundColor: isDark ? '#868686' : '#ffffff',
                                                         borderColor: isDark ? '#444' : '#ccc',
                                                     }}
                                                     dropDownContainerStyle={{
-                                                        backgroundColor: isDark ? '#2a2a2a' : '#ffffff',
+                                                        backgroundColor: isDark ? '#868686' : '#ffffff',
                                                         borderColor: isDark ? '#444' : '#ccc',
+                                                    }}
+                                                    textStyle={{
+                                                        color: isDark ? '#ffffff' : '#000000'
                                                     }}
                                                     listMode="SCROLLVIEW"
                                                         />
                                             </View>
-                                            <Text className={`text-1xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
+                                            <Text className={`text-3xl text-center font-bold ${isDark ? "text-text-dark" : "text-text"}`}>
                                                 Quantity:
                                             </Text>
                                             <TextInput
@@ -543,14 +548,14 @@ const groupDetails = () => {
                                                     "bg-buttons-dark text-text-dark" : "bg-buttons text-text"}`}
                                                 keyboardType={"decimal-pad"}
                                                 placeholder={"Quantity:"}
-                                                placeholderTextColor={"#000000"}
+                                                placeholderTextColor={isDark ? '#ffffff' : '#000000'}
                                                 value={quantity}
                                                 onChangeText={setQuantity}
                                                 autoCapitalize="none"
                                             />
                                             {(value && value <= membership.balance) ? (
                                             <Text className={`text-1xl text-center ${isDark ? "text-text-dark" : "text-text"}`}>
-                                                Value of buying assets: {value}$
+                                                Value of buying assets: {Math.round(value * 100) / 100}$
                                             </Text>
                                                 ): null
                                             }
@@ -649,7 +654,7 @@ const groupDetails = () => {
 
             </View>
 
-            <Menu />
+            <Menu  page={"GROUPS"}/>
 
         </SafeAreaView>
 

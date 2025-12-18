@@ -106,7 +106,7 @@ const WalletScreen = () => {
     return (
         <SafeAreaView className={`flex-1 ${isDark ? "bg-headers-dark" : "bg-headers"}`}>
 
-            <Header title={`${wallet.name} WALLET`} back={`/wallets`} />
+            <Header title={`${wallet.name}`} back={`/wallets`} />
 
             <View className={`flex-[5] z-0 ${isDark ? "bg-background-dark" : "bg-background"}`}>
                 <CurrencyChange setExchangeRate={onSelectedExchangeRate} setCurrencySymbol={onSelectedCurrencySymbol} />
@@ -125,13 +125,15 @@ const WalletScreen = () => {
                 <View className={`flex-row justify-around py-5`}>
                     <TouchableOpacity className={`w-25 ${isDark ? "bg-buttons-dark" : "bg-buttons"} py-2.5 px-2.5`}
                                       onPress={() => router.replace(`/wallets/${walletId}/addAsset`)}>
-                        <Text>
+                        <Text
+                            className={ `${isDark ? "text-text-dark" : "text-text"}`}>
                             add asset
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity className={`w-25 ${isDark ? "bg-buttons-dark" : "bg-buttons"} py-2.5 px-2.5`}
                                       onPress={handleRemove}>
-                        <Text>
+                        <Text
+                            className={ `${isDark ? "text-text-dark" : "text-text"}`}>
                             remove wallet
                         </Text>
                     </TouchableOpacity>
@@ -162,7 +164,7 @@ const WalletScreen = () => {
 
             </View>
 
-            <Menu />
+            <Menu  page={"WALLETS"}/>
 
         </SafeAreaView>
     );

@@ -108,11 +108,17 @@ const requests = () => {
                                 <Text className={`flex-1 text-2xl m-1 ${isDark ? "text-text-dark" : "text-text"}`}>{item.sender_username}</Text>
                                 <TouchableOpacity className={`w-25 ${isDark ? "bg-buttons-dark" : "bg-buttons"} py-2.5 px-2.5 m-1`}
                                                   onPress={() => handleAccept(item.id)}>
-                                    <Text>Accept</Text>
+                                    <Text
+                                        className={`${isDark ? "text-text-dark" : "text-text"}`}>
+                                        Accept
+                                    </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity className={`w-25 ${isDark ? "bg-buttons-dark" : "bg-buttons"} py-2.5 px-2.5 m-1`}
                                                   onPress={() => handleDecline(item.id)}>
-                                    <Text>Decline</Text>
+                                    <Text
+                                        className={`${isDark ? "text-text-dark" : "text-text"}`}>
+                                        Decline
+                                    </Text>
                                 </TouchableOpacity>
                             </View>
                         )}
@@ -122,7 +128,7 @@ const requests = () => {
 
             </View>
 
-            <Menu />
+            <Menu  page={"FRIENDS"}/>
 
         </SafeAreaView>
     )

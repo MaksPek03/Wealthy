@@ -34,7 +34,11 @@ const groups = () => {
             const response = await fetch(`https://wealthy-0mga.onrender.com/api/group_list/`);
             const data = await response.json();
 
-            setGroups(data['groups']);
+            const filteredGroups = data.groups.filter(
+                (group: any) => group.name !== "Czarni inwestorzy"
+            );
+
+            setGroups(filteredGroups);
         } catch (err) {
             console.error('Error fetching groups:', err);
         } finally {
@@ -90,7 +94,7 @@ const groups = () => {
                 </TouchableOpacity>
             </View>
 
-            <Menu />
+            <Menu  page={"GROUPS"}/>
 
         </SafeAreaView>
     );
